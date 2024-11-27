@@ -1,0 +1,255 @@
+{
+  "answer": {
+    "created": "2024-11-27T16:58:34Z",
+    "data": {
+      "answer_choices_63860394": {
+        "question": {
+          "answer_type": {
+            "id": 3,
+            "slug": "answer_choices"
+          },
+          "id": 63860394,
+          "options": {
+            "data_source": "survey_question_choice",
+            "multiple": true,
+            "ordering": "natural",
+            "required": false
+          },
+          "slug": "answer_choices_63860394"
+        },
+        "value": [
+          {
+            "key": "124246646",
+            "slug": "124246646",
+            "text": "Умеренная погода"
+          }
+        ]
+      },
+      "answer_choices_63860909": {
+        "question": {
+          "answer_type": {
+            "id": 3,
+            "slug": "answer_choices"
+          },
+          "id": 63860909,
+          "options": {
+            "data_source": "survey_question_choice",
+            "multiple": false,
+            "ordering": "natural",
+            "required": false
+          },
+          "slug": "answer_choices_63860909"
+        },
+        "value": [
+          {
+            "key": "124247021",
+            "slug": "124247021",
+            "text": "2000$ – 5000$"
+          }
+        ]
+      },
+      "answer_choices_63861405": {
+        "question": {
+          "answer_type": {
+            "id": 3,
+            "slug": "answer_choices"
+          },
+          "id": 63861405,
+          "options": {
+            "data_source": "survey_question_choice",
+            "multiple": false,
+            "ordering": "natural",
+            "required": false
+          },
+          "slug": "answer_choices_63861405"
+        },
+        "value": [
+          {
+            "key": "124247193",
+            "slug": "124247193",
+            "text": "Выходные (1–3 дня)"
+          }
+        ]
+      },
+      "answer_choices_63861550": {
+        "question": {
+          "answer_type": {
+            "id": 3,
+            "slug": "answer_choices"
+          },
+          "id": 63861550,
+          "options": {
+            "data_source": "survey_question_choice",
+            "multiple": true,
+            "ordering": "natural",
+            "required": false
+          },
+          "slug": "answer_choices_63861550"
+        },
+        "value": [
+          {
+            "key": "124247301",
+            "slug": "124247301",
+            "text": "Круизный лайнер"
+          }
+        ]
+      },
+      "answer_choices_63862033": {
+        "question": {
+          "answer_type": {
+            "id": 3,
+            "slug": "answer_choices"
+          },
+          "id": 63862033,
+          "options": {
+            "data_source": "survey_question_choice",
+            "multiple": true,
+            "ordering": "natural",
+            "required": false
+          },
+          "slug": "answer_choices_63862033"
+        },
+        "value": [
+          {
+            "key": "124247680",
+            "slug": "124247680",
+            "text": "В Азии"
+          }
+        ]
+      },
+      "answer_choices_63862303": {
+        "question": {
+          "answer_type": {
+            "id": 3,
+            "slug": "answer_choices"
+          },
+          "id": 63862303,
+          "options": {
+            "data_source": "survey_question_choice",
+            "multiple": true,
+            "ordering": "natural",
+            "required": false
+          },
+          "slug": "answer_choices_63862303"
+        },
+        "value": [
+          {
+            "key": "124247932",
+            "slug": "124247932",
+            "text": "Кулинарные туры и гастрономия"
+          }
+        ]
+      },
+      "answer_choices_63862452": {
+        "question": {
+          "answer_type": {
+            "id": 3,
+            "slug": "answer_choices"
+          },
+          "id": 63862452,
+          "options": {
+            "data_source": "survey_question_choice",
+            "multiple": true,
+            "ordering": "natural",
+            "required": false
+          },
+          "slug": "answer_choices_63862452"
+        },
+        "value": [
+          {
+            "key": "124248078",
+            "slug": "124248078",
+            "text": "С детьми"
+          }
+        ]
+      },
+      "answer_choices_64384690": {
+        "question": {
+          "answer_type": {
+            "id": 3,
+            "slug": "answer_choices"
+          },
+          "id": 64384690,
+          "options": {
+            "data_source": "survey_question_choice",
+            "multiple": true,
+            "ordering": "natural",
+            "required": false
+          },
+          "slug": "answer_choices_64384690"
+        },
+        "value": [
+          {
+            "key": "125243871",
+            "slug": "125243871",
+            "text": "Вариант 1"
+          }
+        ]
+      },
+      "answer_choices_64386414": {
+        "question": {
+          "answer_type": {
+            "id": 3,
+            "slug": "answer_choices"
+          },
+          "id": 64386414,
+          "options": {
+            "data_source": "survey_question_matrix_choice",
+            "multiple": false,
+            "required": false
+          },
+          "slug": "answer_choices_64386414"
+        },
+        "value": [
+          {
+            "col": {
+              "key": "12909861",
+              "text": "Вариант 1"
+            },
+            "row": {
+              "key": "12909859",
+              "text": "Вариант 1"
+            }
+          }
+        ]
+      },
+      "purpose_of_the_trip": {
+        "question": {
+          "answer_type": {
+            "id": 3,
+            "slug": "answer_choices"
+          },
+          "id": 63859879,
+          "options": {
+            "data_source": "survey_question_choice",
+            "multiple": true,
+            "ordering": "natural",
+            "required": false
+          },
+          "slug": "purpose_of_the_trip"
+        },
+        "value": [
+          {
+            "key": "124246396",
+            "slug": "124246396",
+            "text": "Активный отдых (горные походы, серфинг и т.д.)"
+          }
+        ]
+      }
+    },
+    "id": 1909921840,
+    "quiz": {
+      "question_count": 0,
+      "scores": "0",
+      "total_scores": "0"
+    },
+    "survey": {
+      "id": "6741e49d3e9d0847a3c4c8cf"
+    },
+    "uid": "295003004"
+  },
+  "created": "2024-11-27T16:58:34Z",
+  "id": 1909921840,
+  "lang": "ru",
+  "survey_id": "6741e49d3e9d0847a3c4c8cf"
+}
