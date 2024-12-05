@@ -1,103 +1,87 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Варианты Рождественских путешествий по Москве</title>
-    <style>
-        body {
-            font-family: sans-serif;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-        th, td {
-            border: 1px solid #ddd;
-            padding: 8px;
-            text-align: left;
-        }
-        th {
-            background-color: #f2f2f2;
-        }
-    </style>
+    <title>Travel Picker Survey</title>
 </head>
 <body>
+<h1>Travel Picker Survey</h1>
+<form action="/api/v1/travel-inquiries" method="POST">
+    <!-- Purpose of the trip -->
+    <label for="purpose">What is the purpose of your trip?</label><br>
+    <select id="purpose" name="purpose">
+        <option value="A relaxing beach vacation">Relaxing beach vacation</option>
+        <option value="A romantic trip">Romantic trip</option>
+        <option value="An adventurous journey">Adventurous journey</option>
+        <option value="A cultural exploration">Cultural exploration</option>
+        <option value="A family getaway">Family getaway</option>
+    </select>
+    <br><br>
 
-<h1>Варианты Рождественских путешествий по Москве и окрестностям</h1>
+    <!-- Preferred type of destination -->
+    <label for="destination">What type of destination do you prefer?</label><br>
+    <select id="destination" name="destination">
+        <option value="Bustling city life">City life</option>
+        <option value="Quiet countryside">Countryside</option>
+        <option value="Serene mountains">Mountains</option>
+        <option value="Tropical paradise">Tropical paradise</option>
+        <option value="Snowy landscapes">Snowy landscapes</option>
+    </select>
+    <br><br>
 
-<p>Цель поездки: Активный отдых, семейное путешествие (пара)</p>
-<p>Предпочтительная природа/атмосфера: Городская жизнь</p>
-<p>Погода: Холод и снег</p>
-<p>Компания: С партнером</p>
-<p>Бюджет: до 700$ (на двоих)</p>
-<p>Длительность: 3-5 дней</p>
-<p>Транспорт: Неважно</p>
-<p>Место: Москва и окрестности</p>
-<p>Время: Рождественские праздники</p>
-<p>Интересы: Музеи и архитектура, кулинарные туры, природные заповедники/парки</p>
+    <!-- Weather preference -->
+    <label for="weather">What kind of weather do you enjoy?</label><br>
+    <select id="weather" name="weather">
+        <option value="Hot and sunny">Hot and sunny</option>
+        <option value="Cool and breezy">Cool and breezy</option>
+        <option value="Cold and snowy">Cold and snowy</option>
+        <option value="Mild and pleasant">Mild and pleasant</option>
+    </select>
+    <br><br>
 
+    <!-- Budget -->
+    <label for="budget">What is your approximate budget per person?</label><br>
+    <select id="budget" name="budget">
+        <option value="Under $500">Under $500</option>
+        <option value="Between $500 and $1,000">Between $500 and $1,000</option>
+        <option value="Between $1,000 and $2,000">Between $1,000 and $2,000</option>
+        <option value="Over $2,000">Over $2,000</option>
+    </select>
+    <br><br>
 
-<table>
-    <thead>
-    <tr>
-        <th>Вариант</th>
-        <th>Оценка</th>
-        <th>Бюджет ($)</th>
-        <th>Почему подходит</th>
-        <th>Описание</th>
-        <th>Рекомендации</th>
-        <th>Что учесть</th>
-    </tr>
-    </thead>
-    <tbody>
-    <tr>
-        <td>Рождественская Москва: Классика</td>
-        <td>4.5 ⭐</td>
-        <td>500-650</td>
-        <td>Комбинация рождественских мероприятий, музеев и архитектуры.</td>
-        <td>Прогулки по Красной площади, ГУМу, Кремлю, Третьяковской галерее, рождественские ярмарки, катание на коньках.</td>
-        <td>Метро, бронирование билетов, ярмарки на Манежной площади, русская кухня.</td>
-        <td>Высокие цены, много туристов.</td>
-    </tr>
-    <tr>
-        <td>Коломенское и Зарядье: История и Природа</td>
-        <td>4.0 ☃️</td>
-        <td>400-550</td>
-        <td>История и прогулки на свежем воздухе.</td>
-        <td>Коломенское (зимний пейзаж!), парк Зарядье, храмы, лыжи/снегоходы (при возможности).</td>
-        <td>Метро/электричка, удобная обувь, теплая одежда.</td>
-        <td>Скользко зимой, расписание работы.</td>
-    </tr>
-    <tr>
-        <td>Сергиев Посад: Духовность и Архитектура</td>
-        <td>3.5 ⛪</td>
-        <td>350-500</td>
-        <td>Посещение Троице-Сергиевой Лавры и знакомство с местной культурой.</td>
-        <td>Троице-Сергиева Лавра, прогулки по городу.</td>
-        <td>Электричка, удобная обувь, посещение Лавры, местные кафе.</td>
-        <td>Очереди в Лавру, холодная погода.</td>
-    </tr>
-    <tr>
-        <td>Кулинарный тур по Москве</td>
-        <td>4.0 🍽️</td>
-        <td>450-600</td>
-        <td>Фокус на гастрономию.</td>
-        <td>Различные рестораны и кафе, дегустация блюд, кулинарные мастер-классы.</td>
-        <td>Бронирование мест, изучение меню.</td>
-        <td>Высокие цены в ресторанах.</td>
-    </tr>
-    <tr>
-        <td>Рождественские ярмарки и зимние развлечения</td>
-        <td>3.0 🎄</td>
-        <td>300-450</td>
-        <td>Рождественская атмосфера и развлечения.</td>
-        <td>Рождественские ярмарки, катание на коньках, ледовые городки.</td>
-        <td>Расписание работы, теплая одежда.</td>
-        <td>Много людей, непредсказуемая погода.</td>
-    </tr>
-    </tbody>
-</table>
+    <!-- Interests -->
+    <label for="interests">What are your main interests?</label><br>
+    <select id="interests" name="interests" multiple>
+        <option value="Exploring museums and architecture">Museums and architecture</option>
+        <option value="Enjoying culinary tours and gastronomy">Culinary tours and gastronomy</option>
+        <option value="Visiting nature reserves and parks">Nature reserves and parks</option>
+        <option value="Experiencing local festivals and events">Festivals and events</option>
+        <option value="Relaxing at spa resorts">Spa and relaxation</option>
+    </select>
+    <br><br>
 
+    <!-- Travel companions -->
+    <label for="companions">Who are you traveling with?</label><br>
+    <select id="companions" name="companions">
+        <option value="Traveling solo">Solo</option>
+        <option value="Traveling with a partner">With a partner</option>
+        <option value="Traveling with family">With family</option>
+        <option value="Traveling with friends">With friends</option>
+    </select>
+    <br><br>
+
+    <!-- Preferred duration -->
+    <label for="duration">What is the duration of your trip?</label><br>
+    <select id="duration" name="duration">
+        <option value="1-3 days">1-3 days</option>
+        <option value="4-7 days">4-7 days</option>
+        <option value="8-14 days">8-14 days</option>
+        <option value="Over 2 weeks">Over 2 weeks</option>
+    </select>
+    <br><br>
+
+    <button type="submit">Submit</button>
+</form>
 </body>
 </html>

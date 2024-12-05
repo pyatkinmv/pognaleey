@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Travel Quiz</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .container {
+            background: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 400px;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        label {
+            font-weight: bold;
+            display: block;
+            margin-top: 15px;
+        }
+        select, input[type="radio"], input[type="checkbox"], input[type="submit"] {
+            margin-top: 10px;
+            width: 100%;
+        }
+        input[type="submit"] {
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            padding: 10px;
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        input[type="submit"]:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>Travel Quiz</h1>
+    <!-- Форма отправки данных -->
+    <form action="/api/v1/generate-travel-options" method="POST">
+        <!-- Цель поездки -->
+        <label for="цель">Какова цель вашей поездки?</label>
+        <select id="цель" name="цель" required>
+            <option value="Активный отдых">Активный отдых</option>
+            <option value="Романтическая поездка">Романтическая поездка</option>
+            <option value="Семейный отдых">Семейный отдых</option>
+            <option value="Расслабление и отдых">Расслабление и отдых</option>
+        </select>
+
+        <!-- Атмосфера -->
+        <label>Какую атмосферу вы предпочитаете?</label>
+        <input type="radio" id="Городская жизнь" name="Атмосфера" value="Городская жизнь" required>
+        <label for="Городская жизнь">Городская жизнь</label>
+        <input type="radio" id="Природа" name="Атмосфера" value="Природа">
+        <label for="Природа">Природа</label>
+
+        <!-- Погода -->
+        <label for="Погода">Какую погоду вы предпочитаете?</label>
+        <select id="Погода" name="Погода" required>
+            <option value="Тепло и солнце">Тепло и солнце</option>
+            <option value="Холод и снег">Холод и снег</option>
+            <option value="Умеренная погода">Умеренная погода</option>
+        </select>
+
+        <!-- Бюджет -->
+        <label for="Бюджет">Ваш бюджет (в $):</label>
+        <select id="Бюджет" name="Бюджет" required>
+            <option value="До 300$">До 300$</option>
+            <option value="300-700$">300-700$</option>
+            <option value="700-1000$">700-1000$</option>
+            <option value="Более 1000$">Более 1000$</option>
+        </select>
+
+        <!-- Длительность поездки -->
+        <label for="Длительность поездки">Длительность поездки (в днях):</label>
+        <select id="Длительность поездки" name="Длительность поездки" required>
+            <option value="1-3 дня">1-3 дня</option>
+            <option value="3-5 дней">3-5 дней</option>
+            <option value="Более 5 дней">Более 5 дней</option>
+        </select>
+
+        <!-- Интересы -->
+        <label>Какие у вас интересы?</label>
+        <input type="checkbox" id="Музеи и архитектура" name="Интересы" value="Музеи и архитектура">
+        <label for="Музеи и архитектура">Музеи и архитектура</label>
+        <input type="checkbox" id="Кулинарные туры" name="Интересы" value="Кулинарные туры">
+        <label for="Кулинарные туры">Кулинарные туры</label>
+        <input type="checkbox" id="Природные заповедники" name="Интересы" value="Природные заповедники">
+        <label for="Природные заповедники">Природные заповедники</label>
+        <input type="checkbox" id="Шопинг" name="Интересы" value="Шопинг">
+        <label for="Шопинг">Шопинг</label>
+
+        <!-- Транспорт -->
+        <label for="Предпочитаемый транспорт">Предпочитаемый транспорт:</label>
+        <select id="Предпочитаемый транспорт" name="Предпочитаемый транспорт" required>
+            <option value="Самолет">Самолет</option>
+            <option value="Поезд">Поезд</option>
+            <option value="Автомобиль">Автомобиль</option>
+            <option value="Автобус">Автобус</option>
+            <option value="Не важно">Не важно</option>
+        </select>
+
+        <!-- Кнопка отправки -->
+        <input type="submit" value="Найти путешествие">
+    </form>
+</div>
+</body>
+</html>

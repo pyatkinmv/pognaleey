@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Куда сгонять?</title>
+</head>
+<body>
+
+<div th:each="option : ${options}">
+    <!-- Каждый вариант -->
+    <section>
+        <h2 th:text="${option.placeName}">Название места</h2>
+        <p><strong>Необходимый бюджет:</strong> <span th:text="${option.budget}">Бюджет</span></p>
+        <p><strong>Почему этот вариант подходит:</strong> <span th:text="${option.reasoning}">Причина</span></p>
+        <p><strong>Креативное описание:</strong> <span th:text="${option.creativeDescription}">Описание</span></p>
+        <p><strong>Общие рекомендации:</strong> <span th:text="${option.tips}">Рекомендации</span></p>
+
+        <!-- Список достопримечательностей -->
+        <div>
+            <strong>Рекомендуемые места для посещения:</strong>
+            <ul>
+                <li th:each="place : ${option.whereToGo}" th:text="${place}">Место</li>
+            </ul>
+        </div>
+
+        <p><strong>Дополнительные замечания:</strong> <span th:text="${option.additionalConsideration}">Дополнительная информация</span></p>
+    </section>
+    <hr> <!-- Разделительная линия -->
+</div>
+</body>
+</html>
