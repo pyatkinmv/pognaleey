@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Куда сгонять?</title>
+</head>
+
+<body>
+<div th:each="opt : ${options}">
+    <section>
+        <!-- Заголовок варианта -->
+        <h2 th:text="${opt.placeName}">Название варианта</h2>
+
+        <!-- Описание варианта -->
+        <p th:text="${opt.shortDescription}">Описание варианта</p>
+    </section>
+    <hr> <!-- Разделительная линия -->
+</div>
+
+<!-- Кнопка отправки -->
+<form th:action="@{travel-inquiries/{id}/recommendation(id=${inquiryId})}" method="GET">
+    <button type="submit">Подробнее</button>
+</form>
+</body>
+</html>
