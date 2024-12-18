@@ -4,29 +4,115 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Куда сгонять?</title>
+    <style>
+        /* Общие стили страницы */
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f7f8fa;
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+            color: #333;
+        }
+
+        h2 {
+            color: #2c3e50;
+        }
+
+        strong {
+            color: #2980b9;
+        }
+
+        /* Контейнер для вариантов */
+        .option-container {
+            display: flex;
+            align-items: flex-start;
+            background-color: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            margin: 20px;
+            padding: 20px;
+            overflow: hidden;
+        }
+
+        /* Стили для изображения */
+        .option-image {
+            max-width: 550px;
+            max-height: 550px;
+            border-radius: 40px;
+            object-fit: cover;
+            margin-right: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Блок с описанием */
+        .option-details {
+            flex: 1;
+        }
+
+        /* Разделительная линия */
+        hr {
+            border: none;
+            border-top: 1px solid #eaeaea;
+            margin: 20px 0;
+        }
+
+        /* Стили для списка */
+        ul {
+            list-style-type: disc;
+            margin: 10px 0;
+            padding-left: 20px;
+        }
+
+        li {
+            margin-bottom: 5px;
+        }
+
+        /* Дополнительные стили для кнопок (если потребуются в будущем) */
+        button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 10px;
+        }
+
+        button:hover {
+            background-color: #2980b9;
+        }
+    </style>
 </head>
 <body>
 
 <div th:each="option : ${options}">
     <!-- Каждый вариант -->
-    <section>
-        <h2 th:text="${option.placeName}">Название места</h2>
-        <p><strong>Необходимый бюджет:</strong> <span th:text="${option.budget}">Бюджет</span></p>
-        <p><strong>Почему этот вариант подходит:</strong> <span th:text="${option.reasoning}">Причина</span></p>
-        <p><strong>Креативное описание:</strong> <span th:text="${option.creativeDescription}">Описание</span></p>
-        <p><strong>Общие рекомендации:</strong> <span th:text="${option.tips}">Рекомендации</span></p>
+    <section class="option-container">
+        <!-- Картинка слева -->
+        <img th:src="${option.imageUrl}" alt="Изображение места" class="option-image">
 
-        <!-- Список достопримечательностей -->
-        <div>
-            <strong>Рекомендуемые места для посещения:</strong>
-            <ul>
-                <li th:each="place : ${option.whereToGo}" th:text="${place}">Место</li>
-            </ul>
+        <!-- Данные о месте -->
+        <div class="option-details">
+            <h2 th:text="${option.placeName}">Название места</h2>
+            <p><strong>Необходимый бюджет:</strong> <span th:text="${option.budget}">Бюджет</span></p>
+            <p><strong>Почему подходит:</strong> <span th:text="${option.reasoning}">Причина</span></p>
+            <p><strong>Описание:</strong> <span th:text="${option.creativeDescription}">Описание</span></p>
+            <p><strong>Учтите:</strong> <span th:text="${option.tips}">Рекомендации</span></p>
+
+            <!-- Список достопримечательностей -->
+            <div>
+                <strong>Рекомендуемые места для посещения:</strong>
+                <ul>
+                    <li th:each="place : ${option.whereToGo}" th:text="${place}">Место</li>
+                </ul>
+            </div>
+
+            <p><strong>Дополнительные замечания:</strong> <span th:text="${option.additionalConsideration}">Дополнительная информация</span></p>
         </div>
-
-        <p><strong>Дополнительные замечания:</strong> <span th:text="${option.additionalConsideration}">Дополнительная информация</span></p>
     </section>
-    <hr> <!-- Разделительная линия -->
 </div>
+
 </body>
 </html>

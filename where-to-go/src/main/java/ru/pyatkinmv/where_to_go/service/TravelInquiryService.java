@@ -10,6 +10,8 @@ import ru.pyatkinmv.where_to_go.model.TravelRecommendation;
 import ru.pyatkinmv.where_to_go.repository.TravelInquiryRepository;
 
 import java.time.Instant;
+import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
@@ -24,17 +26,22 @@ public class TravelInquiryService {
     public TravelInquiryDto createInquiry(Map<String, String> inquiryParams) {
         var inquiryPayload = toString(inquiryParams);
         var inquiry = TravelInquiry.builder()
-                .payload(inquiryPayload)
+                .params(inquiryPayload)
                 .createdAt(Instant.now())
                 .build();
         inquiry = inquiryRepository.save(inquiry);
-        TravelRecommendation recommendation;
+        List<TravelRecommendation> recommendations;
 
         try {
-            recommendation = recommendationService.createQuickRecommendation(inquiry.getId(), inquiryPayload);
-            recommendationService.createDetailedRecommendationAsync(inquiry.getId(), recommendation.getQuickPayload());
+            recommendations = recommendationService.createQuickRecommendations(inquiry.getId(), inquiryPayload);
+            recommendationService.enrichWithDetailsAsync(
+                    recommendations,
+                    inquiryPayload
+            );
 
-            return TravelInquiryMapper.toDto(inquiry, recommendation);
+            recommendationService.enrichWithImagesAsync(recommendations);
+
+            return TravelInquiryMapper.toDto(inquiry, recommendations);
         } catch (Exception e) {
             throw new RuntimeException("Failed to process inquiry", e);
         }
@@ -46,12 +53,13 @@ public class TravelInquiryService {
             throw new RuntimeException("Inquiry with id " + inquiryId + " does not exist");
         }
 
-        CompletableFuture<TravelRecommendation> future = CompletableFuture.supplyAsync(() -> {
+        CompletableFuture<Collection<TravelRecommendation>> future = CompletableFuture.supplyAsync(() -> {
             while (true) {
-                TravelRecommendation recommendation = recommendationService.findByInquiryId(inquiryId);
+                var recommendations = recommendationService.findByInquiryId(inquiryId);
 
-                if (recommendation != null && recommendation.getDetailedPayload() != null) {
-                    return recommendation;
+                if (!recommendations.isEmpty()
+                        && recommendations.stream().allMatch(it -> it.getDetails() != null)) {
+                    return recommendations;
                 }
 
                 try {
@@ -62,16 +70,16 @@ public class TravelInquiryService {
             }
         });
 
-        TravelRecommendation recommendation;
+        Collection<TravelRecommendation> recommendations;
         try {
-            recommendation = future.get(timeoutMillis, TimeUnit.MILLISECONDS);
+            recommendations = future.get(timeoutMillis, TimeUnit.MILLISECONDS);
         } catch (Exception e) {
             throw new RuntimeException("Timeout: Detailed recommendation not available yet.", e);
         }
 
         var inquiry = inquiryRepository.findById(inquiryId).orElseThrow();
 
-        return TravelInquiryMapper.toDto(inquiry, recommendation);
+        return TravelInquiryMapper.toDto(inquiry, recommendations);
     }
 
     private static String toString(Map<String, String> params) {

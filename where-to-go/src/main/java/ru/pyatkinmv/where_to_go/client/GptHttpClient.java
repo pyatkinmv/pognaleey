@@ -13,7 +13,7 @@ import org.springframework.web.client.RestTemplate;
 @Component
 @RequiredArgsConstructor
 public class GptHttpClient {
-    private final RestTemplate restTemplate;
+    private final RestTemplate gptRestTemplate;
 
     public static final String BODY_TEMPLATE = """
             {
@@ -39,7 +39,7 @@ public class GptHttpClient {
         headers.add("Content-Type", "text/plain; charset=UTF-8");
         var requestEntity = new HttpEntity<>(request, headers);
 
-        var response = restTemplate.exchange("https://llm.api.cloud.yandex.net/foundationModels/v1/completion",
+        var response = gptRestTemplate.exchange("https://llm.api.cloud.yandex.net/foundationModels/v1/completion",
                 HttpMethod.POST, requestEntity, JsonNode.class);
         var result = response.getBody().get("result").get("alternatives").get(0).get("message").get("text").asText()
                 .replace("```", "");

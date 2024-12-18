@@ -1,23 +1,30 @@
 package ru.pyatkinmv.where_to_go.service;
 
-import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import jakarta.annotation.Nullable;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.task.support.ExecutorServiceAdapter;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.pyatkinmv.where_to_go.client.GptHttpClient;
+import ru.pyatkinmv.where_to_go.client.ImagesSearchHttpClient;
+import ru.pyatkinmv.where_to_go.dto.TravelRecommendationDetailedOptionDto;
 import ru.pyatkinmv.where_to_go.dto.TravelRecommendationDetailedOptionListDto;
 import ru.pyatkinmv.where_to_go.dto.TravelRecommendationQuickOptionDto;
+import ru.pyatkinmv.where_to_go.mapper.TravelInquiryMapper;
 import ru.pyatkinmv.where_to_go.model.TravelRecommendation;
 import ru.pyatkinmv.where_to_go.repository.TravelRecommendationRepository;
 
 import java.time.Instant;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.concurrent.*;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 import static ru.pyatkinmv.where_to_go.mapper.TravelInquiryMapper.OBJECT_MAPPER;
 
@@ -26,7 +33,9 @@ import static ru.pyatkinmv.where_to_go.mapper.TravelInquiryMapper.OBJECT_MAPPER;
 @RequiredArgsConstructor
 public class TravelRecommendationService {
     private final GptHttpClient gptHttpClient;
+    private final ImagesSearchHttpClient imagesSearchHttpClient;
     private final TravelRecommendationRepository recommendationRepository;
+    private final ExecutorService executorService;
 
     private static final String PROMPT_TEMPLATE = "Придумай мне ровно 3 варианта путешествий исходя из входных условий." +
             " Добавь каждому варианту 1) необходимый бюджет 2) почему вариант подходит и чем хорош 3) общее описание " +
@@ -47,52 +56,69 @@ public class TravelRecommendationService {
             "place 1;short description (up to 5 words)|place 2;short description|place 3;short description. " +
             "There is no need for any additional numbering and words, the answer is just one line. Conditions:%s";
 
-    private static final String QUICK_REC_TEMPLATE_RUSSIAN = "Придумай мне ровно 3 варианта путешествий исходя из входных условий. Ответ выдай в формате: место1;описание|место2;описание|место3;описание. Описание не должно содержать более 5 слов. Пример: Париж; город любви и романтики|Рим; вечный город с богатой историей|Барселона; город, где слились история и современность. Не надо никаких дополнительных нумераций и слов, ответ просто одной строкой на русском языке. Условия: %s";
+    private static final String QUICK_REC_TEMPLATE_RUSSIAN = "Придумай мне ровно 3 варианта путешествий исходя из входных условий. Ответ выдай в формате: место1;описание|место2;описание|место3;описание. Описание не должно содержать более 5 слов. Пример: Париж;город любви и романтики|Рим;вечный город с богатой историей|Барселона;город, где слились история и современность. Не надо никаких дополнительных нумераций и слов, ответ просто одной строкой на русском языке. Условия: %s";
 
-    private static final String DETAILED_REC_TEMPLATE_RUSSIAN = "У меня есть следующие %d варианта для путешествия: %s. Мои пожелания для путешествия следующие: purpose=Family trip;destination=Asia;weather=warm;budget=Under 1000$-3000$;companions=family;duration=7-14 days. Дай мне исходя из этих предпочтений подробное описание этих вариантов в формате JSON (не надо никаких дополнительных нумераций и слов, в ответе только JSON). Формат: {options: {placeName: НАЗВАНИЕ МЕСТА, budget: НЕОБХОДИМЫЙ БЮДЖЕТ, reasoning: ПОЧЕМУ ЭТОТ ВАРИАНТ ПОДХОДИТ, creativeDescription: КРЕАТИВНОЕ ХУДОЖЕСТВЕННОЕ ОПИСАНИЕ ВАРИАНТА, tips: ОБЩИЕ РЕКОМЕНДАЦИИ, whereToGo: [],ДОСТОПРИМЕЧАТЕЛЬНОСТИ/КОНКРЕТНЫЕ МЕСТА РЕКОМЕНДУЕМЫЕ ДЛЯ ПОСЕЩЕНИЯ], additionalConsideration: ЧТО НУЖНО ДОПОЛНИТЕЛЬНО УЧЕСТЬ}}";
+    private static final String DETAILED_REC_TEMPLATE_RUSSIAN = "У меня есть следующие %d варианта для путешествия: %s. Мои пожелания для путешествия следующие: %s. Дай мне исходя из этих предпочтений подробное описание этих вариантов в формате JSON (не надо никаких дополнительных нумераций и слов, в ответе только JSON). Формат: {options: {placeName: НАЗВАНИЕ МЕСТА, budget: НЕОБХОДИМЫЙ БЮДЖЕТ, reasoning: ПОЧЕМУ ЭТОТ ВАРИАНТ ПОДХОДИТ, creativeDescription: КРЕАТИВНОЕ ХУДОЖЕСТВЕННОЕ ОПИСАНИЕ ВАРИАНТА, tips: ОБЩИЕ РЕКОМЕНДАЦИИ, whereToGo: [],ДОСТОПРИМЕЧАТЕЛЬНОСТИ/КОНКРЕТНЫЕ МЕСТА РЕКОМЕНДУЕМЫЕ ДЛЯ ПОСЕЩЕНИЯ], additionalConsideration: ЧТО НУЖНО ДОПОЛНИТЕЛЬНО УЧЕСТЬ}}";
 
-    public TravelRecommendation createQuickRecommendation(Long inquiryId, String inquiryPayload) {
+    public List<TravelRecommendation> createQuickRecommendations(Long inquiryId, String inquiryPayload) {
         var prompt = String.format(QUICK_REC_TEMPLATE_RUSSIAN, inquiryPayload);
         var answer = gptHttpClient.ask(prompt);
-        var recommendation = TravelRecommendation.builder()
-                .inquiryId(inquiryId)
-                .quickPayload(answer)
-                .createdAt(Instant.now())
-                .build();
+        var recommendations = parse(inquiryId, answer);
+        recommendations = recommendationRepository.saveAll(recommendations);
 
-        return recommendationRepository.save(recommendation);
+        return StreamSupport.stream(recommendations.spliterator(), false).collect(Collectors.toList());
+    }
+
+    private static Iterable<TravelRecommendation> parse(Long inquiryId, String quickRecommendationsAnswer) {
+        return toDtoQuickList(quickRecommendationsAnswer)
+                .stream()
+                .map(it -> TravelRecommendation.builder()
+                        .inquiryId(inquiryId)
+                        .title(it.placeName())
+                        .shortDescription(it.shortDescription())
+                        .createdAt(Instant.now())
+                        .build())
+                .toList();
     }
 
     @SneakyThrows
     @Async
-    public void createDetailedRecommendationAsync(Long recommendationId, String quickRecommendationPayload) {
-        var quickOptions = toDtoQuickList(quickRecommendationPayload);
-        StringBuilder promptOptionsBuilder = new StringBuilder();
+    public void enrichWithDetailsAsync(List<TravelRecommendation> recommendations, String inquiryParams) {
+        log.info("begin enrichWithDetailsAsync");
+        var optionsStr = IntStream.range(0, recommendations.size())
+                .mapToObj(i -> String.format("%d)%s—%s",
+                        i + 1,
+                        recommendations.get(i).getTitle(),
+                        recommendations.get(i).getShortDescription()))
+                .collect(Collectors.joining(";"));
 
-        for (int i = 0; i < quickOptions.size(); i++) {
-            promptOptionsBuilder.append(i + 1)
-                    .append(") ")
-                    .append(quickOptions.get(i).placeName())
-                    .append(" - ")
-                    .append(quickOptions.get(i).shortDescription())
-                    .append(";");
+        var prompt = String.format(DETAILED_REC_TEMPLATE_RUSSIAN, recommendations.size(), optionsStr, inquiryParams);
+        var detailsRaw = gptHttpClient.ask(prompt);
+        var parsed = toDtoDetailedList(detailsRaw).orElseThrow();
+
+        if (recommendations.size() != parsed.options().size()) {
+            throw new IllegalArgumentException("Different size of recommendations");
         }
 
-        var prompt = String.format(DETAILED_REC_TEMPLATE_RUSSIAN, quickOptions.size(), promptOptionsBuilder);
-        var detailedPayload = gptHttpClient.ask(prompt);
-        var recommendation = recommendationRepository.findById(recommendationId).orElseThrow();
-        recommendation.setDetailedPayload(detailedPayload);
-        log.info("Save {} with detailed payload {}", recommendationId, detailedPayload);
-        recommendationRepository.save(recommendation);
+        var recIdToDetailsMap = IntStream.range(0, recommendations.size())
+                .mapToObj(i -> Map.entry(recommendations.get(i).getId(), TravelInquiryMapper.toJson(parsed.options().get(i))))
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+
+        log.info("recIdToDetailsMap before update: {}", recIdToDetailsMap);
+
+        recIdToDetailsMap.forEach(recommendationRepository::updateDetails);
+
+        log.info("end enrichWithDetailsAsync");
     }
 
-    TravelRecommendation findByInquiryId(Long inquiryId) {
+    Collection<TravelRecommendation> findByInquiryId(Long inquiryId) {
         return recommendationRepository.findByInquiryId(inquiryId);
     }
 
     @SneakyThrows
     public static List<TravelRecommendationQuickOptionDto> toDtoQuickList(String recommendationPayload) {
-        recommendationPayload = recommendationPayload.replaceAll("\"", "");
+        recommendationPayload = recommendationPayload.replaceAll("\"", "")
+                .replaceAll("\\.", "");
         return Stream.of(recommendationPayload.split("\\|"))
                 .map(it -> it.split(";"))
                 .filter(TravelRecommendationService::isValid)
@@ -116,6 +142,28 @@ public class TravelRecommendationService {
         }
     }
 
+    @SneakyThrows
+    public static Optional<TravelRecommendationDetailedOptionDto> toDtoDetailed(
+            @Nullable String recommendationDetailedPayload,
+            @Nullable String imageUrl
+    ) {
+        if (recommendationDetailedPayload != null) {
+            var json = (ObjectNode) OBJECT_MAPPER.readTree(recommendationDetailedPayload);
+            json.put("imageUrl", imageUrl);
+            recommendationDetailedPayload = OBJECT_MAPPER.writeValueAsString(json);
+
+            var result = Optional.ofNullable(
+                    OBJECT_MAPPER.readValue(
+                            recommendationDetailedPayload,
+                            TravelRecommendationDetailedOptionDto.class
+                    )
+            );
+            return result;
+        } else {
+            return Optional.empty();
+        }
+    }
+
     private static boolean isValid(String[] it) {
         try {
             return !it[0].isEmpty() && !it[1].isEmpty();
@@ -124,5 +172,44 @@ public class TravelRecommendationService {
 
             return false;
         }
+    }
+
+    @SneakyThrows
+    @Async
+    public void enrichWithImagesAsync(List<TravelRecommendation> recommendations) {
+        log.info("begin enrichWithImagesAsync");
+
+        // TODO
+        var tasks = recommendations.stream().map(this::buildCallable).toList();
+//        var futures = executorService.invokeAll(tasks);
+        var recIdsToImages = tasks.stream().map(it -> {
+            try {
+                RecIdToImageUrl call = it.call();
+                Thread.sleep(1000);
+                return call;
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }).toList();
+
+        log.info("update recIdsToImages {}", recIdsToImages);
+
+        recIdsToImages.forEach(it -> recommendationRepository.updateImageUrl(it.recId(), it.imageUrl()));
+
+        log.info("end enrichWithImagesAsync");
+    }
+
+    private Callable<RecIdToImageUrl> buildCallable(TravelRecommendation recommendation) {
+        return () -> new RecIdToImageUrl(
+                recommendation.getId(),
+                imagesSearchHttpClient.searchImageUrl(recToSearchText(recommendation))
+        );
+    }
+
+    private static String recToSearchText(TravelRecommendation recommendation) {
+        return String.format("%s-%s", recommendation.getTitle(), recommendation.getShortDescription());
+    }
+
+    private record RecIdToImageUrl(long recId, String imageUrl) {
     }
 }

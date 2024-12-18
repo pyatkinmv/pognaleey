@@ -4,23 +4,100 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Куда сгонять?</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f4f6f9;
+            margin: 0;
+            padding: 0;
+            color: #2c3e50;
+        }
+
+        h1 {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 2.5em;
+            color: #34495e;
+        }
+
+        h2 {
+            font-size: 1.8em;
+            color: #3498db;
+            margin: 0 0 10px;
+        }
+
+        p {
+            font-size: 1.2em;
+            color: #2c3e50;
+            line-height: 1.6;
+        }
+
+        section {
+            background: #ffffff;
+            border-radius: 15px;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+            padding: 20px 30px;
+            margin-bottom: 20px;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        section:hover {
+            transform: scale(1.02);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        hr {
+            border: none;
+            border-top: 2px solid #eaeaea;
+            margin: 20px 0;
+        }
+
+        button {
+            background-color: #3498db;
+            color: white;
+            font-size: 1.2em;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s, box-shadow 0.3s;
+            display: block;
+            margin: 20px auto 0;
+            width: 200px;
+            text-align: center;
+        }
+
+        button:hover {
+            background-color: #2980b9;
+            box-shadow: 0 5px 15px rgba(52, 152, 219, 0.4);
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+    </style>
 </head>
 
 <body>
-<div th:each="opt : ${options}">
-    <section>
-        <!-- Заголовок варианта -->
-        <h2 th:text="${opt.placeName}">Название варианта</h2>
+<h1>Куда сгонять?</h1>
+<div class="container">
+    <!-- Варианты путешествий -->
+    <div th:each="opt : ${options}">
+        <section>
+            <!-- Заголовок варианта -->
+            <h2 th:text="${opt.placeName}">Название варианта</h2>
 
-        <!-- Описание варианта -->
-        <p th:text="${opt.shortDescription}">Описание варианта</p>
-    </section>
-    <hr> <!-- Разделительная линия -->
+            <!-- Описание варианта -->
+            <p th:text="${opt.shortDescription}">Описание варианта</p>
+        </section>
+    </div>
+
+    <!-- Кнопка отправки -->
+    <form th:action="@{travel-inquiries/{id}/recommendations(id=${inquiryId})}" method="GET">
+        <button type="submit">Подробнее</button>
+    </form>
 </div>
-
-<!-- Кнопка отправки -->
-<form th:action="@{travel-inquiries/{id}/recommendation(id=${inquiryId})}" method="GET">
-    <button type="submit">Подробнее</button>
-</form>
 </body>
 </html>
