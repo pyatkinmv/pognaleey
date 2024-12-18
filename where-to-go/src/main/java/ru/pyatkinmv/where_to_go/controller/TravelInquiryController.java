@@ -32,7 +32,7 @@ public class TravelInquiryController {
         });
     }
 
-    @GetMapping("/{inquiryId}/recommendation")
+    @GetMapping("/{inquiryId}/recommendations")
     public String getDetailedRecommendation(@PathVariable Long inquiryId) {
         return measuringTime(() -> {
             var inquiry = inquiryService.getInquiryWithDetailedRecommendation(inquiryId, 15_000L);
