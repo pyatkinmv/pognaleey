@@ -93,3 +93,16 @@ button:hover {
 .highlight {
   color: #79C8CB; /* Бирюзовый для выделения ключевых слов */
 }
+
+.budget-range {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.budget-range label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 1em;
+}
