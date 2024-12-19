@@ -8,7 +8,7 @@ const App: React.FC = () => {
         nature: [] as string[],
         weather: [] as string[],
         season: "",
-        budget: "",
+        budget: 1000, // Слайдер: начальное значение бюджета
         duration: "",
         interests: [] as string[],
         from: "",
@@ -19,23 +19,29 @@ const App: React.FC = () => {
 
     // Обработчик изменения значений формы
     const handleChange = (
-        e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
+        e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
     ) => {
-        const {name, value} = e.target;
+        const {name, value, type} = e.target;
 
-        // Обработка множественного выбора (например, select с multiple)
-        if (e.target instanceof HTMLSelectElement && e.target.multiple) {
-            const selectedValues = Array.from(
-                e.target.options as HTMLCollectionOf<HTMLOptionElement>
-            )
-                .filter((option) => option.selected)
-                .map((option) => option.value);
-
-            setFormData({...formData, [name]: selectedValues});
+        if (type === "checkbox") {
+            const isChecked = (e.target as HTMLInputElement).checked; // Приведение типов для доступа к checked
+            setFormData((prevData) => {
+                const selectedValues = prevData[name as keyof typeof formData] as string[];
+                return {
+                    ...prevData,
+                    [name]: isChecked
+                        ? [...selectedValues, value] // Добавляем значение, если флажок установлен
+                        : selectedValues.filter((v) => v !== value), // Удаляем значение, если флажок снят
+                };
+            });
         } else {
-            setFormData({...formData, [name]: value});
+            setFormData({
+                ...formData,
+                [name]: type === "range" ? +value : value, // Для ползунка преобразуем строку в число
+            });
         }
     };
+
 
     // Отправка данных формы
     const handleSubmit = async (e: React.FormEvent) => {
@@ -66,92 +72,101 @@ const App: React.FC = () => {
                     Let us know your preferences to find the perfect travel destination!
                 </div>
 
-                {/* Вопросы формы */}
+                {/* Чекбоксы для цели поездки */}
                 <QuestionContainer label="What is the purpose of your trip? (Select all that apply)">
-                    <select
-                        name="purpose"
-                        id="purpose"
-                        multiple
-                        value={formData.purpose}
-                        onChange={handleChange}
-                    >
-                        <option value="Relaxation and leisure">Relaxation and leisure</option>
-                        <option value="Active vacation (hiking, surfing, etc.)">
-                            Active vacation (hiking, surfing, etc.)
-                        </option>
-                        <option value="Exploring culture and landmarks">
-                            Exploring culture and landmarks
-                        </option>
-                        <option value="Shopping and entertainment">Shopping and entertainment</option>
-                        <option value="Family trip">Family trip</option>
-                        <option value="Other">Other</option>
-                    </select>
+                    {[
+                        "Relaxation and leisure",
+                        "Active vacation (hiking, surfing, etc.)",
+                        "Exploring culture and landmarks",
+                        "Shopping and entertainment",
+                        "Family trip",
+                        "Other",
+                    ].map((option) => (
+                        <div key={option}>
+                            <label>
+                                <input
+                                    type="checkbox"
+                                    name="purpose"
+                                    value={option}
+                                    checked={formData.purpose.includes(option)}
+                                    onChange={handleChange}
+                                />
+                                {option}
+                            </label>
+                        </div>
+                    ))}
                 </QuestionContainer>
 
+                {/* Чекбоксы для природы */}
                 <QuestionContainer label="What type of nature or atmosphere do you prefer? (Select all that apply)">
-                    <select
-                        name="nature"
-                        id="nature"
-                        multiple
-                        value={formData.nature}
-                        onChange={handleChange}
-                    >
-                        <option value="Beaches">Beaches</option>
-                        <option value="Mountains">Mountains</option>
-                        <option value="Forests and nature">Forests and nature</option>
-                        <option value="City life">City life</option>
-                        <option value="Lakes and rivers">Lakes and rivers</option>
-                        <option value="Unique and unusual places">Unique and unusual places</option>
-                    </select>
+                    {[
+                        "Beaches",
+                        "Mountains",
+                        "Forests and nature",
+                        "City life",
+                        "Lakes and rivers",
+                        "Unique and unusual places",
+                    ].map((option) => (
+                        <div key={option}>
+                            <label>
+                                <input
+                                    type="checkbox"
+                                    name="nature"
+                                    value={option}
+                                    checked={formData.nature.includes(option)}
+                                    onChange={handleChange}
+                                />
+                                {option}
+                            </label>
+                        </div>
+                    ))}
                 </QuestionContainer>
 
+                {/* Чекбоксы для погоды */}
                 <QuestionContainer label="What kind of weather do you enjoy? (Select all that apply)">
-                    <select
-                        name="weather"
-                        id="weather"
-                        multiple
-                        value={formData.weather}
+                    {[
+                        "Warm and sunny",
+                        "Cool climate",
+                        "Cold and snowy",
+                        "Moderate weather",
+                        "No preference",
+                    ].map((option) => (
+                        <div key={option}>
+                            <label>
+                                <input
+                                    type="checkbox"
+                                    name="weather"
+                                    value={option}
+                                    checked={formData.weather.includes(option)}
+                                    onChange={handleChange}
+                                />
+                                {option}
+                            </label>
+                        </div>
+                    ))}
+                </QuestionContainer>
+
+                {/* Поле для бюджета (ползунок) */}
+                <QuestionContainer label={`What is your approximate budget per person? ($${formData.budget})`}>
+                    <input
+                        type="range"
+                        name="budget"
+                        min="100"
+                        max="5000"
+                        step="100"
+                        value={formData.budget}
                         onChange={handleChange}
-                    >
-                        <option value="Warm and sunny">Warm and sunny</option>
-                        <option value="Cool climate">Cool climate</option>
-                        <option value="Cold and snowy">Cold and snowy</option>
-                        <option value="Moderate weather">Moderate weather</option>
-                        <option value="No preference">No preference</option>
-                    </select>
+                    />
                 </QuestionContainer>
 
                 {/* Остальные вопросы */}
                 <QuestionContainer label="When do you plan to travel? (Time of year)">
-                    <select
-                        name="season"
-                        id="season"
-                        value={formData.season}
-                        onChange={handleChange}
-                    >
+                    <select name="season" id="season" value={formData.season} onChange={handleChange}>
                         <option value="Winter">Winter</option>
                         <option value="Spring">Spring</option>
                         <option value="Summer">Summer</option>
                         <option value="Fall">Fall</option>
                         <option value="Flexible">Flexible</option>
-                    </select>
-                </QuestionContainer>
-
-                <QuestionContainer label="What is your approximate budget per person?">
-                    <select
-                        name="budget"
-                        id="budget"
-                        value={formData.budget}
-                        onChange={handleChange}
-                    >
-                        <option value="Under $500">Under $500</option>
-                        <option value="Between $500 and $1,000">
-                            Between $500 and $1,000
-                        </option>
-                        <option value="Between $1,000 and $2,000">
-                            Between $1,000 and $2,000
-                        </option>
-                        <option value="Over $2,000">Over $2,000</option>
                     </select>
                 </QuestionContainer>
 
