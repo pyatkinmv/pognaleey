@@ -1,18 +1,18 @@
 package ru.pyatkinmv.where_to_go.controller;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
+import ru.pyatkinmv.where_to_go.dto.TravelInquiryDto;
 import ru.pyatkinmv.where_to_go.service.TravelInquiryService;
-import ru.pyatkinmv.where_to_go.util.Utils;
 
-import java.time.Instant;
 import java.util.Map;
 
 import static ru.pyatkinmv.where_to_go.util.Utils.measuringTime;
 
+// TODO: fixme
+@CrossOrigin
 @RestController
 @RequestMapping("/travel-inquiries")
 @RequiredArgsConstructor
@@ -21,15 +21,16 @@ public class TravelInquiryController {
     private final TemplateEngine templateEngine;
 
     @PostMapping
-    public String createInquiry(@RequestParam Map<String, String> inquiryParams) {
-        return measuringTime(() -> {
-            var inquiry = inquiryService.createInquiry(inquiryParams);
-            Context context = new Context();
-            context.setVariable("options", inquiry.getQuickOptions());
-            context.setVariable("inquiryId", inquiry.getId());
-
-            return templateEngine.process("quick-recommendation-template", context);
-        });
+    public TravelInquiryDto createInquiry(@RequestParam Map<String, String> inquiryParams) {
+        return inquiryService.createInquiry(inquiryParams);
+//        return measuringTime(() -> {
+//            var inquiry = inquiryService.createInquiry(inquiryParams);
+//            Context context = new Context();
+//            context.setVariable("options", inquiry.getQuickOptions());
+//            context.setVariable("inquiryId", inquiry.getId());
+//
+//            return templateEngine.process("quick-recommendation-template", context);
+//        });
     }
 
     @GetMapping("/{inquiryId}/recommendations")
