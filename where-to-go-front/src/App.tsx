@@ -32,14 +32,23 @@ const App: React.FC = () => {
                 };
             });
         } else if (type === "range" && name.startsWith("budget")) {
-            // Обработка диапазона для бюджета
-            const rangeKey = name === "budgetFrom" ? "from" : "to";
-            setFormData({
-                ...formData,
-                budget: {
-                    ...formData.budget,
-                    [rangeKey]: +value,
-                },
+            // Обработка диапазона для бюджета с проверкой
+            setFormData((prevData) => {
+                const newBudget = {...prevData.budget, [name === "budgetFrom" ? "from" : "to"]: +value};
+
+                // Гарантия: from <= to
+                if (newBudget.from > newBudget.to) {
+                    if (name === "budgetFrom") {
+                        newBudget.to = newBudget.from; // Двигаем "to" вместе с "from"
+                    } else {
+                        newBudget.from = newBudget.to; // Двигаем "from" вместе с "to"
+                    }
+                }
+
+                return {
+                    ...prevData,
+                    budget: newBudget,
+                };
             });
         } else {
             setFormData({
