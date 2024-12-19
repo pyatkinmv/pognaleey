@@ -1,13 +1,82 @@
 body {
+  font-family: 'Arial', sans-serif;
+  background-color: #f4f6f9;
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  padding: 0;
+  color: #2c3e50;
 }
 
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
+h1 {
+  text-align: center;
+  margin-top: 20px;
+  font-size: 2.5em;
+  color: #34495e;
+}
+
+form {
+  max-width: 800px;
+  margin: 20px auto;
+  background: #ffffff;
+  padding: 20px 30px;
+  border-radius: 15px;
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+}
+
+label {
+  font-size: 1.2em;
+  font-weight: bold;
+  margin-bottom: 10px;
+  display: block;
+  color: #2c3e50;
+}
+
+select, input[type="text"], textarea {
+  width: 100%;
+  padding: 12px;
+  margin: 10px 0 20px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 1em;
+  color: #2c3e50;
+  background-color: #f9f9f9;
+}
+
+select:focus, input[type="text"]:focus, textarea:focus {
+  outline: none;
+  border: 1px solid #3498db;
+  box-shadow: 0 0 5px rgba(52, 152, 219, 0.5);
+}
+
+button {
+  background-color: #3498db;
+  color: white;
+  font-size: 1.2em;
+  padding: 12px 20px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  display: block;
+  width: 100%;
+}
+
+button:hover {
+  background-color: #2980b9;
+}
+
+.question-container {
+  margin-bottom: 20px;
+  display: flex;
+  flex-direction: column;
+}
+
+.form-heading {
+  text-align: center;
+  font-size: 1.5em;
+  margin-bottom: 20px;
+  color: #7f8c8d;
+}
+
+.highlight {
+  color: #1d6fa5;
 }
