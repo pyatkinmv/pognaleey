@@ -1,5 +1,7 @@
 import React, {useState} from "react";
 
+const API_URL = process.env.REACT_APP_API_URL;
+
 const App: React.FC = () => {
     const [formData, setFormData] = useState({
         purpose: [] as string[],
@@ -61,7 +63,8 @@ const App: React.FC = () => {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         try {
-            const response = await fetch("/api/v1/travel-inquiries", {
+
+            const response = await fetch(`${API_URL}/api/v1/travel-inquiries`, {
                 method: "POST",
                 headers: {"Content-Type": "application/json"},
                 body: JSON.stringify(formData),

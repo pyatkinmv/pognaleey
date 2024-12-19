@@ -34,10 +34,10 @@ public class TravelInquiryService {
 
         try {
             recommendations = recommendationService.createQuickRecommendations(inquiry.getId(), inquiryPayload);
-            recommendationService.enrichWithDetailsAsync(
-                    recommendations,
-                    inquiryPayload
-            );
+//            recommendationService.enrichWithDetailsAsync(
+//                    recommendations,
+//                    inquiryPayload
+//            );
 
             recommendationService.enrichWithImagesAsync(recommendations);
 
