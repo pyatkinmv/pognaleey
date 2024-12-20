@@ -2,6 +2,7 @@ package ru.pyatkinmv.where_to_go.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import org.thymeleaf.TemplateEngine;
 import ru.pyatkinmv.where_to_go.dto.TravelInquiryDto;
@@ -17,6 +18,7 @@ import static ru.pyatkinmv.where_to_go.mapper.TravelInquiryMapper.OBJECT_MAPPER;
 @RestController
 @RequestMapping("/travel-inquiries")
 @RequiredArgsConstructor
+@Slf4j
 public class TravelInquiryController {
     private final TravelInquiryService inquiryService;
     private final TemplateEngine templateEngine;
@@ -24,7 +26,10 @@ public class TravelInquiryController {
     @SneakyThrows
     @PostMapping
     public TravelInquiryDto createInquiry(@RequestBody String inquiryParams) {
-        return inquiryService.createInquiry(OBJECT_MAPPER.readValue(inquiryParams, Map.class));
+        TravelInquiryDto inquiry = inquiryService.createInquiry(OBJECT_MAPPER.readValue(inquiryParams, Map.class));
+        log.info("RESPONSE: {}", OBJECT_MAPPER.writeValueAsString(inquiry));
+
+        return inquiry;
 //        return measuringTime(() -> {
 //            var inquiry = inquiryService.createInquiry(inquiryParams);
 //            Context context = new Context();
@@ -35,12 +40,16 @@ public class TravelInquiryController {
 //        });
     }
 
+    @SneakyThrows
     @GetMapping("/{inquiryId}/recommendations")
     public TravelRecommendationDetailedOptionListDto getDetailedRecommendation(@PathVariable Long inquiryId) {
-        return new TravelRecommendationDetailedOptionListDto(
+        TravelRecommendationDetailedOptionListDto travelRecommendationDetailedOptionListDto = new TravelRecommendationDetailedOptionListDto(
                 inquiryService.getInquiryWithDetailedRecommendation(inquiryId, 15_000L)
-                        .getDetailedOptions()
+                        .getDetailedRecommendations()
         );
+
+        log.info("RESPONSE: {}", OBJECT_MAPPER.writeValueAsString(travelRecommendationDetailedOptionListDto));
+        return travelRecommendationDetailedOptionListDto;
 //        return measuringTime(() -> {
 //            var inquiry = inquiryService.getInquiryWithDetailedRecommendation(inquiryId, 15_000L);
 //            Context context = new Context();

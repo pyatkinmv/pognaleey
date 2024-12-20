@@ -74,19 +74,15 @@ const App: React.FC = () => {
                 body: JSON.stringify(formData),
             });
 
-            // if (response.ok) {
-            //     alert("Form submitted successfully!");
-            // } else {
-            //     alert("Error submitting form.");
-            // }
-
             if (response.ok) {
                 const data = await response.json(); // Получаем JSON с идентификатором
                 const inquiryId = data.id; // Предполагается, что сервер возвращает `inquiryId`
 
                 // Редирект на страницу рекомендаций
                 // navigate(`${API_URL}/api/v1/travel-inquiries/${inquiryId}/recommendations`);
-                navigate(`/api/v1/travel-inquiries/${inquiryId}/recommendations`);
+                navigate(`/api/v1/travel-inquiries/${inquiryId}/recommendations`, {
+                    state: {quickRecommendations: data.quickRecommendations},
+                });
             } else {
                 alert("Error submitting the form.");
             }

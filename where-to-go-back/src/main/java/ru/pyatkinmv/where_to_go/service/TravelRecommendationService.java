@@ -76,8 +76,8 @@ public class TravelRecommendationService {
                 .stream()
                 .map(it -> TravelRecommendation.builder()
                         .inquiryId(inquiryId)
-                        .title(it.placeName())
-                        .shortDescription(it.shortDescription())
+                        .title(it.title())
+                        .shortDescription(it.description())
                         .createdAt(Instant.now())
                         .build())
                 .toList();
@@ -124,7 +124,7 @@ public class TravelRecommendationService {
         return Stream.of(recommendationPayload.split("\\|"))
                 .map(it -> it.split(";"))
                 .filter(TravelRecommendationService::isValid)
-                .map(it -> new TravelRecommendationQuickOptionDto(it[0], it[1]))
+                .map(it -> new TravelRecommendationQuickOptionDto(-1L, it[0], it[1]))
                 .toList();
     }
 
