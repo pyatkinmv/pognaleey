@@ -1,0 +1,87 @@
+/* Общие стили контейнера */
+.recommendations-container {
+    font-family: 'Arial', sans-serif;
+    background-color: #E8DFC2;
+    color: #333;
+    padding: 20px;
+}
+
+/* Заголовок */
+.title {
+    color: #EB6B3B;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+/* Индикатор загрузки */
+.loading-indicator {
+    text-align: center;
+    color: #79C8CB;
+    font-size: 18px;
+    margin-bottom: 20px;
+}
+
+/* Список рекомендаций */
+.recommendations-list {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+/* Карточка рекомендации */
+.recommendation-card {
+    display: flex;
+    align-items: flex-start;
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    padding: 20px;
+}
+
+/* Изображение */
+.recommendation-image {
+    width: 500px;
+    height: 500px;
+    object-fit: cover;
+    border-radius: 10px;
+    margin-right: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Контент рекомендации */
+.recommendation-content {
+    flex: 1;
+}
+
+/* Заголовок рекомендации */
+.recommendation-title {
+    color: #EB6B3B;
+    font-size: 24px;
+    margin-bottom: 10px;
+}
+
+/* Описание рекомендации */
+.recommendation-description {
+    color: #666;
+    margin-bottom: 15px;
+    font-size: 16px;
+    line-height: 1.6;
+}
+
+/* Стили для списков */
+ul {
+    list-style: disc;
+    padding-left: 20px;
+    margin: 10px 0;
+}
+
+li {
+    margin-bottom: 5px;
+}
+
+/* Дополнительные стили для текста */
+strong {
+    color: #79C8CB;
+    font-weight: bold;
+}
