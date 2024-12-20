@@ -1,36 +1,38 @@
 package ru.pyatkinmv.where_to_go.mapper;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.annotation.Nullable;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import lombok.SneakyThrows;
 import org.springframework.stereotype.Component;
 import ru.pyatkinmv.where_to_go.dto.TravelInquiryDto;
-import ru.pyatkinmv.where_to_go.dto.TravelRecommendationDetailedOptionDto;
-import ru.pyatkinmv.where_to_go.dto.TravelRecommendationDetailedOptionListDto;
 import ru.pyatkinmv.where_to_go.dto.TravelRecommendationQuickOptionDto;
 import ru.pyatkinmv.where_to_go.model.TravelInquiry;
 import ru.pyatkinmv.where_to_go.model.TravelRecommendation;
 
 import java.util.Collection;
 
-import static ru.pyatkinmv.where_to_go.service.TravelRecommendationService.*;
+import static ru.pyatkinmv.where_to_go.service.TravelRecommendationService.toDtoDetailed;
 
 @Component
 public class TravelInquiryMapper {
-    public static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
+    public static final ObjectMapper OBJECT_MAPPER = new ObjectMapper()
+            .registerModule(new JavaTimeModule())
+            .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
+
 
     public static TravelInquiryDto toDto(TravelInquiry inquiry, Collection<TravelRecommendation> recommendations) {
         return TravelInquiryDto.builder()
                 .id(inquiry.getId())
                 .payload(inquiry.getParams())
                 .createdAt(inquiry.getCreatedAt())
-                .quickOptions(recommendations.stream()
+                .quickRecommendations(recommendations.stream()
                         .map(it -> new TravelRecommendationQuickOptionDto(
+                                it.getId(),
                                 it.getTitle(),
                                 it.getShortDescription())
                         ).toList())
-                .detailedOptions(recommendations.stream()
+                .detailedRecommendations(recommendations.stream()
                         .map(it -> toDtoDetailed(it.getDetails(), it.getImageUrl()).orElse(null)).toList())
                 .build();
     }

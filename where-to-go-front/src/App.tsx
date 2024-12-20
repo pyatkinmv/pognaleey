@@ -1,4 +1,5 @@
 import React, {useState} from "react";
+import {useNavigate} from "react-router-dom"; // Для перехода между страницами
 
 const API_URL = process.env.REACT_APP_API_URL;
 
@@ -16,6 +17,8 @@ const App: React.FC = () => {
         companions: "",
         preferences: "",
     });
+
+    const navigate = useNavigate(); // Для редиректа
 
     const handleChange = (
         e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
@@ -60,6 +63,7 @@ const App: React.FC = () => {
         }
     };
 
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         try {
@@ -71,9 +75,16 @@ const App: React.FC = () => {
             });
 
             if (response.ok) {
-                alert("Form submitted successfully!");
+                const data = await response.json(); // Получаем JSON с идентификатором
+                const inquiryId = data.id; // Предполагается, что сервер возвращает `inquiryId`
+
+                // Редирект на страницу рекомендаций
+                // navigate(`${API_URL}/api/v1/travel-inquiries/${inquiryId}/recommendations`);
+                navigate(`/api/v1/travel-inquiries/${inquiryId}/recommendations`, {
+                    state: {quickRecommendations: data.quickRecommendations},
+                });
             } else {
-                alert("Error submitting form.");
+                alert("Error submitting the form.");
             }
         } catch (error) {
             console.error("Error:", error);
@@ -210,6 +221,21 @@ const App: React.FC = () => {
                     <p>
                         Selected budget range: ${formData.budget.from} - ${formData.budget.to}
                     </p>
+                </QuestionContainer>
+
+                <QuestionContainer label="What is duration of your trip?">
+                    <select
+                        name="duration"
+                        id="duration"
+                        value={formData.duration}
+                        onChange={handleChange}
+                    >
+                        <option value="1-3 days">1-3 days</option>
+                        <option value="4-7 days">4-7 days</option>
+                        <option value="8-14 days">8-14 days</option>
+                        <option value="over two weeks">over two weeks</option>
+                    </select>
+
                 </QuestionContainer>
 
                 <QuestionContainer label="When do you plan to travel? (Time of year)">

@@ -7,10 +7,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
-import org.springframework.web.util.UriComponentsBuilder;
 
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -22,7 +19,7 @@ import java.util.regex.Pattern;
 public class ImagesSearchHttpClient {
     private final RestTemplate defaultRestTemplate;
 
-    private static final String URL_FORMAT = "https://yandex.ru/images-xml?apikey=APIKEY&folderid=FOLDER_ID&text=%s&isize=large&groupby=attr=ii.groups-on-page=1&itype=png";
+    private static final String URL_FORMAT = "https://yandex.ru/images-xml?apikey=APIKEY&folderid=FOLDER_ID&text=%s&isize=large&groupby=attr=ii.groups-on-page=1&itype=png&iorient=square";
     //&iorient=square
 
     public String searchImageUrl(String text) {
