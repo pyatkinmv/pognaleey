@@ -1,10 +1,12 @@
 import React, {useEffect, useState} from "react";
 import {useLocation, useParams} from "react-router-dom";
+import "./Recommendations.css"; // Подключаем стили
 
 interface QuickRecommendation {
     id: string;
     title: string;
     description: string;
+    imageUrl?: string; // Добавляем поле для URL картинки
 }
 
 interface DetailedRecommendation extends QuickRecommendation {
@@ -21,10 +23,10 @@ const Recommendations: React.FC = () => {
     const params = useParams<{ inquiryId: string }>();
 
     // Получаем quickRecommendations из состояния предыдущей страницы
-    const {quickRecommendations} = location.state as { quickRecommendations: QuickRecommendation[] };
+    const {quickRecommendations} = location.state || {quickRecommendations: []};
 
     // Состояния для рекомендаций и загрузки
-    const [recommendations, setRecommendations] = useState<QuickRecommendation[] | DetailedRecommendation[]>(quickRecommendations);
+    const [recommendations, setRecommendations] = useState<QuickRecommendation[] | DetailedRecommendation[]>(quickRecommendations || []);
     const [isLoading, setIsLoading] = useState<boolean>(true); // Изначально показываем индикатор загрузки
 
     useEffect(() => {
@@ -64,41 +66,50 @@ const Recommendations: React.FC = () => {
     }, [params.inquiryId]);
 
     return (
-        <div>
-            <h1>Recommendations</h1>
+        <div className="recommendations-container">
+            <h1 className="title">Recommendations</h1>
 
             {/* Рендерим прогресс-бар, если идёт загрузка */}
-            {isLoading && <div>Loading detailed recommendations...</div>}
+            {isLoading && <div className="loading-indicator">Loading detailed recommendations...</div>}
 
             {/* Список рекомендаций */}
-            <ul>
+            <div className="recommendations-list">
                 {recommendations.map((recommendation) => (
-                    <li key={recommendation.id}>
-                        <h2>{recommendation.title}</h2>
-                        <p>{recommendation.description}</p>
+                    <div className="recommendation-card" key={recommendation.id}>
+                        {/* Картинка */}
+                        <img
+                            className="recommendation-image"
+                            src={recommendation.imageUrl || "/logo512.png"} // Заглушка, если картинки нет
+                            alt={recommendation.title}
+                        />
+                        {/* Контент */}
+                        <div className="recommendation-content">
+                            <h2 className="recommendation-title">{recommendation.title}</h2>
+                            <p className="recommendation-description">{recommendation.description}</p>
 
-                        {/* Если это детализированная рекомендация, покажем дополнительные данные */}
-                        {"budget" in recommendation && (
-                            <>
-                                <p><strong>Необходимый
-                                    бюджет:</strong> {recommendation.budget?.from || "Не указано"} - {recommendation.budget?.to || "Не указано"}
-                                </p>
-                                <p><strong>Reasoning:</strong> {recommendation.reasoning}</p>
-                                <p><strong>Description:</strong> {recommendation.creativeDescription}</p>
-                                <p><strong>Tips:</strong> {recommendation.tips}</p>
-                                <p><strong>Where to Go:</strong></p>
-                                <ul>
-                                    {recommendation.whereToGo.map((place, index) => (
-                                        <li key={index}>{place}</li>
-                                    ))}
-                                </ul>
-                                <p><strong>Additional Consideration:</strong> {recommendation.additionalConsideration}
-                                </p>
-                            </>
-                        )}
-                    </li>
+                            {/* Если это детализированная рекомендация, покажем дополнительные данные */}
+                            {"budget" in recommendation && (
+                                <>
+                                    <p><strong>Необходимый
+                                        бюджет:</strong> {recommendation.budget?.from || "Не указано"} - {recommendation.budget?.to || "Не указано"}
+                                    </p>
+                                    <p><strong>Reasoning:</strong> {recommendation.reasoning}</p>
+                                    <p><strong>Description:</strong> {recommendation.creativeDescription}</p>
+                                    <p><strong>Tips:</strong> {recommendation.tips}</p>
+                                    <p><strong>Where to Go:</strong></p>
+                                    <ul>
+                                        {recommendation.whereToGo.map((place, index) => (
+                                            <li key={index}>{place}</li>
+                                        ))}
+                                    </ul>
+                                    <p><strong>Additional
+                                        Consideration:</strong> {recommendation.additionalConsideration}</p>
+                                </>
+                            )}
+                        </div>
+                    </div>
                 ))}
-            </ul>
+            </div>
         </div>
     );
 };
