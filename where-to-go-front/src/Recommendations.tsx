@@ -78,7 +78,15 @@ const Recommendations: React.FC = () => {
 
     return (
         <div className="recommendations-container">
-            <h1 className="title">Recommendations</h1>
+            {/* Заголовок с логотипом */}
+            <div className="header">
+                <img
+                    className="logo"
+                    src="/logo-circle192.png" // Путь к логотипу
+                    alt="Логотип"
+                />
+                <h1 className="recommendations-title">Recommendations</h1>
+            </div>
             <div className="recommendations-list">
                 {recommendations.map((recommendation) => (
                     <div className="recommendation-card" key={recommendation.id}>
