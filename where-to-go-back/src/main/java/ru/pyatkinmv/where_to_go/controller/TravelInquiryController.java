@@ -44,7 +44,7 @@ public class TravelInquiryController {
     @GetMapping("/{inquiryId}/recommendations")
     public TravelRecommendationDetailedOptionListDto getDetailedRecommendation(@PathVariable Long inquiryId) {
         TravelRecommendationDetailedOptionListDto travelRecommendationDetailedOptionListDto = new TravelRecommendationDetailedOptionListDto(
-                inquiryService.getInquiryWithDetailedRecommendation(inquiryId, 15_000L)
+                inquiryService.getInquiryWithDetailedRecommendation(inquiryId, 25_000L)
                         .getDetailedRecommendations()
         );
 
