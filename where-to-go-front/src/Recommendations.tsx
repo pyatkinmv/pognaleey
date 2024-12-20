@@ -29,6 +29,17 @@ const Recommendations: React.FC = () => {
     const [recommendations, setRecommendations] = useState<QuickRecommendation[] | DetailedRecommendation[]>(quickRecommendations || []);
     const [isLoading, setIsLoading] = useState<boolean>(true); // Изначально показываем индикатор загрузки
 
+    // Для модального окна
+    const [selectedImage, setSelectedImage] = useState<string | null>(null);
+
+    const handleImageClick = (imageUrl: string) => {
+        setSelectedImage(imageUrl); // Открыть модальное окно
+    };
+
+    const closeModal = () => {
+        setSelectedImage(null); // Закрыть модальное окно
+    };
+
     useEffect(() => {
         // Проверяем, что inquiryId существует
         if (!params.inquiryId) {
@@ -80,6 +91,7 @@ const Recommendations: React.FC = () => {
                                     className="recommendation-image"
                                     src={recommendation.imageUrl}
                                     alt={recommendation.title}
+                                    onClick={() => handleImageClick(recommendation.imageUrl || "/logo512.png")}
                                 />
                             )}
                         </div>
@@ -107,10 +119,22 @@ const Recommendations: React.FC = () => {
                                         Consideration:</strong> {recommendation.additionalConsideration}</p>
                                 </>
                             )}
+
                         </div>
                     </div>
                 ))}
+                {selectedImage && (
+                    <div className="modal-overlay" onClick={closeModal}>
+                        <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+                            <img className="modal-image" src={selectedImage} alt="Enlarged"/>
+                            <button className="modal-close" onClick={closeModal}>
+                                &times;
+                            </button>
+                        </div>
+                    </div>
+                )}
             </div>
+
         </div>
     );
 };
