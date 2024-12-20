@@ -28,17 +28,6 @@
     gap: 20px;
 }
 
-/* Карточка рекомендации */
-.recommendation-card {
-    display: flex;
-    align-items: flex-start;
-    background-color: #fff;
-    border-radius: 10px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-    overflow: hidden;
-    padding: 20px;
-}
-
 /* Изображение */
 .recommendation-image {
     width: 512px;
@@ -112,8 +101,6 @@ strong {
     background-color: #ffffff;
     border-radius: 10px;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-    margin: 20px;
-    padding: 20px;
     overflow: hidden;
 }
 
@@ -152,5 +139,73 @@ strong {
     margin-top: 10px;
     font-size: 16px;
     color: #333;
+}
+
+.recommendation-image:hover {
+    transform: scale(1.05);
+}
+
+/* Детали рекомендации */
+.recommendation-details {
+    margin-top: 10px;
+}
+
+/* Стили для модального окна */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8); /* Затемнение фона */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modal-content {
+    position: relative;
+    background: transparent;
+    border-radius: 10px;
+    max-width: 90%;
+    max-height: 90%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+}
+
+.modal-image {
+    max-width: 100%;
+    max-height: 100%;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+}
+
+/* Кнопка закрытия в виде крестика */
+.modal-close {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    color: #fff; /* Белый цвет крестика */
+    font-size: 24px; /* Увеличенный размер */
+    font-weight: bold;
+    background: none; /* Убираем фон */
+    border: none; /* Убираем границы */
+    cursor: pointer;
+    padding: 0; /* Убираем внутренние отступы */
+    line-height: 1;
+    z-index: 1001; /* Чтобы кнопка была поверх картинки */
+    transition: transform 0.3s ease;
+}
+
+.modal-close:hover {
+    transform: scale(1.2); /* Увеличение при наведении */
+    color: #eb6b3b; /* Цвет крестика при наведении */
+}
+
+.modal-close:hover {
+    background: #c74d27;
 }
 
