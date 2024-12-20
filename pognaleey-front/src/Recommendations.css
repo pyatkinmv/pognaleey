@@ -1,0 +1,232 @@
+/* Общие стили контейнера */
+.recommendations-container {
+    font-family: 'Arial', sans-serif;
+    background-color: #E8DFC2;
+    color: #333;
+    padding: 20px;
+}
+
+/* Заголовок */
+.title {
+    color: #EB6B3B;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+/* Индикатор загрузки */
+.loading-indicator {
+    text-align: center;
+    color: #79C8CB;
+    font-size: 18px;
+    margin-bottom: 20px;
+}
+
+/* Список рекомендаций */
+.recommendations-list {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+/* Изображение */
+.recommendation-image {
+    width: 512px;
+    height: 512px;
+    object-fit: cover;
+    border-radius: 10px;
+    margin-right: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Контент рекомендации */
+.recommendation-content {
+    flex: 1;
+}
+
+/* Заголовок рекомендации */
+.recommendation-title {
+    color: #EB6B3B;
+    font-size: 24px;
+    margin-bottom: 10px;
+}
+
+/* Описание рекомендации */
+.recommendation-description {
+    color: #666;
+    margin-bottom: 15px;
+    font-size: 16px;
+    line-height: 1.6;
+}
+
+/* Стили для списков */
+ul {
+    list-style: disc;
+    padding-left: 20px;
+    margin: 10px 0;
+}
+
+li {
+    margin-bottom: 5px;
+}
+
+/* Дополнительные стили для текста */
+strong {
+    color: #79C8CB;
+    font-weight: bold;
+}
+
+/* CSS для вращающегося прогресс-бара */
+.loader {
+    border: 4px solid #f3f3f3; /* Light grey */
+    border-top: 4px solid #79C8CB; /* Blue color */
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    animation: spin 1s linear infinite;
+    margin: auto; /* Центрирование внутри элемента */
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+.recommendation-card {
+    display: flex;
+    align-items: center;
+    background-color: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+}
+
+/* Обёртка для изображения */
+.recommendation-image-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 500px;
+    height: 500px;
+    background-color: #f0f0f0;
+    border-radius: 10px;
+    margin-right: 20px;
+}
+
+/* Картинка */
+.recommendation-image {
+    max-width: 100%;
+    max-height: 100%;
+    border-radius: 10px;
+    object-fit: cover;
+}
+
+/* Контейнер с текстом */
+.recommendation-content {
+    flex: 1;
+}
+
+/* Заголовок */
+.recommendation-content h2 {
+    color: #79C8CB;
+}
+
+/* Описание */
+.recommendation-content p {
+    margin-top: 10px;
+    font-size: 16px;
+    color: #333;
+}
+
+.recommendation-image:hover {
+    transform: scale(1.05);
+}
+
+/* Детали рекомендации */
+.recommendation-details {
+    margin-top: 10px;
+}
+
+/* Стили для модального окна */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8); /* Затемнение фона */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modal-content {
+    position: relative;
+    background: transparent;
+    border-radius: 10px;
+    max-width: 90%;
+    max-height: 90%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+}
+
+.modal-image {
+    max-width: 100%;
+    max-height: 100%;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+}
+
+/* Кнопка закрытия в виде крестика */
+.modal-close {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    color: #fff; /* Белый цвет крестика */
+    font-size: 24px; /* Увеличенный размер */
+    font-weight: bold;
+    background: none; /* Убираем фон */
+    border: none; /* Убираем границы */
+    cursor: pointer;
+    padding: 0; /* Убираем внутренние отступы */
+    line-height: 1;
+    z-index: 1001; /* Чтобы кнопка была поверх картинки */
+    transition: transform 0.3s ease;
+}
+
+.modal-close:hover {
+    transform: scale(1.2); /* Увеличение при наведении */
+    color: #eb6b3b; /* Цвет крестика при наведении */
+}
+
+.modal-close:hover {
+    background: #c74d27;
+}
+
+/* Контейнер заголовка */
+.header {
+    display: flex; /* Расположить элементы в строку */
+    align-items: center; /* Вертикально выравниваем логотип и текст */
+    margin: 20px 0; /* Отступ сверху и снизу для заголовка */
+}
+
+/* Логотип */
+.logo {
+    width: 92px; /* Ширина логотипа */
+    height: 92px; /* Высота логотипа */
+    object-fit: contain; /* Сохраняем пропорции логотипа */
+    margin-right: 20px; /* Отступ справа от логотипа до текста */
+}
+
+/* Заголовок */
+.recommendations-title {
+    font-size: 2.5rem; /* Размер текста */
+    color: #eb6b3b; /* Цвет заголовка */
+    margin: 0; /* Убираем лишние отступы */
+}
