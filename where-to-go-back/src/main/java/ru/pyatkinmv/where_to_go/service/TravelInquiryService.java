@@ -23,7 +23,7 @@ public class TravelInquiryService {
     private final TravelInquiryRepository inquiryRepository;
     private final TravelRecommendationService recommendationService;
 
-    public TravelInquiryDto createInquiry(Map<String, String> inquiryParams) {
+    public TravelInquiryDto createInquiry(Map<String, Object> inquiryParams) {
         var inquiryPayload = toString(inquiryParams);
         var inquiry = TravelInquiry.builder()
                 .params(inquiryPayload)
@@ -34,10 +34,10 @@ public class TravelInquiryService {
 
         try {
             recommendations = recommendationService.createQuickRecommendations(inquiry.getId(), inquiryPayload);
-//            recommendationService.enrichWithDetailsAsync(
-//                    recommendations,
-//                    inquiryPayload
-//            );
+            recommendationService.enrichWithDetailsAsync(
+                    recommendations,
+                    inquiryPayload
+            );
 
             recommendationService.enrichWithImagesAsync(recommendations);
 
@@ -82,10 +82,30 @@ public class TravelInquiryService {
         return TravelInquiryMapper.toDto(inquiry, recommendations);
     }
 
-    private static String toString(Map<String, String> params) {
-        return params.entrySet().stream()
+    private static String toString(Map<String, Object> params) {
+        return filterNonEmpty(params).entrySet().stream()
                 .map(it -> it.getKey() + "=" + it.getValue())
                 .collect(Collectors.joining(";"));
+    }
+
+    private static Map<String, Object> filterNonEmpty(Map<String, Object> params) {
+        return params.entrySet().stream()
+                .filter(it -> {
+                    if (it.getValue() instanceof String && ((String) it.getValue()).isEmpty()) {
+                        return false;
+                    }
+
+                    if (it.getValue() instanceof Collection && ((Collection) it.getValue()).isEmpty()) {
+                        return false;
+                    }
+
+                    if (it.getValue() instanceof Map && ((Map) it.getValue()).isEmpty()) {
+                        return false;
+                    }
+
+
+                    return true;
+                }).collect(Collectors.toMap(it -> it.getKey(), it -> it.getValue()));
     }
 
 }
