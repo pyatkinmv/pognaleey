@@ -68,20 +68,21 @@ const Recommendations: React.FC = () => {
     return (
         <div className="recommendations-container">
             <h1 className="title">Recommendations</h1>
-
-            {/* Рендерим прогресс-бар, если идёт загрузка */}
-            {isLoading && <div className="loading-indicator">Loading detailed recommendations...</div>}
-
-            {/* Список рекомендаций */}
             <div className="recommendations-list">
                 {recommendations.map((recommendation) => (
                     <div className="recommendation-card" key={recommendation.id}>
-                        {/* Картинка */}
-                        <img
-                            className="recommendation-image"
-                            src={recommendation.imageUrl || "/logo512.png"} // Заглушка, если картинки нет
-                            alt={recommendation.title}
-                        />
+                        {/* Вращающийся индикатор или изображение */}
+                        <div className="recommendation-image-wrapper">
+                            {isLoading ? (
+                                <div className="loader"/> // Прогресс-бар
+                            ) : (
+                                <img
+                                    className="recommendation-image"
+                                    src={recommendation.imageUrl}
+                                    alt={recommendation.title}
+                                />
+                            )}
+                        </div>
                         {/* Контент */}
                         <div className="recommendation-content">
                             <h2 className="recommendation-title">{recommendation.title}</h2>
