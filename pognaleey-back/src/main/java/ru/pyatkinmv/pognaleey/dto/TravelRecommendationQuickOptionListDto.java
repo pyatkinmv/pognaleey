@@ -2,5 +2,5 @@ package ru.pyatkinmv.pognaleey.dto;
 
 import java.util.List;
 
-public record TravelRecommendationQuickOptionListDto(List<TravelRecommendationDetailedOptionDto> options) {
+public record TravelRecommendationQuickOptionListDto(List<TravelRecommendationDto> options) {
 }

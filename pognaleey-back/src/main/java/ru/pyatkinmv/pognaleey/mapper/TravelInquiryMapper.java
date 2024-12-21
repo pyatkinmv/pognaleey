@@ -6,6 +6,7 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import lombok.SneakyThrows;
 import org.springframework.stereotype.Component;
 import ru.pyatkinmv.pognaleey.dto.TravelInquiryDto;
+import ru.pyatkinmv.pognaleey.dto.TravelRecommendationListDto;
 import ru.pyatkinmv.pognaleey.dto.TravelRecommendationQuickOptionDto;
 import ru.pyatkinmv.pognaleey.model.TravelInquiry;
 import ru.pyatkinmv.pognaleey.model.TravelRecommendation;
@@ -35,6 +36,14 @@ public class TravelInquiryMapper {
                 .detailedRecommendations(recommendations.stream()
                         .map(it -> toDtoDetailed(it.getDetails(), it.getImageUrl()).orElse(null)).toList())
                 .build();
+    }
+
+    public static TravelRecommendationListDto toDto(Collection<TravelRecommendation> recommendations) {
+        return new TravelRecommendationListDto(
+                recommendations.stream()
+                        .map(it -> toDtoDetailed(it.getDetails(), it.getImageUrl()).orElse(null))
+                        .toList()
+        );
     }
 
     @SneakyThrows

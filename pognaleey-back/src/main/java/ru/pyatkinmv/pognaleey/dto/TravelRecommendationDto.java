@@ -4,7 +4,7 @@ import lombok.Setter;
 
 import java.util.List;
 
-public record TravelRecommendationDetailedOptionDto(
+public record TravelRecommendationDto(
         String title,
         Budget budget,
         String reasoning,
@@ -12,7 +12,6 @@ public record TravelRecommendationDetailedOptionDto(
         String tips,
         List<String> whereToGo,
         String additionalConsideration,
-        @Setter
         String imageUrl
 ) {
     public record Budget(int from, int to) {

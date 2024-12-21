@@ -17,6 +17,6 @@ public class TravelInquiryDto {
     private String payload;
     private Instant createdAt;
     private List<TravelRecommendationQuickOptionDto> quickRecommendations;
-    private List<TravelRecommendationDetailedOptionDto> detailedRecommendations;
+    private List<TravelRecommendationDto> detailedRecommendations;
 }
 
