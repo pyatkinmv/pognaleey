@@ -9,8 +9,8 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import ru.pyatkinmv.pognaleey.client.GptHttpClient;
 import ru.pyatkinmv.pognaleey.client.ImagesSearchHttpClient;
-import ru.pyatkinmv.pognaleey.dto.TravelRecommendationDetailedOptionDto;
-import ru.pyatkinmv.pognaleey.dto.TravelRecommendationDetailedOptionListDto;
+import ru.pyatkinmv.pognaleey.dto.TravelRecommendationDto;
+import ru.pyatkinmv.pognaleey.dto.TravelRecommendationListDto;
 import ru.pyatkinmv.pognaleey.dto.TravelRecommendationQuickOptionDto;
 import ru.pyatkinmv.pognaleey.mapper.TravelInquiryMapper;
 import ru.pyatkinmv.pognaleey.model.TravelRecommendation;
@@ -129,14 +129,14 @@ public class TravelRecommendationService {
     }
 
     @SneakyThrows
-    public static Optional<TravelRecommendationDetailedOptionListDto> toDtoDetailedList(
+    public static Optional<TravelRecommendationListDto> toDtoDetailedList(
             @Nullable String recommendationDetailedPayload
     ) {
         if (recommendationDetailedPayload != null) {
             return Optional.ofNullable(
                     OBJECT_MAPPER.readValue(
                             recommendationDetailedPayload,
-                            TravelRecommendationDetailedOptionListDto.class
+                            TravelRecommendationListDto.class
                     )
             );
         } else {
@@ -145,7 +145,7 @@ public class TravelRecommendationService {
     }
 
     @SneakyThrows
-    public static Optional<TravelRecommendationDetailedOptionDto> toDtoDetailed(
+    public static Optional<TravelRecommendationDto> toDtoDetailed(
             @Nullable String recommendationDetailedPayload,
             @Nullable String imageUrl
     ) {
@@ -157,7 +157,7 @@ public class TravelRecommendationService {
             var result = Optional.ofNullable(
                     OBJECT_MAPPER.readValue(
                             recommendationDetailedPayload,
-                            TravelRecommendationDetailedOptionDto.class
+                            TravelRecommendationDto.class
                     )
             );
             return result;

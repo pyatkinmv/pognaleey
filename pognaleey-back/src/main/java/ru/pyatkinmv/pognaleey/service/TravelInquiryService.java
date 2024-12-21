@@ -1,9 +1,9 @@
 package ru.pyatkinmv.pognaleey.service;
 
 import lombok.RequiredArgsConstructor;
-import lombok.SneakyThrows;
 import org.springframework.stereotype.Service;
 import ru.pyatkinmv.pognaleey.dto.TravelInquiryDto;
+import ru.pyatkinmv.pognaleey.dto.TravelRecommendationListDto;
 import ru.pyatkinmv.pognaleey.mapper.TravelInquiryMapper;
 import ru.pyatkinmv.pognaleey.model.TravelInquiry;
 import ru.pyatkinmv.pognaleey.model.TravelRecommendation;
@@ -34,11 +34,7 @@ public class TravelInquiryService {
 
         try {
             recommendations = recommendationService.createQuickRecommendations(inquiry.getId(), inquiryPayload);
-            recommendationService.enrichWithDetailsAsync(
-                    recommendations,
-                    inquiryPayload
-            );
-
+            recommendationService.enrichWithDetailsAsync(recommendations, inquiryPayload);
             recommendationService.enrichWithImagesAsync(recommendations);
 
             return TravelInquiryMapper.toDto(inquiry, recommendations);
@@ -47,13 +43,28 @@ public class TravelInquiryService {
         }
     }
 
-    @SneakyThrows
-    public TravelInquiryDto getInquiryWithDetailedRecommendation(Long inquiryId, long timeoutMillis) {
-        if (!inquiryRepository.existsById(inquiryId)) {
+    public TravelRecommendationListDto getInquiryRecommendations(Long inquiryId, long timeoutMillis) {
+        var inquiry = inquiryRepository.findById(inquiryId);
+
+        if (inquiry.isEmpty()) {
             throw new RuntimeException("Inquiry with id " + inquiryId + " does not exist");
         }
 
-        CompletableFuture<Collection<TravelRecommendation>> future = CompletableFuture.supplyAsync(() -> {
+        var future = buildRecommendationFutureFetch(inquiryId, 500);
+        Collection<TravelRecommendation> recommendations;
+
+        try {
+            recommendations = future.get(timeoutMillis, TimeUnit.MILLISECONDS);
+        } catch (Exception e) {
+            throw new RuntimeException("Timeout: Detailed recommendation not available yet.", e);
+        }
+
+        return TravelInquiryMapper.toDto(recommendations);
+    }
+
+    private CompletableFuture<Collection<TravelRecommendation>> buildRecommendationFutureFetch(Long inquiryId,
+                                                                                               long sleepMs) {
+        return CompletableFuture.supplyAsync(() -> {
             while (true) {
                 var recommendations = recommendationService.findByInquiryId(inquiryId);
 
@@ -63,23 +74,12 @@ public class TravelInquiryService {
                 }
 
                 try {
-                    Thread.sleep(500);
+                    Thread.sleep(sleepMs);
                 } catch (InterruptedException e) {
                     throw new RuntimeException(e);
                 }
             }
         });
-
-        Collection<TravelRecommendation> recommendations;
-        try {
-            recommendations = future.get(timeoutMillis, TimeUnit.MILLISECONDS);
-        } catch (Exception e) {
-            throw new RuntimeException("Timeout: Detailed recommendation not available yet.", e);
-        }
-
-        var inquiry = inquiryRepository.findById(inquiryId).orElseThrow();
-
-        return TravelInquiryMapper.toDto(inquiry, recommendations);
     }
 
     private static String toString(Map<String, Object> params) {
