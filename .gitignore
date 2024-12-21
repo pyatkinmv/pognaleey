@@ -1,4 +1,4 @@
-where-to-go-back/HELP.md
+pognaleey-back/HELP.md
 target/
 !.mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
@@ -62,4 +62,7 @@ dist/
 
 yarn-debug.log*
 yarn-error.log*
+
+# Файлы конфигурации с секретами
+application-*.properties
 
