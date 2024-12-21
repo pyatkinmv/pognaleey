@@ -2,9 +2,7 @@ package ru.pyatkinmv.pognaleey.client;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
@@ -19,38 +17,29 @@ import java.util.regex.Pattern;
 public class ImagesSearchHttpClient {
     private final RestTemplate defaultRestTemplate;
 
-    private static final String URL_FORMAT = "https://yandex.ru/images-xml?apikey=APIKEY&folderid=FOLDER_ID&text=%s&isize=large&groupby=attr=ii.groups-on-page=1&itype=png&iorient=square";
-    //&iorient=square
+    @Value("${image-search-client.api-key}")
+    private String imageSearchApiKey;
+
+    @Value("${image-search-client.folder-id}")
+    private String imageSearchFolderId;
+
+    private static final String URL_FORMAT = "https://yandex.ru/images-xml?apikey=%s&folderid=%s&text=%s&isize=large" +
+            "&groupby=attr=ii.groups-on-page=1&itype=png&iorient=square";
 
     public String searchImageUrl(String text) {
         log.info("searchImageUrl for text {}", text);
 
-        var headers = new HttpHeaders();
-//        headers.add("Content-Type", "text/plain; charset=UTF-8");
-        var requestEntity = new HttpEntity<>(headers);
-//        var url = UriComponentsBuilder.fromUriString("https://yandex.ru/images-xml")
-//                .queryParam("text", text)
-//                .queryParam("folderid", "FOLDER_ID")
-////                .queryParam("groupby", "attr=ii.groups-on-page=1")
-//                .queryParam("iorient", "square")
-//                .queryParam("apikey", "APIKEY")
-//                .queryParam("isize", "large")
-//                .build(false)
-////                .encode(StandardCharsets.UTF_8)
-//                .toUriString();
-
-        var url = String.format(URL_FORMAT, text);
+        var url = String.format(URL_FORMAT, imageSearchApiKey, imageSearchFolderId, text);
 
         log.info("searchImageUrl url {}", url);
-        var responseXml = defaultRestTemplate.exchange(url, HttpMethod.GET, requestEntity, String.class);
-//        log.info("searchImageUrl responseXml {}", responseXml);
+        var responseXml = defaultRestTemplate.getForObject(url, String.class);
 
         // Регулярное выражение для поиска <image-link>
         String regex = "<image-link>(.*?)</image-link>";
 
         // Создаем Pattern и Matcher
         var pattern = Pattern.compile(regex);
-        Matcher matcher = pattern.matcher(responseXml.getBody());
+        Matcher matcher = pattern.matcher(responseXml);
 
         // Список для хранения ссылок
         List<String> imageLinks = new ArrayList<>();
@@ -65,7 +54,7 @@ public class ImagesSearchHttpClient {
 
         if (imageLinks.isEmpty()) {
             log.info("no imageLinks found");
-            log.info(responseXml.getBody());
+            log.info(responseXml);
         }
 
         return imageLinks.getFirst();
