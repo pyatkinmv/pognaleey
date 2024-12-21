@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
-import org.thymeleaf.TemplateEngine;
 import ru.pyatkinmv.pognaleey.dto.TravelInquiryDto;
 import ru.pyatkinmv.pognaleey.dto.TravelRecommendationDetailedOptionListDto;
 import ru.pyatkinmv.pognaleey.service.TravelInquiryService;
@@ -21,7 +20,6 @@ import static ru.pyatkinmv.pognaleey.mapper.TravelInquiryMapper.OBJECT_MAPPER;
 @Slf4j
 public class TravelInquiryController {
     private final TravelInquiryService inquiryService;
-    private final TemplateEngine templateEngine;
 
     @SneakyThrows
     @PostMapping
