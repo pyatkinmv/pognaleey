@@ -13,7 +13,7 @@ import java.time.Instant;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@Table("TRAVEL_INQUIRIES")
+@Table("travel_inquiries")
 public class TravelInquiry {
     @Id
     private Long id;

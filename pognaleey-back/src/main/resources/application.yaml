@@ -1,0 +1,24 @@
+server:
+  servlet:
+    context-path: /api/v1
+  port: 8080
+spring:
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+  application:
+    name: pognaleey
+  datasource:
+    url: jdbc:postgresql://host:5432/pognaleey
+  profiles:
+    active: dev
+logging:
+  level:
+    root: INFO
+image-search-client:
+  api-key: apiKey
+  folder-id: folderId
+gpt-client:
+  folder-id: folderId
+  api-key: apiKey
+

@@ -65,4 +65,5 @@ yarn-error.log*
 
 # Файлы конфигурации с секретами
 application-*.properties
+application-*.yaml
 
