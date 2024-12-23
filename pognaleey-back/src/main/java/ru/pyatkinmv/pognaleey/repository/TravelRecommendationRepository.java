@@ -13,7 +13,7 @@ public interface TravelRecommendationRepository extends CrudRepository<TravelRec
 
     @Modifying
     @Query("""
-                UPDATE TRAVEL_RECOMMENDATIONS 
+                UPDATE travel_recommendations 
                 SET DETAILS = :details
                 WHERE id = :id
             """)
@@ -29,7 +29,7 @@ public interface TravelRecommendationRepository extends CrudRepository<TravelRec
 
     @Modifying
     @Query("""
-                UPDATE TRAVEL_RECOMMENDATIONS 
+                UPDATE travel_recommendations 
                 SET IMAGE_URL = :imageUrl
                 WHERE id = :id
             """)

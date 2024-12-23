@@ -1,0 +1,5 @@
+spring:
+  datasource:
+    url: jdbc:tc:postgresql:17-alpine:///pognaleey
+  profiles:
+    active: test
