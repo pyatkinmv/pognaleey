@@ -1,0 +1,38 @@
+version: "3.9"
+services:
+  pognaleey-back:
+    container_name: pognaleey-back=
+    build:
+      context: ./pognaleey-back
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"        # Map pognaleey-back service to localhost:8080
+      - "5005:5005"        # Expose debugging port
+    environment:
+      SPRING_PROFILES_ACTIVE: dev
+    depends_on:
+      - dbpostgresql                 # Ensure the database starts first
+
+  pognaleey-front:
+    container_name: pognaleey-front
+    build:
+      context: ./pognaleey-front
+      dockerfile: Dockerfile
+    ports:
+      - "80:80"        # Map pognaleey-front to localhost:3000
+    stdin_open: true
+    tty: true
+    volumes:
+      - ./pognaleey-front/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on:
+      - pognaleey-back
+
+  dbpostgresql:
+    image: postgres:17.2
+    container_name: pognaleey-db
+    ports:
+      - "5432:5432"        # Map PostgreSQL to localhost:5432
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: pognaleey

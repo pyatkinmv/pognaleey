@@ -1,8 +1,6 @@
 import React, {useState} from "react";
 import {useNavigate} from "react-router-dom"; // Для перехода между страницами
 
-const API_URL = process.env.REACT_APP_API_URL;
-
 const App: React.FC = () => {
     const [formData, setFormData] = useState({
         purpose: [] as string[],
@@ -67,8 +65,7 @@ const App: React.FC = () => {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         try {
-
-            const response = await fetch(`${API_URL}/api/v1/travel-inquiries`, {
+            const response = await fetch(`${process.env.REACT_APP_API_URL}/travel-inquiries`, {
                 method: "POST",
                 headers: {"Content-Type": "application/json"},
                 body: JSON.stringify(formData),
@@ -79,8 +76,7 @@ const App: React.FC = () => {
                 const inquiryId = data.id; // Предполагается, что сервер возвращает `inquiryId`
 
                 // Редирект на страницу рекомендаций
-                // navigate(`${API_URL}/api/v1/travel-inquiries/${inquiryId}/recommendations`);
-                navigate(`/api/v1/travel-inquiries/${inquiryId}/recommendations`, {
+                navigate(`/travel-inquiries/${inquiryId}/recommendations`, {
                     state: {quickRecommendations: data.quickRecommendations},
                 });
             } else {

@@ -10,8 +10,6 @@ import ru.pyatkinmv.pognaleey.service.TravelInquiryService;
 
 import java.util.Map;
 
-// TODO: fixme
-@CrossOrigin
 @RestController
 @RequestMapping("/travel-inquiries")
 @RequiredArgsConstructor

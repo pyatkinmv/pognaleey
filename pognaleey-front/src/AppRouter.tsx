@@ -8,7 +8,7 @@ const AppRouter: React.FC = () => {
             <Routes>
                 <Route path="/" element={<App/>}/>
                 <Route
-                    path="/api/v1/travel-inquiries/:inquiryId/recommendations"
+                    path="/travel-inquiries/:inquiryId/recommendations"
                     element={<Recommendations/>}
                 />
             </Routes>
