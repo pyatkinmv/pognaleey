@@ -53,7 +53,7 @@ const Recommendations: React.FC = () => {
             setIsLoading(true); // Устанавливаем индикатор загрузки
 
             try {
-                const response = await fetch(`${process.env.REACT_APP_API_URL}/api/v1/travel-inquiries/${params.inquiryId}/recommendations`);
+                const response = await fetch(`${process.env.REACT_APP_API_URL}/travel-inquiries/${params.inquiryId}/recommendations`);
 
                 if (!response.ok) {
                     throw new Error(`Failed to fetch recommendations: ${response.status}`);

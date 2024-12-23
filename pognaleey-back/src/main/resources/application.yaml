@@ -9,9 +9,11 @@ spring:
   application:
     name: pognaleey
   datasource:
-    url: jdbc:postgresql://host:5432/pognaleey
+    url: jdbc:postgresql://${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}
+    username: ${POSTGRES_USER}
+    password: ${POSTGRES_PASSWORD}
   profiles:
-    active: dev
+    active: local
 logging:
   level:
     root: INFO
