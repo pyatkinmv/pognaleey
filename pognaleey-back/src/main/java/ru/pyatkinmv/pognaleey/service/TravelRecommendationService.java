@@ -36,10 +36,9 @@ public class TravelRecommendationService {
     private final GptHttpClient gptHttpClient;
     private final ImagesSearchHttpClient imagesSearchHttpClient;
     private final TravelRecommendationRepository recommendationRepository;
-    private final PromptService promptService;
 
     public List<TravelRecommendation> createShortRecommendations(Long inquiryId, String inquiryParams) {
-        var prompt = promptService.getShortPrompt(3, inquiryParams);
+        var prompt = PromptService.getShortPrompt(3, inquiryParams);
         var answer = gptHttpClient.ask(prompt);
         var recommendations = parse(inquiryId, answer);
         recommendations = recommendationRepository.saveAll(recommendations);
@@ -63,7 +62,7 @@ public class TravelRecommendationService {
     @Async
     public void enrichWithDetailsAsync(List<TravelRecommendation> recommendations, String inquiryParams) {
         log.info("begin enrichWithDetailsAsync");
-        var prompt = promptService.getDetailedPrompt(recommendations, inquiryParams);
+        var prompt = PromptService.getDetailedPrompt(recommendations, inquiryParams);
         var detailsRaw = gptHttpClient.ask(prompt);
         var parsed = toDtoDetailedList(detailsRaw).orElseThrow();
 
