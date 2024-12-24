@@ -88,6 +88,8 @@ public class TravelInquiryService {
                 .collect(Collectors.joining(";"));
     }
 
+    //TODO: fixme
+    @Deprecated
     private static Map<String, Object> filterNonEmpty(Map<String, Object> params) {
         return params.entrySet().stream()
                 .filter(it -> {

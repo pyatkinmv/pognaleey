@@ -189,6 +189,10 @@ public class TravelRecommendationService {
         return String.format("%s-%s", recommendation.getTitle(), recommendation.getShortDescription());
     }
 
+    public List<TravelRecommendation> findAllByIds(List<Long> recommendationIds) {
+        return recommendationRepository.findAllByIdIn(recommendationIds);
+    }
+
     private record RecIdToImageUrl(long recId, String imageUrl) {
     }
 }

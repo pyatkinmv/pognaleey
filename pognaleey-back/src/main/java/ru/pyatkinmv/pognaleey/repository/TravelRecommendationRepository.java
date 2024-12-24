@@ -6,9 +6,12 @@ import org.springframework.data.repository.CrudRepository;
 import ru.pyatkinmv.pognaleey.model.TravelRecommendation;
 
 import java.util.Collection;
+import java.util.List;
 
 public interface TravelRecommendationRepository extends CrudRepository<TravelRecommendation, Long> {
     Collection<TravelRecommendation> findByInquiryId(Long inquiryId);
+
+    List<TravelRecommendation> findAllByIdIn(List<Long> ids);
 
     @Modifying
     @Query("""
