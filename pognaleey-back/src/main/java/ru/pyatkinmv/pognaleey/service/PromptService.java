@@ -7,19 +7,18 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-@Service
 public class PromptService {
 
     private static final String SHORT_PROMPT_FORMAT = """
-            Придумай мне ровно %d варианта путешествий исходя из входных условий. 
-            Ответ выдай в формате: место1;описание|место2;описание|место3;описание. 
-            Описание не должно содержать более 5 слов. 
-            Пример: Париж;город любви и романтики|Рим;вечный город с богатой историей|Барселона;история и современность. 
-            Не надо никаких дополнительных нумераций и слов, ответ просто одной строкой на русском языке. Условия: %s"
+            Придумай мне ровно %d варианта путешествий исходя из входных условий.
+            Ответ выдай в формате: место1;описание|место2;описание|место3;описание.
+            Описание не должно содержать более 5 слов.
+            Пример: Париж;город любви и романтики|Рим;вечный город с богатой историей|Барселона;история и современность.
+            Не надо никаких дополнительных нумераций и слов, ответ просто одной строкой на русском языке.Условия: %s
             """;
 
     private static final String DETAILED_PROMPT_FORMAT = """
-            У меня есть следующие %d варианта для путешествия: %s. Мои пожелания для путешествия следующие: %s.
+            У меня есть следующие %d варианта для путешествия: %s.Мои пожелания для путешествия следующие: %s.
             Дай мне исходя из этих предпочтений подробное описание этих вариантов в формате JSON
             (не надо никаких дополнительных нумераций и слов, в ответе только JSON).
             Формат:
@@ -37,16 +36,16 @@ public class PromptService {
                 ]
             }""";
 
-    public String getShortPrompt(int optionsNumber, String inquiryParams) {
+    public static String getShortPrompt(int optionsNumber, String inquiryParams) {
         return String.format(SHORT_PROMPT_FORMAT, optionsNumber, inquiryParams)
-                .replaceAll("\n", "").replaceAll("\t", "");
+                .replaceAll("\n", "");
     }
 
-    public String getDetailedPrompt(List<TravelRecommendation> recommendations, String inquiryParams) {
+    public static String getDetailedPrompt(List<TravelRecommendation> recommendations, String inquiryParams) {
         var recommendationsStr = toPromtString(recommendations);
 
         return String.format(DETAILED_PROMPT_FORMAT, recommendations.size(), recommendationsStr, inquiryParams)
-                .replaceAll("\n", "").replaceAll("\t", "");
+                .replaceAll("\n", "").replaceAll("   ", "");
     }
 
     private static String toPromtString(List<TravelRecommendation> recommendations) {
