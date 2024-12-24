@@ -1,6 +1,5 @@
 package ru.pyatkinmv.pognaleey.service;
 
-import org.springframework.stereotype.Service;
 import ru.pyatkinmv.pognaleey.model.TravelRecommendation;
 
 import java.util.List;
@@ -9,7 +8,7 @@ import java.util.stream.IntStream;
 
 public class PromptService {
 
-    private static final String SHORT_PROMPT_FORMAT = """
+    static final String SHORT_PROMPT_FORMAT = """
             Придумай мне ровно %d варианта путешествий исходя из входных условий.
             Ответ выдай в формате: место1;описание|место2;описание|место3;описание.
             Описание не должно содержать более 5 слов.
@@ -17,7 +16,7 @@ public class PromptService {
             Не надо никаких дополнительных нумераций и слов, ответ просто одной строкой на русском языке.Условия: %s
             """;
 
-    private static final String DETAILED_PROMPT_FORMAT = """
+    static final String DETAILED_PROMPT_FORMAT = """
             У меня есть следующие %d варианта для путешествия: %s.Мои пожелания для путешествия следующие: %s.
             Дай мне исходя из этих предпочтений подробное описание этих вариантов в формате JSON
             (не надо никаких дополнительных нумераций и слов, в ответе только JSON).

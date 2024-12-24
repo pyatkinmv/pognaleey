@@ -18,6 +18,8 @@ public class TravelRecommendation {
     @Id
     private Long id;
 
+    private Instant createdAt;
+
     private Long inquiryId;
 
     private String title;
@@ -27,6 +29,4 @@ public class TravelRecommendation {
     private String details;
 
     private String imageUrl;
-
-    private Instant createdAt;
 }
