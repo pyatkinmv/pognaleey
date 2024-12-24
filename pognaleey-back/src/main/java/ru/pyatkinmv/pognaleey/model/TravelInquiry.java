@@ -20,7 +20,5 @@ public class TravelInquiry {
 
     private String params;
 
-//    private TravelInquiryStatus status;
-
     private Instant createdAt;
 }

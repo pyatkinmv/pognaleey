@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.pyatkinmv.pognaleey.dto.TravelInquiryDto;
 import ru.pyatkinmv.pognaleey.dto.TravelRecommendationListDto;
-import ru.pyatkinmv.pognaleey.mapper.TravelInquiryMapper;
+import ru.pyatkinmv.pognaleey.mapper.TravelMapper;
 import ru.pyatkinmv.pognaleey.model.TravelInquiry;
 import ru.pyatkinmv.pognaleey.model.TravelRecommendation;
 import ru.pyatkinmv.pognaleey.repository.TravelInquiryRepository;
@@ -33,11 +33,11 @@ public class TravelInquiryService {
         List<TravelRecommendation> recommendations;
 
         try {
-            recommendations = recommendationService.createQuickRecommendations(inquiry.getId(), inquiryPayload);
+            recommendations = recommendationService.createShortRecommendations(inquiry.getId(), inquiryPayload);
             recommendationService.enrichWithDetailsAsync(recommendations, inquiryPayload);
             recommendationService.enrichWithImagesAsync(recommendations);
 
-            return TravelInquiryMapper.toDto(inquiry, recommendations);
+            return TravelMapper.toDto(inquiry, recommendations);
         } catch (Exception e) {
             throw new RuntimeException("Failed to process inquiry", e);
         }
@@ -59,7 +59,7 @@ public class TravelInquiryService {
             throw new RuntimeException("Timeout: Detailed recommendation not available yet.", e);
         }
 
-        return TravelInquiryMapper.toDto(recommendations);
+        return TravelMapper.toDto(recommendations);
     }
 
     private CompletableFuture<Collection<TravelRecommendation>> buildRecommendationFutureFetch(Long inquiryId,
