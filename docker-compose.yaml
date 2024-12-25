@@ -8,8 +8,6 @@ services:
     ports:
       - "8080:8080"        # Map pognaleey-back service to localhost:8080
       - "5005:5005"        # Expose debugging port
-    environment:
-      SPRING_PROFILES_ACTIVE: dev
     depends_on:
       - dbpostgresql                 # Ensure the database starts first
 

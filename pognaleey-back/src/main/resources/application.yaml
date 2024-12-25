@@ -23,4 +23,5 @@ image-search-client:
 gpt-client:
   folder-id: folderId
   api-key: apiKey
-
+  url: url
+  model-uri: modelUri

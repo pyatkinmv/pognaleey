@@ -1,6 +1,10 @@
 package ru.pyatkinmv.pognaleey.service;
 
+import ru.pyatkinmv.pognaleey.dto.gpt.GptResponseQuickRecommendationListDto;
+import ru.pyatkinmv.pognaleey.dto.gpt.GptResponseQuickRecommendationListDto.GptResponseQuickRecommendationDto;
+import ru.pyatkinmv.pognaleey.dto.gpt.GptResponseRecommendationDetailsListDto;
 import ru.pyatkinmv.pognaleey.model.TravelRecommendation;
+import ru.pyatkinmv.pognaleey.util.Utils;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -8,42 +12,46 @@ import java.util.stream.IntStream;
 
 public class PromptService {
 
-    static final String SHORT_PROMPT_FORMAT = """
-            Придумай мне ровно %d варианта путешествий исходя из входных условий.
-            Ответ выдай в формате: место1;описание|место2;описание|место3;описание.
-            Описание не должно содержать более 5 слов.
-            Пример: Париж;город любви и романтики|Рим;вечный город с богатой историей|Барселона;история и современность.
-            Не надо никаких дополнительных нумераций и слов, ответ просто одной строкой на русском языке.Условия: %s
-            """;
+    static final GptResponseRecommendationDetailsListDto DETAILED_PROMPT_OBJ = new GptResponseRecommendationDetailsListDto(
+            List.of(
+                    new GptResponseRecommendationDetailsListDto.GptResponseRecommendationDetailsDto(
+                            "НАЗВАНИЕ МЕСТА",
+                            new GptResponseRecommendationDetailsListDto.Budget("БЮДЖЕТ ОТ", "БЮДЖЕТ ДО"),
+                            "ПОЧЕМУ ЭТОТ ВАРИАНТ ПОДХОДИТ",
+                            "КРЕАТИВНОЕ ХУДОЖЕСТВЕННОЕ ОПИСАНИЕ ВАРИАНТА",
+                            "ОБЩИЕ РЕКОМЕНДАЦИИ (СТРОКА)",
+                            List.of("ДОСТОПРИМЕЧАТЕЛЬНОСТИ/КОНКРЕТНЫЕ МЕСТА РЕКОМЕНДУЕМЫЕ ДЛЯ ПОСЕЩЕНИЯ"),
+                            "ЧТО НУЖНО ДОПОЛНИТЕЛЬНО УЧЕСТЬ"
+                    )
+            )
+    );
+
+    static final GptResponseQuickRecommendationListDto QUICK_PROMPT_OBJ = new GptResponseQuickRecommendationListDto(
+            List.of(
+                    new GptResponseQuickRecommendationDto("МЕСТО", "ОПИСАНИЕ")
+            )
+    );
 
     static final String DETAILED_PROMPT_FORMAT = """
             У меня есть следующие %d варианта для путешествия: %s.Мои пожелания для путешествия следующие: %s.
             Дай мне исходя из этих предпочтений подробное описание этих вариантов в формате JSON
-            (не надо никаких дополнительных нумераций и слов, в ответе только JSON).
-            Формат:
-            {recommendations:
-                [
-                    {
-                        title: НАЗВАНИЕ МЕСТА,
-                        budget: {from: БЮДЖЕТ ОТ, to: БЮДЖЕТ ДО},
-                        reasoning: ПОЧЕМУ ЭТОТ ВАРИАНТ ПОДХОДИТ,
-                        creativeDescription: КРЕАТИВНОЕ ХУДОЖЕСТВЕННОЕ ОПИСАНИЕ ВАРИАНТА,
-                        tips: ОБЩИЕ РЕКОМЕНДАЦИИ (СТРОКА),
-                        whereToGo: [ДОСТОПРИМЕЧАТЕЛЬНОСТИ/КОНКРЕТНЫЕ МЕСТА РЕКОМЕНДУЕМЫЕ ДЛЯ ПОСЕЩЕНИЯ],
-                        additionalConsideration: ЧТО НУЖНО ДОПОЛНИТЕЛЬНО УЧЕСТЬ
-                    }
-                ]
-            }""";
+            (не надо никаких дополнительных нумераций и слов, в ответе только JSON). Формат: %s""";
 
-    public static String getShortPrompt(int optionsNumber, String inquiryParams) {
-        return String.format(SHORT_PROMPT_FORMAT, optionsNumber, inquiryParams)
+    static final String SHORT_PROMPT_FORMAT = """
+            Придумай мне ровно %d варианта путешествий исходя из входных условий.
+            Ответ выдай в формате: %s.Описание не должно содержать более 5 слов.Условия: %s
+            """;
+
+    public static String generateShortPrompt(int optionsNumber, String inquiryParams) {
+        return String.format(SHORT_PROMPT_FORMAT, optionsNumber, Utils.toJson(QUICK_PROMPT_OBJ), inquiryParams)
                 .replaceAll("\n", "");
     }
 
-    public static String getDetailedPrompt(List<TravelRecommendation> recommendations, String inquiryParams) {
+    public static String generateDetailedPrompt(List<TravelRecommendation> recommendations, String inquiryParams) {
         var recommendationsStr = toPromtString(recommendations);
 
-        return String.format(DETAILED_PROMPT_FORMAT, recommendations.size(), recommendationsStr, inquiryParams)
+        return String.format(DETAILED_PROMPT_FORMAT, recommendations.size(), recommendationsStr, inquiryParams,
+                        Utils.toJson(DETAILED_PROMPT_OBJ))
                 .replaceAll("\n", "").replaceAll("   ", "");
     }
 
