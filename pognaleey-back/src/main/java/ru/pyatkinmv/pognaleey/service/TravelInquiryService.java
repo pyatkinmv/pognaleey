@@ -37,7 +37,7 @@ public class TravelInquiryService {
             recommendationService.enrichWithDetailsAsync(recommendations, inquiryPayload);
             recommendationService.enrichWithImagesAsync(recommendations);
 
-            return TravelMapper.toDto(inquiry, recommendations);
+            return TravelMapper.toInquiryDto(inquiry, recommendations);
         } catch (Exception e) {
             throw new RuntimeException("Failed to process inquiry", e);
         }
@@ -59,7 +59,7 @@ public class TravelInquiryService {
             throw new RuntimeException("Timeout: Detailed recommendation not available yet.", e);
         }
 
-        return TravelMapper.toDto(recommendations);
+        return TravelMapper.toRecommendationListDto(recommendations);
     }
 
     private CompletableFuture<Collection<TravelRecommendation>> buildRecommendationFutureFetch(Long inquiryId,
@@ -69,7 +69,8 @@ public class TravelInquiryService {
                 var recommendations = recommendationService.findByInquiryId(inquiryId);
 
                 if (!recommendations.isEmpty()
-                        && recommendations.stream().allMatch(it -> it.getDetails() != null)) {
+                        && recommendations.stream().allMatch(
+                        it -> it.getDetails() != null && it.getImageUrl() != null)) {
                     return recommendations;
                 }
 

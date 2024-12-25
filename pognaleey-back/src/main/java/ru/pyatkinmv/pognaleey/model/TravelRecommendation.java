@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Table;
+import ru.pyatkinmv.pognaleey.dto.gpt.GptResponseRecommendationDetailsListDto;
 
 import java.time.Instant;
 
@@ -26,6 +27,9 @@ public class TravelRecommendation {
 
     private String shortDescription;
 
+    /**
+     * {@link GptResponseRecommendationDetailsListDto.GptResponseRecommendationDetailsDto} stored here
+     */
     private String details;
 
     private String imageUrl;

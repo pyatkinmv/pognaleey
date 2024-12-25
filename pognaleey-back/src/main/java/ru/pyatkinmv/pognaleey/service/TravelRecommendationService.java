@@ -1,7 +1,5 @@
 package ru.pyatkinmv.pognaleey.service;
 
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import jakarta.annotation.Nullable;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -9,9 +7,9 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import ru.pyatkinmv.pognaleey.client.GptHttpClient;
 import ru.pyatkinmv.pognaleey.client.ImagesSearchHttpClient;
-import ru.pyatkinmv.pognaleey.dto.TravelRecommendationDto;
-import ru.pyatkinmv.pognaleey.dto.TravelRecommendationListDto;
-import ru.pyatkinmv.pognaleey.dto.TravelShortRecommendationDto;
+import ru.pyatkinmv.pognaleey.dto.gpt.GptResponseQuickRecommendationListDto;
+import ru.pyatkinmv.pognaleey.dto.gpt.GptResponseRecommendationDetailsListDto;
+import ru.pyatkinmv.pognaleey.dto.gpt.HasRecommendations;
 import ru.pyatkinmv.pognaleey.model.TravelRecommendation;
 import ru.pyatkinmv.pognaleey.repository.TravelRecommendationRepository;
 import ru.pyatkinmv.pognaleey.util.Utils;
@@ -20,14 +18,11 @@ import java.time.Instant;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.concurrent.Callable;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
-import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
-
-import static ru.pyatkinmv.pognaleey.util.Utils.OBJECT_MAPPER;
 
 @Slf4j
 @Service
@@ -38,16 +33,18 @@ public class TravelRecommendationService {
     private final TravelRecommendationRepository recommendationRepository;
 
     public List<TravelRecommendation> createShortRecommendations(Long inquiryId, String inquiryParams) {
-        var prompt = PromptService.getShortPrompt(3, inquiryParams);
+        var prompt = PromptService.generateShortPrompt(3, inquiryParams);
         var answer = gptHttpClient.ask(prompt);
-        var recommendations = parse(inquiryId, answer);
+        var recommendations = parseQuick(inquiryId, answer);
         recommendations = recommendationRepository.saveAll(recommendations);
 
         return StreamSupport.stream(recommendations.spliterator(), false).collect(Collectors.toList());
     }
 
-    private static Iterable<TravelRecommendation> parse(Long inquiryId, String shortRecommendationsAnswer) {
-        return toDtoQuickList(shortRecommendationsAnswer)
+    private static Iterable<TravelRecommendation> parseQuick(Long inquiryId, String quickRecommendationsAnswer) {
+        var parsed = parse(quickRecommendationsAnswer, GptResponseQuickRecommendationListDto.class);
+
+        return parsed.recommendations()
                 .stream()
                 .map(it -> TravelRecommendation.builder()
                         .inquiryId(inquiryId)
@@ -62,23 +59,38 @@ public class TravelRecommendationService {
     @Async
     public void enrichWithDetailsAsync(List<TravelRecommendation> recommendations, String inquiryParams) {
         log.info("begin enrichWithDetailsAsync");
-        var prompt = PromptService.getDetailedPrompt(recommendations, inquiryParams);
-        var detailsRaw = gptHttpClient.ask(prompt);
-        var parsed = toDtoDetailedList(detailsRaw).orElseThrow();
+        var prompt = PromptService.generateDetailedPrompt(recommendations, inquiryParams);
+        var recommendationDetailsRaw = gptHttpClient.ask(prompt);
+        var parsed = parse(recommendationDetailsRaw, GptResponseRecommendationDetailsListDto.class);
 
         if (recommendations.size() != parsed.recommendations().size()) {
             throw new IllegalArgumentException("Different size of recommendations");
         }
 
-        var recIdToDetailsMap = IntStream.range(0, recommendations.size())
+        var recommendationIdToDetailsMap = IntStream.range(0, recommendations.size())
                 .mapToObj(i -> Map.entry(recommendations.get(i).getId(), Utils.toJson(parsed.recommendations().get(i))))
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 
-        log.info("recIdToDetailsMap before update: {}", recIdToDetailsMap);
+        log.info("recommendationIdToDetailsMap before update: {}", recommendationIdToDetailsMap);
 
-        recIdToDetailsMap.forEach(recommendationRepository::updateDetails);
+        recommendationIdToDetailsMap.forEach(recommendationRepository::updateDetails);
 
         log.info("end enrichWithDetailsAsync");
+    }
+
+    @SneakyThrows
+    static <T extends HasRecommendations<?>> T parse(String gptRecommendationsAnswerRaw, Class<T> clazz) {
+        var regex = "\\{[\\s\\S]*\"recommendations\":[\\s\\S]*\\}";
+        var pattern = Pattern.compile(regex);
+        var matcher = pattern.matcher(gptRecommendationsAnswerRaw);
+
+        if (matcher.find()) {
+            var jsonStr = matcher.group(0);
+
+            return Utils.toObject(jsonStr, clazz);
+        } else {
+            throw new RuntimeException("gptRecommendationsAnswerRaw has wrong format: " + gptRecommendationsAnswerRaw);
+        }
     }
 
     Collection<TravelRecommendation> findByInquiryId(Long inquiryId) {
@@ -88,78 +100,12 @@ public class TravelRecommendationService {
     // TODO: fixme
     @Deprecated
     @SneakyThrows
-    public static List<TravelShortRecommendationDto> toDtoQuickList(String recommendationPayload) {
-        recommendationPayload = recommendationPayload.replaceAll("\"", "")
-                .replaceAll("\\.", "");
-        return Stream.of(recommendationPayload.split("\\|"))
-                .map(it -> it.split(";"))
-                .filter(TravelRecommendationService::isValid)
-                .map(it -> new TravelShortRecommendationDto(-1L, it[0], it[1]))
-                .toList();
-    }
-
-    // TODO: fixme
-    @Deprecated
-    @SneakyThrows
-    public static Optional<TravelRecommendationListDto> toDtoDetailedList(
-            @Nullable String recommendationDetailedPayload
-    ) {
-        if (recommendationDetailedPayload != null) {
-            return Optional.ofNullable(
-                    OBJECT_MAPPER.readValue(
-                            recommendationDetailedPayload,
-                            TravelRecommendationListDto.class
-                    )
-            );
-        } else {
-            return Optional.empty();
-        }
-    }
-
-    // TODO: fixme
-    @Deprecated
-    @SneakyThrows
-    public static Optional<TravelRecommendationDto> toDtoDetailed(
-            @Nullable String recommendationDetailedPayload,
-            @Nullable String imageUrl
-    ) {
-        if (recommendationDetailedPayload != null) {
-            var json = (ObjectNode) OBJECT_MAPPER.readTree(recommendationDetailedPayload);
-            json.put("imageUrl", imageUrl);
-            recommendationDetailedPayload = OBJECT_MAPPER.writeValueAsString(json);
-
-            var result = Optional.ofNullable(
-                    OBJECT_MAPPER.readValue(
-                            recommendationDetailedPayload,
-                            TravelRecommendationDto.class
-                    )
-            );
-            return result;
-        } else {
-            return Optional.empty();
-        }
-    }
-
-    // TODO: fixme
-    @Deprecated
-    private static boolean isValid(String[] it) {
-        try {
-            return !it[0].isEmpty() && !it[1].isEmpty();
-        } catch (RuntimeException e) {
-            log.error(e.getMessage());
-
-            return false;
-        }
-    }
-
-    // TODO: fixme
-    @Deprecated
-    @SneakyThrows
     @Async
     public void enrichWithImagesAsync(List<TravelRecommendation> recommendations) {
         log.info("begin enrichWithImagesAsync");
 
-        // TODO
+        // TODO: fixme
+        //  Current api doesn't allow making more than one request per second
         var tasks = recommendations.stream().map(this::buildCallable).toList();
         var recIdsToImages = tasks.stream().map(it -> {
             try {
