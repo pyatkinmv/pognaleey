@@ -5,11 +5,11 @@ import org.springframework.data.jdbc.repository.query.Query;
 import org.springframework.data.repository.CrudRepository;
 import ru.pyatkinmv.pognaleey.model.TravelRecommendation;
 
-import java.util.Collection;
 import java.util.List;
+import java.util.stream.StreamSupport;
 
 public interface TravelRecommendationRepository extends CrudRepository<TravelRecommendation, Long> {
-    Collection<TravelRecommendation> findByInquiryId(Long inquiryId);
+    List<TravelRecommendation> findByInquiryId(Long inquiryId);
 
     List<TravelRecommendation> findAllByIdIn(List<Long> ids);
 
@@ -28,5 +28,9 @@ public interface TravelRecommendationRepository extends CrudRepository<TravelRec
                 WHERE id = :id
             """)
     void updateImageUrl(Long id, String imageUrl);
+
+    default List<TravelRecommendation> saveAllFromIterable(Iterable<TravelRecommendation> travelRecommendations) {
+        return StreamSupport.stream(saveAll(travelRecommendations).spliterator(), false).toList();
+    }
 
 }

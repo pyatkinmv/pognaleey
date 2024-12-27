@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import ru.pyatkinmv.pognaleey.dto.TravelInquiryDto;
 import ru.pyatkinmv.pognaleey.dto.TravelRecommendationListDto;
 import ru.pyatkinmv.pognaleey.service.TravelInquiryService;
+import ru.pyatkinmv.pognaleey.util.Utils;
 
 import java.util.Map;
 
@@ -20,12 +21,12 @@ public class TravelInquiryController {
     @SneakyThrows
     @PostMapping
     public TravelInquiryDto createInquiry(@RequestBody Map<String, Object> inquiryParams) {
-        return inquiryService.createInquiry(inquiryParams);
+        return Utils.measuringTime(() -> inquiryService.createInquiry(inquiryParams));
     }
 
     @SneakyThrows
     @GetMapping("/{inquiryId}/recommendations")
     public TravelRecommendationListDto getInquiryRecommendations(@PathVariable Long inquiryId) {
-        return inquiryService.getInquiryRecommendations(inquiryId, 30_000L);
+        return Utils.measuringTime(() -> inquiryService.getInquiryRecommendations(inquiryId, 30_000L));
     }
 }

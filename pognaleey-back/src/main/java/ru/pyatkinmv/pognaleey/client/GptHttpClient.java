@@ -3,6 +3,9 @@ package ru.pyatkinmv.pognaleey.client;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 import ru.pyatkinmv.pognaleey.dto.gpt.GptBodyRequestDto;
@@ -14,18 +17,24 @@ import java.util.Optional;
 @Component
 @RequiredArgsConstructor
 public class GptHttpClient {
-    private final RestTemplate gptRestTemplate;
+    private final RestTemplate restTemplate;
 
-    @Value("${gpt-client.url}")
-    private String gptUrl;
+    @Value("${gpt-client.base-url}")
+    private String gptBaseUrl;
 
     @Value("${gpt-client.model-uri}")
     private String modelUri;
 
+    @Value("${gpt-client.api-key}")
+    private String gptApiKey;
+
+    @Value("${gpt-client.folder-id}")
+    private String gptFolderId;
+
     public String ask(String prompt) {
         log.info("question: {}", prompt);
-        var request = new GptBodyRequestDto(prompt, modelUri);
-        var response = gptRestTemplate.postForEntity(gptUrl, request, GptBodyResponseDto.class);
+        var requestEntity = buildRequest(prompt);
+        var response = restTemplate.exchange(gptBaseUrl, HttpMethod.POST, requestEntity, GptBodyResponseDto.class);
         var responseBody = Optional.ofNullable(response.getBody())
                 .orElseThrow(() -> new RuntimeException("Could not get answer from gpt client"));
 
@@ -39,7 +48,13 @@ public class GptHttpClient {
         return answer;
     }
 
+    private HttpEntity<GptBodyRequestDto> buildRequest(String prompt) {
+        var request = new GptBodyRequestDto(prompt, modelUri);
+        var headers = new HttpHeaders();
+        headers.add("x-folder-id", gptFolderId);
+        headers.add(HttpHeaders.AUTHORIZATION, "Api-Key " + gptApiKey);
 
-    //Стамбул; город контрастов|Прага; столица Чехии|Тбилиси; гостеприимный город|
+        return new HttpEntity<>(request, headers);
+    }
 
 }
