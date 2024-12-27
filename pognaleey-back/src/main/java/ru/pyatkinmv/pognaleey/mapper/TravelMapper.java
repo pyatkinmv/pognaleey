@@ -6,7 +6,7 @@ import ru.pyatkinmv.pognaleey.dto.TravelInquiryDto;
 import ru.pyatkinmv.pognaleey.dto.TravelQuickRecommendationDto;
 import ru.pyatkinmv.pognaleey.dto.TravelRecommendationDto;
 import ru.pyatkinmv.pognaleey.dto.TravelRecommendationListDto;
-import ru.pyatkinmv.pognaleey.dto.gpt.GptResponseRecommendationDetailsListDto;
+import ru.pyatkinmv.pognaleey.dto.gpt.GptResponseRecommendationDetailsDto;
 import ru.pyatkinmv.pognaleey.model.TravelInquiry;
 import ru.pyatkinmv.pognaleey.model.TravelRecommendation;
 import ru.pyatkinmv.pognaleey.util.Utils;
@@ -42,15 +42,12 @@ public class TravelMapper {
     public static TravelRecommendationDto toRecommendationDto(String recommendationDetailsJson, String imageUrl) {
         var details = Utils.toObject(
                 recommendationDetailsJson,
-                GptResponseRecommendationDetailsListDto.GptResponseRecommendationDetailsDto.class
+                GptResponseRecommendationDetailsDto.class
         );
 
         return new TravelRecommendationDto(
                 details.title(),
-                new TravelRecommendationDto.Budget(
-                        Utils.parseInt(details.budget().from()),
-                        Utils.parseInt(details.budget().to())
-                ),
+                details.budget(),
                 details.reasoning(),
                 details.creativeDescription(),
                 details.tips(),

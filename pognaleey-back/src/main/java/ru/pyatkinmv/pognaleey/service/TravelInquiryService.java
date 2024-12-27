@@ -8,13 +8,13 @@ import ru.pyatkinmv.pognaleey.mapper.TravelMapper;
 import ru.pyatkinmv.pognaleey.model.TravelInquiry;
 import ru.pyatkinmv.pognaleey.model.TravelRecommendation;
 import ru.pyatkinmv.pognaleey.repository.TravelInquiryRepository;
+import ru.pyatkinmv.pognaleey.util.LongPolling;
 
 import java.time.Instant;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.TimeUnit;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -23,8 +23,35 @@ public class TravelInquiryService {
     private final TravelInquiryRepository inquiryRepository;
     private final TravelRecommendationService recommendationService;
 
+    private static String toStringFilteringNonEmpty(Map<String, Object> params) {
+        var filteredMap = params.entrySet()
+                .stream()
+                .filter(entry -> !isEmpty(entry.getValue())) // Удаляем пустые значения
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+
+        return filteredMap.entrySet().stream()
+                .map(it -> it.getKey() + "=" + it.getValue())
+                .collect(Collectors.joining(";"));
+    }
+
+    private static boolean isEmpty(Object it) {
+        if (it instanceof String && ((String) it).isEmpty()) {
+            return true;
+        }
+
+        if (it instanceof Collection && ((Collection<?>) it).isEmpty()) {
+            return true;
+        }
+
+        if (it instanceof Map && ((Map<?, ?>) it).isEmpty()) {
+            return true;
+        }
+
+        return false;
+    }
+
     public TravelInquiryDto createInquiry(Map<String, Object> inquiryParams) {
-        var inquiryPayload = toString(inquiryParams);
+        var inquiryPayload = toStringFilteringNonEmpty(inquiryParams);
         var inquiry = TravelInquiry.builder()
                 .params(inquiryPayload)
                 .createdAt(Instant.now())
@@ -33,7 +60,7 @@ public class TravelInquiryService {
         List<TravelRecommendation> recommendations;
 
         try {
-            recommendations = recommendationService.createShortRecommendations(inquiry.getId(), inquiryPayload);
+            recommendations = recommendationService.createQuickRecommendations(inquiry.getId(), inquiryPayload);
             recommendationService.enrichWithDetailsAsync(recommendations, inquiryPayload);
             recommendationService.enrichWithImagesAsync(recommendations);
 
@@ -50,65 +77,26 @@ public class TravelInquiryService {
             throw new RuntimeException("Inquiry with id " + inquiryId + " does not exist");
         }
 
-        var future = buildRecommendationFutureFetch(inquiryId, 500);
-        Collection<TravelRecommendation> recommendations;
-
-        try {
-            recommendations = future.get(timeoutMillis, TimeUnit.MILLISECONDS);
-        } catch (Exception e) {
-            throw new RuntimeException("Timeout: Detailed recommendation not available yet.", e);
-        }
+        var longPoll = new LongPolling<List<TravelRecommendation>>();
+        var recommendations = longPoll.execute(
+                () -> findRecommendationsFilteringDetailsAndImages(inquiryId),
+                timeoutMillis,
+                300
+        );
 
         return TravelMapper.toRecommendationListDto(recommendations);
     }
 
-    private CompletableFuture<Collection<TravelRecommendation>> buildRecommendationFutureFetch(Long inquiryId,
-                                                                                               long sleepMs) {
-        return CompletableFuture.supplyAsync(() -> {
-            while (true) {
-                var recommendations = recommendationService.findByInquiryId(inquiryId);
+    private Optional<List<TravelRecommendation>> findRecommendationsFilteringDetailsAndImages(Long inquiryId) {
+        var recommendations = recommendationService.findByInquiryId(inquiryId);
 
-                if (!recommendations.isEmpty()
-                        && recommendations.stream().allMatch(
-                        it -> it.getDetails() != null && it.getImageUrl() != null)) {
-                    return recommendations;
-                }
-
-                try {
-                    Thread.sleep(sleepMs);
-                } catch (InterruptedException e) {
-                    throw new RuntimeException(e);
-                }
-            }
-        });
-    }
-
-    private static String toString(Map<String, Object> params) {
-        return filterNonEmpty(params).entrySet().stream()
-                .map(it -> it.getKey() + "=" + it.getValue())
-                .collect(Collectors.joining(";"));
-    }
-
-    //TODO: fixme
-    @Deprecated
-    private static Map<String, Object> filterNonEmpty(Map<String, Object> params) {
-        return params.entrySet().stream()
-                .filter(it -> {
-                    if (it.getValue() instanceof String && ((String) it.getValue()).isEmpty()) {
-                        return false;
-                    }
-
-                    if (it.getValue() instanceof Collection && ((Collection) it.getValue()).isEmpty()) {
-                        return false;
-                    }
-
-                    if (it.getValue() instanceof Map && ((Map) it.getValue()).isEmpty()) {
-                        return false;
-                    }
-
-
-                    return true;
-                }).collect(Collectors.toMap(it -> it.getKey(), it -> it.getValue()));
+        if (!recommendations.isEmpty()
+                && recommendations.stream().allMatch(
+                it -> it.getDetails() != null && it.getImageUrl() != null)) {
+            return Optional.of(recommendations);
+        } else {
+            return Optional.empty();
+        }
     }
 
 }

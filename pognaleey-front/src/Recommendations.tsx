@@ -10,7 +10,7 @@ interface QuickRecommendation {
 }
 
 interface DetailedRecommendation extends QuickRecommendation {
-    budget: { from: string, to: string };
+    budget: string;
     reasoning: string;
     creativeDescription: string;
     tips: string;
@@ -111,9 +111,7 @@ const Recommendations: React.FC = () => {
                             {/* Если это детализированная рекомендация, покажем дополнительные данные */}
                             {"budget" in recommendation && (
                                 <>
-                                    <p><strong>Необходимый
-                                        бюджет:</strong> {recommendation.budget?.from || "Не указано"} - {recommendation.budget?.to || "Не указано"}
-                                    </p>
+                                    <p><strong>Необходимый бюджет:</strong> {recommendation.budget || "Не указано"}</p>
                                     <p><strong>Reasoning:</strong> {recommendation.reasoning}</p>
                                     <p><strong>Description:</strong> {recommendation.creativeDescription}</p>
                                     <p><strong>Tips:</strong> {recommendation.tips}</p>
