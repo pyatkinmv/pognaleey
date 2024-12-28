@@ -85,7 +85,7 @@ const Recommendations: React.FC = () => {
                     src="/logo-circle192.png" // Путь к логотипу
                     alt="Логотип"
                 />
-                <h1 className="recommendations-title">Recommendations</h1>
+                <h1 className="recommendations-title">Погнали!</h1>
             </div>
             <div className="recommendations-list">
                 {recommendations.map((recommendation) => (

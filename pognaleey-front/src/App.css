@@ -36,3 +36,88 @@
     transform: rotate(360deg);
   }
 }
+
+.card-grid {
+  display: flex;
+  gap: 15px;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-top: 15px;
+}
+
+
+.card {
+  width: 130px;
+  height: 100px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid #ccc;
+  border-radius: 10px;
+  background-color: #f8f9fa;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.card:hover {
+  border-color: #4caf50;
+}
+
+.card.selected {
+  border-color: #4caf50;
+  background-color: #e8f5e9;
+}
+
+.card-icon {
+  font-size: 36px;
+  margin-bottom: 10px;
+}
+
+.card-label {
+  text-align: center;
+  font-weight: bold;
+  font-size: 14px;
+}
+
+/* Дополнительные стили для уменьшенных карточек */
+.card-small {
+  width: 80px; /* Уменьшение размеров */
+  height: 70px;
+}
+
+/* Дополнительные стили для уменьшенных карточек */
+.card-narrow {
+  width: 118px; /* Уменьшение размеров */
+  height: 100px;
+}
+
+/* Дополнительные стили для уменьшенных карточек */
+.card-short {
+  width: 130px; /* Уменьшение размеров */
+  height: 50px;
+}
+
+.card-small .card-icon {
+  font-size: 24px; /* Уменьшение размера иконки */
+}
+
+.card-small .card-label {
+  font-size: 12px; /* Уменьшение размера текста */
+}
+
+.question-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* Центрирование по горизонтали */
+  justify-content: center; /* Центрирование по вертикали, если нужно */
+  text-align: center; /* Центрирование текста внутри label */
+}
+
+.question-container label {
+  font-size: 20px; /* Настройте размер текста, если необходимо */
+  font-weight: bold; /* Настройте стиль текста, если нужно */
+}
+
+
