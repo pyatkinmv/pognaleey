@@ -1,19 +1,18 @@
 import React, {useState} from "react";
 import {useNavigate} from "react-router-dom"; // Для перехода между страницами
+import "./App.css"; // Подключаем стили
 
 const App: React.FC = () => {
     const [formData, setFormData] = useState({
         purpose: [] as string[],
-        nature: [] as string[],
-        weather: [] as string[],
-        season: "",
-        budget: {from: 500, to: 2000}, // Диапазон бюджета
+        preferences: [] as string[],
+        budget: "",
         duration: "",
-        interests: [] as string[],
-        from: "",
+        transport: [] as string[],
+        season: "",
         to: "",
         companions: "",
-        preferences: "",
+        additionalPreferences: "",
     });
 
     const navigate = useNavigate(); // Для редиректа
@@ -23,35 +22,14 @@ const App: React.FC = () => {
     ) => {
         const {name, value, type} = e.target;
 
-        if (type === "checkbox") {
-            const isChecked = (e.target as HTMLInputElement).checked;
-            setFormData((prevData) => {
-                const selectedValues = prevData[name as keyof typeof formData] as string[];
-                return {
-                    ...prevData,
-                    [name]: isChecked
-                        ? [...selectedValues, value]
-                        : selectedValues.filter((v) => v !== value),
-                };
-            });
-        } else if (type === "range" && name.startsWith("budget")) {
-            // Обработка диапазона для бюджета с проверкой
-            setFormData((prevData) => {
-                const newBudget = {...prevData.budget, [name === "budgetFrom" ? "from" : "to"]: +value};
-
-                // Гарантия: from <= to
-                if (newBudget.from > newBudget.to) {
-                    if (name === "budgetFrom") {
-                        newBudget.to = newBudget.from; // Двигаем "to" вместе с "from"
-                    } else {
-                        newBudget.from = newBudget.to; // Двигаем "from" вместе с "to"
-                    }
-                }
-
-                return {
-                    ...prevData,
-                    budget: newBudget,
-                };
+        if (type === "select-multiple") {
+            const options = Array.from(
+                (e.target as HTMLSelectElement).selectedOptions,
+                (option) => option.value
+            );
+            setFormData({
+                ...formData,
+                [name]: options,
             });
         } else {
             setFormData({
@@ -60,7 +38,6 @@ const App: React.FC = () => {
             });
         }
     };
-
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -72,227 +49,282 @@ const App: React.FC = () => {
             });
 
             if (response.ok) {
-                const data = await response.json(); // Получаем JSON с идентификатором
-                const inquiryId = data.id; // Предполагается, что сервер возвращает `inquiryId`
+                const data = await response.json();
+                const inquiryId = data.id;
 
                 // Редирект на страницу рекомендаций
                 navigate(`/travel-inquiries/${inquiryId}/recommendations`, {
                     state: {quickRecommendations: data.quickRecommendations},
                 });
             } else {
-                alert("Error submitting the form.");
+                alert("Ошибка отправки формы.");
             }
         } catch (error) {
-            console.error("Error:", error);
-            alert("Failed to submit form.");
+            console.error("Ошибка:", error);
+            alert("Не удалось отправить форму.");
         }
     };
 
+    const purposeOptions = [
+        {value: "отдых", label: "Отдых и релаксация", icon: "🧘"},
+        {value: "активный", label: "Активный отдых", icon: "🚴"},
+        {value: "культура", label: "Культура", icon: "🏛️"},
+        {value: "шоппинг", label: "Шоппинг", icon: "🛍️"},
+        {value: "оздоровление", label: "Оздоровление", icon: "🌿"}
+    ];
+
+    const companionOptions = [
+        {value: "один", label: "Один", icon: "🧍"},
+        {value: "пара", label: "С партнером", icon: "❤️"},
+        {value: "семья", label: "С семьёй", icon: "👨‍👩‍👧‍👦"},
+        {value: "друзья", label: "С друзьями", icon: "👫"},
+        {value: "группа", label: "В группе", icon: "🚌"},
+    ];
+
+    const durationOptions = [
+        {value: "1-3 дня", label: "1-3 дня"},
+        {value: "4-7 дней", label: "4-7 дней"},
+        {value: "8-14 дней", label: "8-14 дней"},
+        {value: "Более двух недель", label: "Более двух недель"},
+    ]
+
+    const transportOptions = [
+        {value: "автомобиль", label: "Автомобиль", icon: "🚗"},
+        {value: "самолет", label: "Самолёт", icon: "✈️"},
+        {value: "поезд", label: "Поезд", icon: "🚂"},
+        {value: "автобус", label: "Автобус", icon: "🚌"},
+        {value: "корабль", label: "Корабль", icon: "🛳️"},
+    ];
+
+    const budgetOptions = [
+        {value: "до 20 000", label: "До 20 000 ₽", icon: "🪙"},
+        {value: "20 000 - 50 000", label: "20 000 - 50 000 ₽", icon: "💵"},
+        {value: "50 000 - 100 000", label: "50 000 - 100 000 ₽", icon: "💳"},
+        {value: "100 000 - 200 000", label: "100 000 - 200 000 ₽", icon: "💼"},
+        {value: "от 200 000", label: "Свыше 200 000 ₽", icon: "💎"}
+    ];
+
+    const preferencesOptions = [
+        {value: "море и пляжи", label: "Море и пляжи", icon: "🏖️"}, // Пляжный отдых
+        {value: "спа", label: "СПА", icon: "🛀"}, // СПА и релакс
+        {value: "горы", label: "Горы", icon: "🏔️"}, // Активный отдых в горах
+        {value: "город", label: "Мегаполисы", icon: "🏙️"}, // Экскурсии и культурный туризм
+        {value: "село", label: "Сельская местность", icon: "🐓"},
+        {value: "кемпинг", label: "Кемпинг", icon: "⛺"}, // СПА и релакс
+        {value: "история и культура", label: "История и культура", icon: "🎭"}, // Исторический туризм
+        {value: "лыжи", label: "Горнолыжка", icon: "🎿"}, // Лыжи, снег
+        {value: "сафари", label: "Сафари", icon: "🦁"}, // Экзотическая природа, животные
+        {value: "круиз", label: "Круизы", icon: "🛳️"}, // Морские путешествия
+        {value: "еда", label: "Кулинария", icon: "🍔"}, // Еда и дегустации
+        {value: "алкоголь", label: "Алкоголь", icon: "🍷"}, // Еда и дегустации
+        {value: "фестивали", label: "Фестивали", icon: "🎉"}, // Еда и дегустации
+        {value: "ночная жизнь", label: "Ночная жизнь", icon: "🌃"}, // Еда и дегустации
+        {value: "экзотика", label: "Экзотика", icon: "🐪"}, // Еда и дегустации\
+        {value: "маленькие города", label: "Маленькие города", icon: "🏡"}
+    ];
+
+    const seasonOptions = [
+        {value: "зима", label: "Зима", icon: "❄️"}, // Холодное время года, горнолыжный отдых, рождественские ярмарки
+        {value: "весна", label: "Весна", icon: "🌸"}, // Цветение, мягкая погода, романтичные поездки
+        {value: "лето", label: "Лето", icon: "☀️"}, // Жаркая погода, пляжи, каникулы
+        {value: "осень", label: "Осень", icon: "🍂"},
+    ]
+
+    const regionOptions = [
+        {value: "россия", label: "Россия", icon: "🪆"}, // Путешествия внутри страны
+        {value: "европа", label: "Европа", icon: "🗼"}, // Европейские страны
+        {value: "азия", label: "Азия", icon: "🐉"}, // Восточная культура
+        {value: "африка", label: "Африка", icon: "🌴"}, // Африканские страны
+        {value: "америка", label: "Америка", icon: "🗽"}, // Северная и Южная Америка
+        {value: "австралия", label: "Австралия и Океания", icon: "🌊"}, // Австралия и острова
+    ];
+
+    const handleCardMultiSelect = (field: keyof typeof formData, value: string) => {
+        setFormData((prevData) => {
+            const fieldData = prevData[field]; // Получаем данные для указанного поля
+
+            // Убедимся, что данные поля — это массив
+            if (Array.isArray(fieldData)) {
+                return {
+                    ...prevData,
+                    [field]: fieldData.includes(value)
+                        ? fieldData.filter((v) => v !== value) // Удаление значения
+                        : [...fieldData, value], // Добавление значения
+                };
+            }
+
+            console.error(`Field "${field}" is not an array.`);
+            return prevData; // Возвращаем без изменений, если поле — не массив
+        });
+    };
+
+    const handleCardSingleSelect = (field: keyof typeof formData, value: string) => {
+        setFormData((prevData) => ({
+            ...prevData,
+            [field]: prevData[field] === value ? "" : value, // Снимаем выбор, если нажали на уже выбранное
+        }));
+    };
+
+
     return (
         <div>
-            <h1>Travel Picker Survey</h1>
+            {/* Заголовок с логотипом */}
+            <div className="header">
+                <img
+                    className="logo"
+                    src="/logo-circle192.png" // Путь к логотипу
+                    alt="Логотип"
+                />
+                <h1 className="recommendations-title">Погнали?</h1>
+            </div>
+
             <form onSubmit={handleSubmit}>
                 <div className="form-heading">
-                    Let us know your preferences to find the perfect travel destination!
+                    Заполните, чтобы Голубь Фёдор придумал для вас идеальное путешествие!
                 </div>
 
-                {/* Вопросы формы */}
-                <QuestionContainer label="What is the purpose of your trip? (Select all that apply)">
-                    <input
-                        type="checkbox"
-                        name="purpose"
-                        value="Relaxation and leisure"
-                        onChange={handleChange}
-                    />{" "}
-                    Relaxation and leisure
-                    <input
-                        type="checkbox"
-                        name="purpose"
-                        value="Active vacation (hiking, surfing, etc.)"
-                        onChange={handleChange}
-                    />{" "}
-                    Active vacation (hiking, surfing, etc.)
-                    <input
-                        type="checkbox"
-                        name="purpose"
-                        value="Exploring culture and landmarks"
-                        onChange={handleChange}
-                    />{" "}
-                    Exploring culture and landmarks
-                    <input
-                        type="checkbox"
-                        name="purpose"
-                        value="Shopping and entertainment"
-                        onChange={handleChange}
-                    />{" "}
-                    Shopping and entertainment
-                    <input
-                        type="checkbox"
-                        name="purpose"
-                        value="Family trip"
-                        onChange={handleChange}
-                    />{" "}
-                    Family trip
-                    <input
-                        type="checkbox"
-                        name="purpose"
-                        value="Other"
-                        onChange={handleChange}
-                    />{" "}
-                    Other
-                </QuestionContainer>
-
-                <QuestionContainer label="What type of nature or atmosphere do you prefer? (Select all that apply)">
-                    <input
-                        type="checkbox"
-                        name="nature"
-                        value="Beaches"
-                        onChange={handleChange}
-                    />{" "}
-                    Beaches
-                    <input
-                        type="checkbox"
-                        name="nature"
-                        value="Mountains"
-                        onChange={handleChange}
-                    />{" "}
-                    Mountains
-                    <input
-                        type="checkbox"
-                        name="nature"
-                        value="Forests and nature"
-                        onChange={handleChange}
-                    />{" "}
-                    Forests and nature
-                    <input
-                        type="checkbox"
-                        name="nature"
-                        value="City life"
-                        onChange={handleChange}
-                    />{" "}
-                    City life
-                    <input
-                        type="checkbox"
-                        name="nature"
-                        value="Lakes and rivers"
-                        onChange={handleChange}
-                    />{" "}
-                    Lakes and rivers
-                    <input
-                        type="checkbox"
-                        name="nature"
-                        value="Unique and unusual places"
-                        onChange={handleChange}
-                    />{" "}
-                    Unique and unusual places
-                </QuestionContainer>
-
-                <QuestionContainer label="What is your approximate budget per person?">
-                    <div className="budget-range">
-                        <label>
-                            From: ${formData.budget.from}
-                            <input
-                                type="range"
-                                name="budgetFrom"
-                                min="100"
-                                max="5000"
-                                step="100"
-                                value={formData.budget.from}
-                                onChange={handleChange}
-                            />
-                        </label>
-                        <label>
-                            To: ${formData.budget.to}
-                            <input
-                                type="range"
-                                name="budgetTo"
-                                min="100"
-                                max="5000"
-                                step="100"
-                                value={formData.budget.to}
-                                onChange={handleChange}
-                            />
-                        </label>
+                {/* Цель поездки */}
+                <QuestionContainer label="Какова цель вашего путешествия?">
+                    <div className="card-grid">
+                        {purposeOptions.map((option) => (
+                            <div
+                                key={option.value}
+                                className={`card ${formData.purpose.includes(option.value) ? "selected" : ""}`}
+                                onClick={() => handleCardMultiSelect("purpose", option.value)}
+                            >
+                                <div className="card-icon">{option.icon}</div>
+                                <div className="card-label">{option.label}</div>
+                            </div>
+                        ))}
                     </div>
-                    <p>
-                        Selected budget range: ${formData.budget.from} - ${formData.budget.to}
-                    </p>
                 </QuestionContainer>
 
-                <QuestionContainer label="What is duration of your trip?">
-                    <select
-                        name="duration"
-                        id="duration"
-                        value={formData.duration}
-                        onChange={handleChange}
-                    >
-                        <option value="1-3 days">1-3 days</option>
-                        <option value="4-7 days">4-7 days</option>
-                        <option value="8-14 days">8-14 days</option>
-                        <option value="over two weeks">over two weeks</option>
-                    </select>
 
+                {/* Вопрос о компаньонах */}
+                {/* Цель поездки */}
+                <QuestionContainer label="С кем вы путешествуете?">
+                    <div className="card-grid">
+                        {companionOptions.map((option) => (
+                            <div
+                                key={option.value}
+                                className={`card ${formData.companions === option.value ? "selected" : ""}`}
+                                onClick={() => handleCardSingleSelect("companions", option.value)}
+                            >
+                                <div className="card-icon">{option.icon}</div>
+                                <div className="card-label">{option.label}</div>
+                            </div>
+                        ))}
+                    </div>
                 </QuestionContainer>
 
-                <QuestionContainer label="When do you plan to travel? (Time of year)">
-                    <select name="season" id="season" value={formData.season} onChange={handleChange}>
-                        <option value="Winter">Winter</option>
-                        <option value="Spring">Spring</option>
-                        <option value="Summer">Summer</option>
-                        <option value="Fall">Fall</option>
-                        <option value="Flexible">Flexible</option>
-                    </select>
+                <QuestionContainer label="Какой вид транспорта вы предпочитаете?">
+                    <div className="card-grid">
+                        {transportOptions.map((option) => (
+                            <div
+                                key={option.value}
+                                className={`card ${formData.transport.includes(option.value) ? "selected" : ""}`}
+                                onClick={() => handleCardMultiSelect("transport", option.value)}
+                            >
+                                <div className="card-icon">{option.icon}</div>
+                                <div className="card-label">{option.label}</div>
+                            </div>
+                        ))}
+                    </div>
                 </QuestionContainer>
 
-                <QuestionContainer label="Where are you starting your journey from?">
-                    <input
-                        type="text"
-                        id="from"
-                        name="from"
-                        placeholder="Enter your starting location"
-                        value={formData.from}
+                {/* Бюджет */}
+                <QuestionContainer label="Каков ваш примерный бюджет на человека?">
+                    <div className="card-grid">
+                        {budgetOptions.map((option) => (
+                            <div
+                                key={option.value}
+                                className={`card ${formData.budget === option.value ? "selected" : ""}`}
+                                onClick={() => handleCardSingleSelect("budget", option.value)}
+                            >
+                                <div className="card-icon">{option.icon}</div>
+                                <div className="card-label">{option.label}</div>
+                            </div>
+                        ))}
+                    </div>
+                </QuestionContainer>
+
+                {/* Куда */}
+                <QuestionContainer label="Куда вы хотите поехать?">
+                    <div className="card-grid">
+                        {regionOptions.map((option) => (
+                            <div
+                                key={option.value}
+                                className={`card ${formData.to === option.value ? "selected" : ""} card-narrow`}
+                                onClick={() => handleCardSingleSelect("to", option.value)}
+                            >
+                                <div className="card-icon">{option.icon}</div>
+                                <div className="card-label">{option.label}</div>
+                            </div>
+                        ))}
+                    </div>
+                </QuestionContainer>
+
+                {/* Вопрос о предпочтениях */}
+                <QuestionContainer label="Какие направления и условия отдыха вас интересуют?">
+                    <div className="card-grid">
+                        {preferencesOptions.map((option) => (
+                            <div
+                                key={option.value}
+                                className={`card ${formData.preferences.includes(option.value) ? "selected" : ""} card-small`}
+                                onClick={() => handleCardMultiSelect("preferences", option.value)}
+                            >
+                                <div className="card-icon">{option.icon}</div>
+                                <div className="card-label">{option.label}</div>
+                            </div>
+                        ))}
+                    </div>
+                </QuestionContainer>
+
+                {/* Сезон */}
+                <QuestionContainer label="Когда вы планируете путешествовать?">
+                    <div className="card-grid">
+                        {seasonOptions.map((option) => (
+                            <div
+                                key={option.value}
+                                className={`card ${formData.season === option.value ? "selected" : ""}`}
+                                onClick={() => handleCardSingleSelect("season", option.value)}
+                            >
+                                <div className="card-icon">{option.icon}</div>
+                                <div className="card-label">{option.label}</div>
+                            </div>
+                        ))}
+                    </div>
+                </QuestionContainer>
+
+                {/* Вопрос о продолжительности */}
+                <QuestionContainer label="Какова продолжительность вашей поездки?">
+                    <div className="card-grid">
+                        {durationOptions.map((option) => (
+                            <div
+                                key={option.value}
+                                className={`card ${formData.duration === option.value ? "selected" : ""} card-short`}
+                                onClick={() => handleCardSingleSelect("duration", option.value)}
+                            >
+                                <div className="card-label">{option.label}</div>
+                            </div>
+                        ))}
+                    </div>
+                </QuestionContainer>
+
+                {/* Дополнительные предпочтения */}
+                <QuestionContainer label="Есть ли у вас дополнительные предпочтения?">
+                    <textarea
+                        id="additionalPreferences"
+                        name="additionalPreferences"
+                        rows={4}
+                        placeholder="Напишите любые дополнительные детали"
+                        value={formData.additionalPreferences}
                         onChange={handleChange}
                     />
-                </QuestionContainer>
-
-                <QuestionContainer label="Where do you want to go?">
-                    <input
-                        type="text"
-                        id="to"
-                        name="to"
-                        placeholder="Enter your desired destination"
-                        value={formData.to}
-                        onChange={handleChange}
-                    />
-                </QuestionContainer>
-
-                <QuestionContainer label="Who are you traveling with?">
-                    <select
-                        name="companions"
-                        id="companions"
-                        value={formData.companions}
-                        onChange={handleChange}
-                    >
-                        <option value="Traveling solo">Solo</option>
-                        <option value="Traveling with a partner">With a partner</option>
-                        <option value="Traveling with family">With family</option>
-                        <option value="Traveling with friends">With friends</option>
-                    </select>
-                </QuestionContainer>
-
-                <QuestionContainer label="Do you have any additional preferences?">
-          <textarea
-              id="preferences"
-              name="preferences"
-              rows={4}
-              placeholder="Write any additional details here"
-              value={formData.preferences}
-              onChange={handleChange}
-          />
                 </QuestionContainer>
 
                 {/* Кнопка отправки */}
-                <button type="submit">Submit</button>
+                <button type="submit">Отправить</button>
             </form>
         </div>
     );
