@@ -126,7 +126,7 @@ public class TravelRecommendationService {
     @Async
     public void enrichWithImagesAsync(List<TravelRecommendation> recommendations) {
         log.info("begin enrichWithImagesAsync");
-        recommendations.forEach(it -> searchSaveAndSleep(it));
+        recommendations.forEach(this::searchSaveAndSleep);
         log.info("end enrichWithImagesAsync");
     }
 
@@ -138,7 +138,7 @@ public class TravelRecommendationService {
         recommendationRepository.updateImageUrl(recommendation.getId(), imageUrl);
         // TODO: Current api doesn't allow making more than one request per second
         //  Implement ParallelRequestLimiter or use another API
-        Thread.sleep(500);
+        Thread.sleep(1000);
     }
 
     record QuickRecommendation(String title, String description) {
