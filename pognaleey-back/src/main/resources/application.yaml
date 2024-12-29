@@ -9,19 +9,20 @@ spring:
   application:
     name: pognaleey
   datasource:
-    url: jdbc:postgresql://${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}
+    url: jdbc:postgresql://dbpostgresql:5432/${POSTGRES_DB}
     username: ${POSTGRES_USER}
     password: ${POSTGRES_PASSWORD}
   profiles:
-    active: local
+    active: dev
 logging:
   level:
     root: INFO
 image-search-client:
-  api-key: apiKey
-  folder-id: folderId
+  base-url: https://yandex.ru/images-xml
+  api-key: ${IMAGE_SEARCH_API_KEY}
+  folder-id: ${IMAGE_SEARCH_FOLDER_ID}
 gpt-client:
-  folder-id: folderId
-  api-key: apiKey
-  url: url
-  model-uri: modelUri
+  base-url: https://llm.api.cloud.yandex.net/foundationModels/v1/completion
+  model-uri: gpt://b1g4e7108ae9pp9j7tn7/yandexgpt/rc
+  folder-id: ${GPT_FOLDER_ID}
+  api-key: ${GPT_API_KEY}
