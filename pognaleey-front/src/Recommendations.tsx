@@ -112,17 +112,16 @@ const Recommendations: React.FC = () => {
                             {"budget" in recommendation && (
                                 <>
                                     <p><strong>Необходимый бюджет:</strong> {recommendation.budget || "Не указано"}</p>
-                                    <p><strong>Reasoning:</strong> {recommendation.reasoning}</p>
-                                    <p><strong>Description:</strong> {recommendation.creativeDescription}</p>
-                                    <p><strong>Tips:</strong> {recommendation.tips}</p>
-                                    <p><strong>Where to Go:</strong></p>
+                                    <p><strong>Почему подходит:</strong> {recommendation.reasoning}</p>
+                                    <p><strong>Описание:</strong> {recommendation.creativeDescription}</p>
+                                    <p><strong>Советы:</strong> {recommendation.tips}</p>
+                                    <p><strong>Места для посещения:</strong></p>
                                     <ul>
                                         {recommendation.whereToGo.map((place, index) => (
                                             <li key={index}>{place}</li>
                                         ))}
                                     </ul>
-                                    <p><strong>Additional
-                                        Consideration:</strong> {recommendation.additionalConsideration}</p>
+                                    <p><strong>Дополнительно:</strong> {recommendation.additionalConsideration}</p>
                                 </>
                             )}
 
