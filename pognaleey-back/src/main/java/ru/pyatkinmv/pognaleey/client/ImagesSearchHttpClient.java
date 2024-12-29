@@ -46,7 +46,7 @@ public class ImagesSearchHttpClient {
     public String searchImageUrl(String text) {
         log.info("searchImageUrl for text {}", text);
         var uri = buildUri(text);
-        log.info("searchImageUrl uri {}", uri);
+        log.info("searchImageUrl uri {}", withoutSecret(uri));
         var responseXml = Objects.requireNonNull(restTemplate.getForObject(uri, String.class));
 
         // Either url or image-link must work
@@ -75,6 +75,10 @@ public class ImagesSearchHttpClient {
         log.info("searchImageUrl resultUrl {}", resultUrl);
 
         return resultUrl;
+    }
+
+    private String withoutSecret(URI uri) {
+        return uri.toString().replace(imageSearchApiKey, "SECRET");
     }
 
     private boolean isUrlValid(String imageUrl) {
