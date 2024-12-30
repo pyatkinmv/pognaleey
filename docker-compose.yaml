@@ -32,6 +32,8 @@ services:
       GPT_API_KEY: ${GPT_API_KEY}
       IMAGE_SEARCH_API_KEY: ${IMAGE_SEARCH_API_KEY}
       IMAGE_SEARCH_FOLDER_ID: ${IMAGE_SEARCH_FOLDER_ID}
+    networks:
+      - app-network
 
   pognaleey-front:
     container_name: pognaleey-front
