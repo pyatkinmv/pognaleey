@@ -15,7 +15,7 @@ RUN npm run build
 FROM alpine:3.18
 
 # Копируем собранное приложение
-COPY --from=build /usr/src/app/build /app
+COPY --from=build /usr/src/app/build /usr/src/app/build
 
 # Устанавливаем минимальный веб-сервер для тестов (если нужно, например, serve)
 RUN apk add --no-cache nodejs npm && npm install -g serve
@@ -24,4 +24,4 @@ RUN apk add --no-cache nodejs npm && npm install -g serve
 EXPOSE 3000
 
 # Запускаем фронтенд (для тестов — глобальный Nginx раздает эти файлы в проде)
-CMD ["serve", "-s", "/app"]
+CMD ["serve", "-s", "/usr/src/app/build"]
