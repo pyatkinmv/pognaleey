@@ -13,4 +13,4 @@ RUN npm run build
 
 # Копируем файлы сборки в указанную папку (на хосте она будет замонтирована)
 #CMD ["cp", "-r", "/usr/src/app/build", "/usr/src/app/mnt"]
-CMD ["cp", "-r", "/usr/src/app/build", "/mnt/build"]
+CMD ["cp", "-r", "/usr/src/app/build", "/mnt"]
