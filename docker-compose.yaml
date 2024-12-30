@@ -43,7 +43,7 @@ services:
     networks:
       - app-network
     volumes:
-      - ./pognaleey-front/build:/usr/src/app/build
+      - ./pognaleey-front/build:/app
 
   certbot:
     image: certbot/certbot
