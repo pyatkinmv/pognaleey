@@ -53,6 +53,10 @@ dist/
 # production
 /build
 
+#certs
+certbot/
+certs/
+
 # misc
 .DS_Store
 .env.local
