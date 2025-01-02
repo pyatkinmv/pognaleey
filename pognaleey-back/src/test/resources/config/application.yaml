@@ -3,3 +3,12 @@ spring:
     url: jdbc:tc:postgresql:17-alpine:///pognaleey
   profiles:
     active: test
+image-search-client:
+  base-url: url
+  api-key: apiKey
+  folder-id: folderId
+gpt-client:
+  base-url: url
+  model-uri: uri
+  folder-id: folderId
+  api-key: apiKey
