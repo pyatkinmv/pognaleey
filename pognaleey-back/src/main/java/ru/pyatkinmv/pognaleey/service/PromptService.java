@@ -18,12 +18,12 @@ public class PromptService {
             "ЧТО НУЖНО ДОПОЛНИТЕЛЬНО УЧЕСТЬ"
     );
 
-    static final String DETAILED_PROMPT_FORMAT = """
+    public static final String DETAILED_PROMPT_FORMAT = """
             У меня есть идея для путешествия:%s.Мои пожелания следующие: %s.
             Дай мне исходя из этих предпочтений подробное описание в формате JSON
             (не надо никаких дополнительных нумераций и слов, в ответе только JSON). Формат: %s""";
 
-    static final String QUICK_PROMPT_FORMAT = """
+    public static final String QUICK_PROMPT_FORMAT = """
             Придумай мне ровно %d варианта путешествий исходя из входных условий: %s.
             Ответ выдай в формате: место1;описание|место2;описание|место3;описание.
             Описание не должно содержать более 4 слов.
