@@ -1,6 +1,6 @@
 // LoginForm.tsx
 import React, {useState} from "react";
-import {useNavigate} from "react-router-dom";
+import {Link, useNavigate} from "react-router-dom";
 import "./LoginForm.css";
 
 const LoginForm: React.FC = () => {
@@ -83,6 +83,11 @@ const LoginForm: React.FC = () => {
 
                 <button type="submit" className="login-button">Войти</button>
             </form>
+
+            {/* Текст с ссылкой на регистрацию */}
+            <div className="signup-prompt">
+                Not a member? <Link to="/register" className="signup-link">Signup now</Link>
+            </div>
         </div>
     );
 };

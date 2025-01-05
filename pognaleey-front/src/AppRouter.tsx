@@ -2,8 +2,9 @@ import {BrowserRouter as Router, Route, Routes} from "react-router-dom";
 import App from "./App";
 import Recommendations from "./Recommendations";
 import LoginForm from "./LoginForm";
-// import RegisterForm from "./RegisterForm";
+import RegisterForm from "./RegisterForm";
 import PrivateRoute from "./PrivateRoute";
+import React from "react";
 
 const AppRouter: React.FC = () => {
     return (
@@ -11,7 +12,7 @@ const AppRouter: React.FC = () => {
             <Routes>
                 {/* Доступные без авторизации страницы */}
                 <Route path="/login" element={<LoginForm/>}/>
-                {/*<Route path="/register" element={<RegisterForm />} />*/}
+                <Route path="/register" element={<RegisterForm/>}/>
 
                 {/* Защищенные маршруты */}
                 <Route
