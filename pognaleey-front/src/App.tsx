@@ -1,6 +1,7 @@
 import React, {useState} from "react";
 import {useNavigate} from "react-router-dom"; // Для перехода между страницами
-import "./App.css"; // Подключаем стили
+import "./App.css";
+import apiClient from "./apiClient"; // Подключаем стили
 
 const App: React.FC = () => {
     const [formData, setFormData] = useState({
@@ -42,9 +43,8 @@ const App: React.FC = () => {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         try {
-            const response = await fetch(`${process.env.REACT_APP_API_URL}/travel-inquiries`, {
+            const response = await apiClient(`${process.env.REACT_APP_API_URL}/travel-inquiries`, {
                 method: "POST",
-                headers: {"Content-Type": "application/json"},
                 body: JSON.stringify(formData),
             });
 

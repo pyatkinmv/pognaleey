@@ -1,6 +1,7 @@
 import React, {useEffect, useState} from "react";
 import {useLocation, useParams} from "react-router-dom";
-import "./Recommendations.css"; // Подключаем стили
+import "./Recommendations.css";
+import apiClient from "./apiClient"; // Подключаем стили
 
 interface QuickRecommendation {
     id: string;
@@ -53,7 +54,7 @@ const Recommendations: React.FC = () => {
             setIsLoading(true); // Устанавливаем индикатор загрузки
 
             try {
-                const response = await fetch(`${process.env.REACT_APP_API_URL}/travel-inquiries/${params.inquiryId}/recommendations`);
+                const response = await apiClient(`${process.env.REACT_APP_API_URL}/travel-inquiries/${params.inquiryId}/recommendations`);
 
                 if (!response.ok) {
                     throw new Error(`Failed to fetch recommendations: ${response.status}`);
