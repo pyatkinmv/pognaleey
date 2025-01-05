@@ -24,6 +24,7 @@
    GPT_API_KEY=
    IMAGE_SEARCH_API_KEY=
    IMAGE_SEARCH_FOLDER_ID=
+   JWT_SECRET=
    ```
 
 3. Add a `.env` file in the `pognaleey-front/` directory with the following content:

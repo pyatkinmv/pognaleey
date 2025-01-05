@@ -3,6 +3,7 @@ package ru.pyatkinmv.pognaleey.service;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import ru.pyatkinmv.pognaleey.client.GptHttpClient;
@@ -30,6 +31,9 @@ public class TravelRecommendationService {
     private final ImagesSearchHttpClient imagesSearchHttpClient;
     private final TravelRecommendationRepository recommendationRepository;
     private final ExecutorService executorService;
+
+    @Value("${image-search-client.sleep-between-requests-ms}")
+    private Long sleepBetweenRequestsMs;
 
     private static List<TravelRecommendation> parseQuick(Long inquiryId, String quickRecommendationsAnswer) {
         var parsed = parseQuick(quickRecommendationsAnswer);
@@ -138,7 +142,7 @@ public class TravelRecommendationService {
         recommendationRepository.updateImageUrl(recommendation.getId(), imageUrl);
         // TODO: Current api doesn't allow making more than one request per second
         //  Implement ParallelRequestLimiter or use another API
-        Thread.sleep(1000);
+        Thread.sleep(sleepBetweenRequestsMs);
     }
 
     record QuickRecommendation(String title, String description) {

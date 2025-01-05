@@ -13,7 +13,7 @@ import static ru.pyatkinmv.pognaleey.service.PromptService.DETAILED_PROMPT_FORMA
 import static ru.pyatkinmv.pognaleey.service.PromptService.QUICK_PROMPT_FORMAT;
 
 @TestConfiguration
-public class ClientsConfiguration {
+public class ClientsConfig {
 
     @Bean
     public GptHttpClient gptHttpClient() {

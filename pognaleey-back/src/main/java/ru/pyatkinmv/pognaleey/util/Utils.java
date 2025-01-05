@@ -4,12 +4,14 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import lombok.SneakyThrows;
+import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
 
 import java.time.Instant;
 import java.util.function.Supplier;
 
 @Slf4j
+@UtilityClass
 public final class Utils {
 
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper()
