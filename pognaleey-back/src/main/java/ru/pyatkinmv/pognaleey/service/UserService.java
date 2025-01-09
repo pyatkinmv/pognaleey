@@ -7,6 +7,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import ru.pyatkinmv.pognaleey.dto.AuthRequestDto;
 import ru.pyatkinmv.pognaleey.dto.UserDto;
+import ru.pyatkinmv.pognaleey.mapper.TravelMapper;
 import ru.pyatkinmv.pognaleey.model.User;
 import ru.pyatkinmv.pognaleey.repository.UserRepository;
 
@@ -18,10 +19,6 @@ public class UserService implements UserDetailsService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
-
-    private static UserDto toUserDto(User user) {
-        return new UserDto(user.getId(), user.getUsername());
-    }
 
     public boolean isValidUser(AuthRequestDto authRequestDto) {
         var user = loadUserByUsername(authRequestDto.username());
@@ -46,7 +43,7 @@ public class UserService implements UserDetailsService {
         user.setUsername(registerRequest.username());
         user.setPassword(passwordEncoder.encode(registerRequest.password()));
 
-        return toUserDto(userRepository.save(
+        return TravelMapper.toUserDto(userRepository.save(
                         User.builder()
                                 .username(registerRequest.username())
                                 .password(passwordEncoder.encode(registerRequest.password()))

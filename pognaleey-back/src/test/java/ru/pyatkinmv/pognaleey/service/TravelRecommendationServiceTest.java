@@ -75,7 +75,7 @@ class TravelRecommendationServiceTest extends DatabaseCleaningTest {
 
     private TravelInquiry createTravelInquiry() {
         var inquiryParams = "duration=8-14 days;from=Moscow;to=Asia;budget={from=2100, to=3800}";
-        var inquiry = travelInquiryRepository.save(new TravelInquiry(null, inquiryParams, Instant.now()));
+        var inquiry = travelInquiryRepository.save(new TravelInquiry(null, inquiryParams, Instant.now(), null));
         assertThat(inquiry.getParams()).isEqualTo(inquiryParams);
         assertThat(inquiry.getId()).isNotNull();
 

@@ -13,14 +13,14 @@ import java.time.Instant;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@Table("travel_inquiries")
-public class TravelInquiry {
+@Table("travel_guides_likes")
+public class TravelGuideLike {
     @Id
     private Long id;
-
-    private String params;
 
     private Instant createdAt;
 
     private Long userId;
+
+    private Long guideId;
 }

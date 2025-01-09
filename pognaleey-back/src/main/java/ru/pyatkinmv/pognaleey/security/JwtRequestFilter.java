@@ -11,6 +11,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
+import ru.pyatkinmv.pognaleey.service.UserService;
 
 import java.io.IOException;
 
@@ -19,6 +20,7 @@ import java.io.IOException;
 public class JwtRequestFilter extends OncePerRequestFilter {
 
     private final JwtProvider jwtProvider;
+    private final UserService userService;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
@@ -35,7 +37,8 @@ public class JwtRequestFilter extends OncePerRequestFilter {
             }
 
             if (username != null && jwtProvider.isTokenValid(jwt)) {
-                var authenticationToken = new JwtAuthenticationToken(username);
+                var user = userService.loadUserByUsername(username);
+                var authenticationToken = new JwtAuthenticationToken(user);
                 authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 SecurityContextHolder.getContext().setAuthentication(authenticationToken);
             }
