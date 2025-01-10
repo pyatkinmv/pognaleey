@@ -2,120 +2,138 @@ package ru.pyatkinmv.pognaleey.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.lang.Nullable;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import ru.pyatkinmv.pognaleey.dto.TravelGuideFullDto;
 import ru.pyatkinmv.pognaleey.dto.TravelGuideLikeDto;
-import ru.pyatkinmv.pognaleey.dto.TravelGuideShortListDto;
+import ru.pyatkinmv.pognaleey.dto.TravelGuideShortDto;
 import ru.pyatkinmv.pognaleey.mapper.TravelMapper;
 import ru.pyatkinmv.pognaleey.model.TravelGuide;
 import ru.pyatkinmv.pognaleey.model.TravelGuideLike;
 import ru.pyatkinmv.pognaleey.model.User;
-import ru.pyatkinmv.pognaleey.repository.TravelGuideLikeRepository;
 import ru.pyatkinmv.pognaleey.repository.TravelGuideRepository;
 
 import java.time.Instant;
+import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
+
+import static ru.pyatkinmv.pognaleey.security.AuthenticatedUserProvider.getCurrentUser;
+import static ru.pyatkinmv.pognaleey.security.AuthenticatedUserProvider.getCurrentUserOrThrow;
 
 @Slf4j
 @RequiredArgsConstructor
 @Service
 public class TravelGuideService {
     private final TravelGuideRepository guideRepository;
-    private final TravelGuideLikeRepository likeRepository;
+    private final TravelGuideLikeService likeService;
+    private final UserService userService;
 
-    public TravelGuideLikeDto likeGuide(long guideId, @Nullable User user) {
-        // TODO: idempotency?
-        if (user == null) {
-            throw new IllegalArgumentException("user is null");
-        }
-
+    public TravelGuideLikeDto likeGuide(long guideId) {
         var guide = guideRepository.findById(guideId)
                 .orElseThrow(() -> new IllegalArgumentException(String.format("Guide %d not found", guideId)));
 
-        likeRepository.save(
-                TravelGuideLike.builder()
-                        .userId(user.getId())
-                        .createdAt(Instant.now())
-                        .guideId(guide.getId()).build()
-        );
+        var user = getCurrentUserOrThrow();
+        var doesntExist = likeService.findByUserIdAndGuideId(user.getId(), guideId).isEmpty();
 
-        int totalLikes = likeRepository.countByGuideId(guideId);
+        if (doesntExist) {
+            likeService.save(
+                    TravelGuideLike.builder()
+                            .userId(user.getId())
+                            .createdAt(Instant.now())
+                            .guideId(guide.getId()).build()
+            );
+        }
+
+        int totalLikes = likeService.countByGuideId(guideId);
 
         return new TravelGuideLikeDto(guide.getId(), true, totalLikes);
     }
 
-    public TravelGuideLikeDto unlikeGuide(long guideId, @Nullable User user) {
-        // TODO: idempotency?
-        if (user == null) {
-            throw new IllegalArgumentException("user is null");
-        }
-
-        var like = likeRepository.findByUserIdAndGuideId(user.getId(), guideId)
-                .orElseThrow(() -> new IllegalArgumentException("Like not found"));
-
-        likeRepository.delete(like);
-
-        int totalLikes = likeRepository.countByGuideId(guideId);
+    public TravelGuideLikeDto unlikeGuide(long guideId) {
+        likeService.findByUserIdAndGuideId(getCurrentUserOrThrow().getId(), guideId)
+                .ifPresent(likeService::delete);
+        int totalLikes = likeService.countByGuideId(guideId);
 
         return new TravelGuideLikeDto(guideId, false, totalLikes);
     }
 
-    public TravelGuideFullDto getFullGuide(long guideId, @Nullable User user) {
+    public TravelGuideFullDto getFullGuide(long guideId) {
         var guide = guideRepository.findById(guideId)
                 .orElseThrow(() -> new IllegalArgumentException(String.format("Guide %d not found", guideId)));
-        int totalLikes = likeRepository.countByGuideId(guideId);
+        int totalLikes = likeService.countByGuideId(guideId);
 
-        return TravelMapper.toGuideDto(guide, user, totalLikes);
+        return TravelMapper.toGuideDto(guide, getCurrentUser().orElse(null), totalLikes);
     }
 
-    public TravelGuideShortListDto getMyGuides(@Nullable User user) {
-        if (user == null) {
-            throw new IllegalArgumentException("user is null");
+    public Page<TravelGuideShortDto> getMyGuides(Pageable pageable) {
+        var user = getCurrentUserOrThrow();
+        var totalCount = guideRepository.countAllByUserId(user.getId());
+        var offset = pageable.getPageSize() * pageable.getPageNumber();
+        var guideIdToLikesCountMap = guideRepository.findTopGuides(user.getId(), pageable.getPageSize(), offset);
+        var userGuides = guideRepository.findAllByIdIn(guideIdToLikesCountMap.keySet());
+        var guides = TravelMapper.toGuideListDto(userGuides, List.of(user), guideIdToLikesCountMap);
+
+        return new PageImpl<>(guides, pageable, totalCount);
+    }
+
+    public Page<TravelGuideShortDto> getLikedGuides(Pageable pageable) {
+        var user = getCurrentUserOrThrow();
+        var offset = pageable.getPageSize() * pageable.getPageNumber();
+        var likedGuidesIds = likeService.findGuidesIdsByUserId(user.getId(), pageable.getPageSize(), offset);
+
+        if (likedGuidesIds.isEmpty()) {
+            return Page.empty(pageable);
         }
 
-        var userGuides = guideRepository.findByUserId(user.getId());
-        var userGuidesIds = userGuides.stream().map(TravelGuide::getId).toList();
-        var guideIdToLikesCountMap = guideRepository.findLikesCountByGuideIds(userGuidesIds);
+        var userGuides = guideRepository.findAllByIdIn(likedGuidesIds);
+        var guideIdToLikesCountMap = guideRepository.countLikesByGuideId(likedGuidesIds);
+        var totalCount = likeService.countByUserId(user.getId());
+        var users = findUsersByGuides(userGuides);
+        var guides = TravelMapper.toGuideListDto(userGuides, users, guideIdToLikesCountMap);
 
-        return TravelMapper.toGuideListDto(userGuides, user, guideIdToLikesCountMap);
+        return new PageImpl<>(guides, pageable, totalCount);
     }
 
-    public TravelGuideShortListDto getLikedGuides(@Nullable User user) {
-        if (user == null) {
-            throw new IllegalArgumentException("user is null");
-        }
-
-        var userGuidesLikes = likeRepository.findAllByUserId(user.getId());
-        var userGuidesIds = userGuidesLikes.stream().map(TravelGuideLike::getGuideId).toList();
-        var userGuides = guideRepository.findAllByIdIn(userGuidesIds);
-        var guideIdToLikesCountMap = guideRepository.findLikesCountByGuideIds(userGuidesIds);
-
-        return TravelMapper.toGuideListDto(userGuides, user, guideIdToLikesCountMap);
-    }
-
-    // TODO: pageable
-    public TravelGuideShortListDto getFeedGuides(@Nullable User user) {
-        var topGuideIdToLikeCountMap = guideRepository.findTopGuides(10);
+    public Page<TravelGuideShortDto> getFeedGuides(Pageable pageable) {
+        var offset = pageable.getPageSize() * pageable.getPageNumber();
+        var topGuideIdToLikeCountMap = guideRepository.findTopGuides(null, pageable.getPageSize(), offset);
         var topGuides = guideRepository.findAllByIdIn(topGuideIdToLikeCountMap.keySet());
+        var totalCount = guideRepository.count();
+        var users = findUsersByGuides(topGuides);
+        var guides = TravelMapper.toGuideListDto(topGuides, users, topGuideIdToLikeCountMap);
 
-        return TravelMapper.toGuideListDto(topGuides, user, topGuideIdToLikeCountMap);
+        return new PageImpl<>(guides, pageable, totalCount);
     }
 
-    public TravelGuideFullDto createGuide(long recommendationId, @Nullable User user) {
+    private List<User> findUsersByGuides(List<TravelGuide> guides) {
+        var usersIds = guides.stream()
+                .map(TravelGuide::getUserId)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toSet());
+
+        return userService.findUsersByIds(usersIds);
+    }
+
+    public TravelGuideFullDto createGuide(long recommendationId) {
+        var user = getCurrentUser().orElse(null);
         // TODO: Implement
         var uuid = UUID.randomUUID().toString();
-        var guide = TravelGuide.builder()
-                .title("title-" + uuid)
-                .details("details-" + uuid)
-                .imageUrl("https://image-url.com")
-                .recommendationId(recommendationId)
-                .userId(Optional.ofNullable(user).map(it -> it.getId()).orElse(null))
-                .createdAt(Instant.now())
-                .build();
-        guide = guideRepository.save(guide);
-        int totalLikes = likeRepository.countByGuideId(guide.getId());
+        var guide = guideRepository.save(
+                TravelGuide.builder()
+                        .title("title-" + uuid)
+                        .details("details-" + uuid)
+                        .imageUrl("https://image-url.com")
+                        .recommendationId(recommendationId)
+                        .userId(Optional.ofNullable(user).map(User::getId).orElse(null))
+                        .createdAt(Instant.now())
+                        .build()
+        );
+        int totalLikes = likeService.countByGuideId(guide.getId());
 
         return TravelMapper.toGuideDto(guide, user, totalLikes);
     }

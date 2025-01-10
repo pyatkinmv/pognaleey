@@ -22,6 +22,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
     private final JwtProvider jwtProvider;
     private final UserService userService;
 
+    @SuppressWarnings("NullableProblems")
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {

@@ -12,6 +12,8 @@ import ru.pyatkinmv.pognaleey.model.User;
 import ru.pyatkinmv.pognaleey.repository.UserRepository;
 
 import java.time.Instant;
+import java.util.Collection;
+import java.util.List;
 
 @RequiredArgsConstructor
 @Service
@@ -39,10 +41,6 @@ public class UserService implements UserDetailsService {
             );
         }
 
-        User user = new User();
-        user.setUsername(registerRequest.username());
-        user.setPassword(passwordEncoder.encode(registerRequest.password()));
-
         return TravelMapper.toUserDto(userRepository.save(
                         User.builder()
                                 .username(registerRequest.username())
@@ -51,6 +49,10 @@ public class UserService implements UserDetailsService {
                                 .build()
                 )
         );
+    }
+
+    public List<User> findUsersByIds(Collection<Long> usersIds) {
+        return userRepository.findAllByIdIn(usersIds);
     }
 }
 

@@ -10,10 +10,8 @@ import ru.pyatkinmv.pognaleey.model.TravelRecommendation;
 import ru.pyatkinmv.pognaleey.model.User;
 import ru.pyatkinmv.pognaleey.util.Utils;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Component
 public class TravelMapper {
@@ -70,22 +68,24 @@ public class TravelMapper {
         );
     }
 
-    public static TravelGuideShortListDto toGuideListDto(List<TravelGuide> userGuides,
-                                                         User user,
-                                                         Map<Long, Integer> guideIdToLikesCountMap) {
-        return new TravelGuideShortListDto(
-                userGuides.stream()
-                        .map(it -> new TravelGuideShortDto(
-                                        it.getId(),
-                                        it.getTitle(),
-                                        it.getImageUrl(),
-                                        guideIdToLikesCountMap.get(it.getId()),
-                                        Optional.ofNullable(user)
-                                                .map(TravelMapper::toUserDto)
-                                                .orElse(null)
-                                )
-                        ).toList()
-        );
+    public static List<TravelGuideShortDto> toGuideListDto(List<TravelGuide> userGuides,
+                                                           List<User> users,
+                                                           Map<Long, Integer> guideIdToLikesCountMap) {
+        var userIdToUser = users.stream().collect(Collectors.toMap(User::getId, it -> it));
+
+        return userGuides.stream()
+                .map(it -> new TravelGuideShortDto(
+                                it.getId(),
+                                it.getTitle(),
+                                it.getImageUrl(),
+                                guideIdToLikesCountMap.get(it.getId()),
+                                Optional.ofNullable(userIdToUser.get(it.getUserId()))
+                                        .map(TravelMapper::toUserDto)
+                                        .orElse(null)
+                        )
+                )
+                .sorted(Comparator.comparingInt(TravelGuideShortDto::totalLikes).reversed())
+                .toList();
     }
 
     public static UserDto toUserDto(User user) {

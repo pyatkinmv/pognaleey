@@ -3,8 +3,10 @@ package ru.pyatkinmv.pognaleey.repository;
 import org.springframework.dao.DataAccessException;
 import org.springframework.data.jdbc.repository.query.Query;
 import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.jdbc.core.ResultSetExtractor;
+import org.springframework.lang.Nullable;
 import ru.pyatkinmv.pognaleey.model.TravelGuide;
 
 import java.sql.ResultSet;
@@ -14,18 +16,19 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public interface TravelGuideRepository extends CrudRepository<TravelGuide, Long> {
-    List<TravelGuide> findByUserId(Long userId);
-
+public interface TravelGuideRepository extends CrudRepository<TravelGuide, Long>, PagingAndSortingRepository<TravelGuide, Long> {
 
     @Query(value = """
             SELECT g.id AS guideId, COUNT(l.id) AS likesCount
                         FROM travel_guides g
                         LEFT JOIN travel_guides_likes l ON g.id = l.guide_id
-                        WHERE g.id IN :guideIds
+                        WHERE COALESCE(:userId, g.user_id) = g.user_id
                         GROUP BY g.id
+                        ORDER BY likesCount DESC
+                        LIMIT :limit OFFSET :offset
             """, resultSetExtractorClass = GuideLikesExtractor.class)
-    Map<Long, Integer> findLikesCountByGuideIds(@Param("guideIds") List<Long> guideIds);
+    Map<Long, Integer> findTopGuides(@Param("userId") @Nullable Long userId, @Param("limit") int limit,
+                                     @Param("offset") int offset);
 
     List<TravelGuide> findAllByIdIn(Collection<Long> ids);
 
@@ -33,11 +36,12 @@ public interface TravelGuideRepository extends CrudRepository<TravelGuide, Long>
             SELECT g.id AS guideId, COUNT(gl.id) AS likesCount
             FROM travel_guides g
             LEFT JOIN travel_guides_likes gl ON g.id = gl.guide_id
+            WHERE g.id IN (:guideIds)
             GROUP BY g.id
-            ORDER BY likesCount DESC
-            LIMIT :limit
             """, resultSetExtractorClass = GuideLikesExtractor.class)
-    Map<Long, Integer> findTopGuides(@Param("limit") int limit);
+    Map<Long, Integer> countLikesByGuideId(@Param("guideIds") Collection<Long> guideIds);
+
+    int countAllByUserId(Long userId);
 
     class GuideLikesExtractor implements ResultSetExtractor<Map<Long, Integer>> {
 

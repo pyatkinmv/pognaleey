@@ -2,13 +2,12 @@ package ru.pyatkinmv.pognaleey.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.lang.Nullable;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
 import ru.pyatkinmv.pognaleey.dto.TravelGuideFullDto;
 import ru.pyatkinmv.pognaleey.dto.TravelGuideLikeDto;
-import ru.pyatkinmv.pognaleey.dto.TravelGuideShortListDto;
-import ru.pyatkinmv.pognaleey.model.User;
+import ru.pyatkinmv.pognaleey.dto.TravelGuideShortDto;
 import ru.pyatkinmv.pognaleey.service.TravelGuideService;
 
 @RestController
@@ -20,43 +19,38 @@ public class TravelGuideController {
 
     // TODO: Redesign
     @PostMapping
-    public TravelGuideFullDto createGuide(@RequestParam("recommendationId") long recommendationId,
-                                          @AuthenticationPrincipal @Nullable User user) {
-        return travelGuideService.createGuide(recommendationId, user);
+    public TravelGuideFullDto createGuide(@RequestParam("recommendationId") long recommendationId) {
+        return travelGuideService.createGuide(recommendationId);
     }
 
-    @PostMapping("/{guideId}/like")
-    public TravelGuideLikeDto likeGuide(@PathVariable("guideId") long guideId,
-                                        @AuthenticationPrincipal @Nullable User user) {
-        return travelGuideService.likeGuide(guideId, user);
+    @PutMapping("/{guideId}/like")
+    public TravelGuideLikeDto likeGuide(@PathVariable("guideId") long guideId) {
+        return travelGuideService.likeGuide(guideId);
     }
 
     @DeleteMapping("/{guideId}/unlike")
-    public TravelGuideLikeDto unlikeGuide(@PathVariable("guideId") long guideId,
-                                          @AuthenticationPrincipal @Nullable User user) {
-        return travelGuideService.unlikeGuide(guideId, user);
+    public TravelGuideLikeDto unlikeGuide(@PathVariable("guideId") long guideId) {
+        return travelGuideService.unlikeGuide(guideId);
     }
 
     @GetMapping("/{guideId}")
-    public TravelGuideFullDto getGuide(@PathVariable("guideId") long guideId,
-                                       @AuthenticationPrincipal @Nullable User user) {
-        return travelGuideService.getFullGuide(guideId, user);
+    public TravelGuideFullDto getGuide(@PathVariable("guideId") long guideId) {
+        return travelGuideService.getFullGuide(guideId);
     }
 
     @GetMapping("/liked")
-    public TravelGuideShortListDto getLikedGuides(@AuthenticationPrincipal @Nullable User user) {
-        return travelGuideService.getLikedGuides(user);
+    public Page<TravelGuideShortDto> getLikedGuides(Pageable pageable) {
+        return travelGuideService.getLikedGuides(pageable);
     }
 
     @GetMapping("/my")
-    public TravelGuideShortListDto getMyGuides(@AuthenticationPrincipal @Nullable User user) {
-        return travelGuideService.getMyGuides(user);
+    public Page<TravelGuideShortDto> getMyGuides(Pageable pageable) {
+        return travelGuideService.getMyGuides(pageable);
     }
 
-    // TODO: Pagination?
     @GetMapping("/feed")
-    public TravelGuideShortListDto getFeedGuides(@AuthenticationPrincipal @Nullable User user) {
-        return travelGuideService.getFeedGuides(user);
+    public Page<TravelGuideShortDto> getFeedGuides(Pageable pageable) {
+        return travelGuideService.getFeedGuides(pageable);
     }
 
 }
