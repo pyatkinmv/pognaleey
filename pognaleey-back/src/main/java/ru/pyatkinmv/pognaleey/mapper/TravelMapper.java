@@ -1,6 +1,7 @@
 package ru.pyatkinmv.pognaleey.mapper;
 
 import lombok.SneakyThrows;
+import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
 import ru.pyatkinmv.pognaleey.dto.*;
 import ru.pyatkinmv.pognaleey.dto.gpt.GptResponseRecommendationDetailsDto;
@@ -57,7 +58,7 @@ public class TravelMapper {
         );
     }
 
-    public static TravelGuideFullDto toGuideDto(TravelGuide guide, User user, int totalLikes) {
+    public static TravelGuideFullDto toGuideDto(TravelGuide guide, @Nullable User user, int totalLikes) {
         return new TravelGuideFullDto(
                 guide.getId(),
                 guide.getTitle(),

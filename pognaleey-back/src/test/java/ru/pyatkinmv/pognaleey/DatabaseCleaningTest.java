@@ -1,10 +1,12 @@
 package ru.pyatkinmv.pognaleey;
 
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.jdbc.core.JdbcTemplate;
 
+@Slf4j
 @SpringBootTest
 public abstract class DatabaseCleaningTest {
 
@@ -17,6 +19,7 @@ public abstract class DatabaseCleaningTest {
     }
 
     private void cleanDatabase() {
+        log.info("Cleaning database...");
         var truncateQuery = """
                 DO $$
                 DECLARE
@@ -32,5 +35,6 @@ public abstract class DatabaseCleaningTest {
                 END $$;
                 """;
         jdbcTemplate.execute(truncateQuery);
+        log.info("Database has been cleaned");
     }
 }

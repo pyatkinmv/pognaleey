@@ -66,8 +66,11 @@ public class TravelGuideService {
         var guide = guideRepository.findById(guideId)
                 .orElseThrow(() -> new IllegalArgumentException(String.format("Guide %d not found", guideId)));
         int totalLikes = likeService.countByGuideId(guideId);
+        var owner = Optional.ofNullable(guide.getUserId())
+                .flatMap(userService::findUserById)
+                .orElse(null);
 
-        return TravelMapper.toGuideDto(guide, getCurrentUser().orElse(null), totalLikes);
+        return TravelMapper.toGuideDto(guide, owner, totalLikes);
     }
 
     public Page<TravelGuideShortDto> getMyGuides(Pageable pageable) {
@@ -121,7 +124,7 @@ public class TravelGuideService {
 
     public TravelGuideFullDto createGuide(long recommendationId) {
         var user = getCurrentUser().orElse(null);
-        // TODO: Implement
+        // TODO: Implement method
         var uuid = UUID.randomUUID().toString();
         var guide = guideRepository.save(
                 TravelGuide.builder()
@@ -133,8 +136,7 @@ public class TravelGuideService {
                         .createdAt(Instant.now())
                         .build()
         );
-        int totalLikes = likeService.countByGuideId(guide.getId());
 
-        return TravelMapper.toGuideDto(guide, user, totalLikes);
+        return TravelMapper.toGuideDto(guide, user, 0);
     }
 }

@@ -1,10 +1,12 @@
 package ru.pyatkinmv.pognaleey.security;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.context.SecurityContextHolder;
 import ru.pyatkinmv.pognaleey.model.User;
 
 import java.util.Optional;
 
+@Slf4j
 public final class AuthenticatedUserProvider {
 
     public static User getCurrentUserOrThrow() {
@@ -21,6 +23,7 @@ public final class AuthenticatedUserProvider {
         var principal = authentication.getPrincipal();
 
         if (!(principal instanceof User)) {
+            log.warn("Wrong user type {}", principal.getClass().getName());
             return Optional.empty();
         }
 

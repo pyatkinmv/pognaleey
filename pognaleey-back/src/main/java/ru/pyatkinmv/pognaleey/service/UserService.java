@@ -14,6 +14,7 @@ import ru.pyatkinmv.pognaleey.repository.UserRepository;
 import java.time.Instant;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 
 @RequiredArgsConstructor
 @Service
@@ -53,6 +54,10 @@ public class UserService implements UserDetailsService {
 
     public List<User> findUsersByIds(Collection<Long> usersIds) {
         return userRepository.findAllByIdIn(usersIds);
+    }
+
+    public Optional<User> findUserById(Long id) {
+        return userRepository.findById(id);
     }
 }
 
