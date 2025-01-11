@@ -1,4 +1,4 @@
-package ru.pyatkinmv.pognaleey.dto.gpt;
+package ru.pyatkinmv.pognaleey.dto;
 
 import java.util.List;
 

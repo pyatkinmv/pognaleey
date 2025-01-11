@@ -1,11 +1,17 @@
 package ru.pyatkinmv.pognaleey.config;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.web.client.RestTemplate;
+import ru.pyatkinmv.pognaleey.client.ChatGptHttpClient;
+import ru.pyatkinmv.pognaleey.client.GptHttpClient;
+import ru.pyatkinmv.pognaleey.client.YandexGptHttpClient;
 
 import java.time.Duration;
 import java.util.concurrent.ExecutorService;
@@ -34,4 +40,26 @@ public class AppConfig {
         return Executors.newFixedThreadPool(nThreads);
     }
 
+    @Bean
+    @ConditionalOnProperty(prefix = "gpt-client", name = "current", havingValue = "yandex")
+    public GptHttpClient yandexGptHttpClient(
+            @Autowired RestTemplate restTemplate,
+            @Value("${gpt-client.yandex.base-url}") String gptBaseUrl,
+            @Value("${gpt-client.yandex.model-uri}") String modelUri,
+            @Value("${gpt-client.yandex.api-key}") String gptApiKey,
+            @Value("${gpt-client.yandex.folder-id}") String gptFolderId
+    ) {
+        return new YandexGptHttpClient(restTemplate, gptBaseUrl, modelUri, gptApiKey, gptFolderId);
+    }
+
+    @Bean
+    @ConditionalOnProperty(prefix = "gpt-client", name = "current", havingValue = "openai")
+    public GptHttpClient chatGptHttpClient(
+            @Autowired RestTemplate restTemplate,
+            @Value("${gpt-client.openai.base-url}") String gptBaseUrl,
+            @Value("${gpt-client.openai.model}") String model,
+            @Value("${gpt-client.openai.api-key}") String gptApiKey
+    ) {
+        return new ChatGptHttpClient(restTemplate, gptBaseUrl, model, gptApiKey);
+    }
 }

@@ -2,8 +2,8 @@ package ru.pyatkinmv.pognaleey.config;
 
 import org.mockito.ArgumentMatchers;
 import org.mockito.Mockito;
-import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import ru.pyatkinmv.pognaleey.client.GptHttpClient;
 import ru.pyatkinmv.pognaleey.client.ImagesSearchHttpClient;
 
@@ -12,7 +12,7 @@ import static org.mockito.Mockito.when;
 import static ru.pyatkinmv.pognaleey.service.PromptService.DETAILED_PROMPT_FORMAT;
 import static ru.pyatkinmv.pognaleey.service.PromptService.QUICK_PROMPT_FORMAT;
 
-@TestConfiguration
+@Configuration
 public class ClientsConfig {
 
     @Bean

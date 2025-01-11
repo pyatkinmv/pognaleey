@@ -31,18 +31,6 @@ public class ImagesSearchHttpClient {
     @Value("${image-search-client.base-url}")
     private String imageSearchBaseUrl;
 
-    private URI buildUri(String text) {
-        return UriComponentsBuilder.fromUriString(imageSearchBaseUrl)
-                .queryParam("apikey", imageSearchApiKey)  // Добавление параметров
-                .queryParam("folderid", imageSearchFolderId)
-                .queryParam("isize", "large")
-                .queryParam("groupby", "attr=ii.groups-on-page=5")
-                .queryParam("text", text)
-                .build()
-                .encode() // Кодировка параметров
-                .toUri();
-    }
-
     public String searchImageUrl(String text) {
         log.info("searchImageUrl for text {}", text);
         var uri = buildUri(text);
@@ -75,6 +63,18 @@ public class ImagesSearchHttpClient {
         log.info("searchImageUrl resultUrl {}", resultUrl);
 
         return resultUrl;
+    }
+
+    private URI buildUri(String text) {
+        return UriComponentsBuilder.fromUriString(imageSearchBaseUrl)
+                .queryParam("apikey", imageSearchApiKey)  // Добавление параметров
+                .queryParam("folderid", imageSearchFolderId)
+                .queryParam("isize", "large")
+                .queryParam("groupby", "attr=ii.groups-on-page=5")
+                .queryParam("text", text)
+                .build()
+                .encode() // Кодировка параметров
+                .toUri();
     }
 
     private String withoutSecret(URI uri) {

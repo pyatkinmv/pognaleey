@@ -1,6 +1,6 @@
 package ru.pyatkinmv.pognaleey.service;
 
-import ru.pyatkinmv.pognaleey.dto.gpt.GptResponseRecommendationDetailsDto;
+import ru.pyatkinmv.pognaleey.dto.GptResponseRecommendationDetailsDto;
 import ru.pyatkinmv.pognaleey.model.TravelRecommendation;
 import ru.pyatkinmv.pognaleey.util.Utils;
 

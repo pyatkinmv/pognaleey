@@ -3,9 +3,7 @@ package ru.pyatkinmv.pognaleey.service;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Import;
 import ru.pyatkinmv.pognaleey.DatabaseCleaningTest;
-import ru.pyatkinmv.pognaleey.config.ClientsConfig;
 import ru.pyatkinmv.pognaleey.model.TravelInquiry;
 import ru.pyatkinmv.pognaleey.model.TravelRecommendation;
 import ru.pyatkinmv.pognaleey.repository.TravelInquiryRepository;
@@ -17,7 +15,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static ru.pyatkinmv.pognaleey.service.PromptService.DETAILED_PROMPT_OBJ;
 
 @SpringBootTest
-@Import(ClientsConfig.class)
 class TravelRecommendationServiceTest extends DatabaseCleaningTest {
     @Autowired
     private TravelRecommendationService travelRecommendationService;

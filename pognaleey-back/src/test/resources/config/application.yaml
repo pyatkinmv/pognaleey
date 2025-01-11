@@ -9,9 +9,16 @@ image-search-client:
   folder-id: folderId
   sleep-between-requests-ms: 0
 gpt-client:
-  base-url: url
-  model-uri: uri
-  folder-id: folderId
-  api-key: apiKey
+  # noinspection SpringBootApplicationYaml
+  current: null
+  yandex:
+    base-url: url
+    model-uri: uri
+    folder-id: folderId
+    api-key: apiKey
+  openai:
+    base-url: url
+    model: model
+    api-key: apiKey
 jwt:
   secret: tests-environment-secret-key-for-jwt-auth

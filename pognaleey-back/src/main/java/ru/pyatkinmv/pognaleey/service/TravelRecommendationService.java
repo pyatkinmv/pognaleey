@@ -8,7 +8,7 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import ru.pyatkinmv.pognaleey.client.GptHttpClient;
 import ru.pyatkinmv.pognaleey.client.ImagesSearchHttpClient;
-import ru.pyatkinmv.pognaleey.dto.gpt.GptResponseRecommendationDetailsDto;
+import ru.pyatkinmv.pognaleey.dto.GptResponseRecommendationDetailsDto;
 import ru.pyatkinmv.pognaleey.model.TravelRecommendation;
 import ru.pyatkinmv.pognaleey.repository.TravelRecommendationRepository;
 import ru.pyatkinmv.pognaleey.util.Utils;

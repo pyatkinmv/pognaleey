@@ -4,7 +4,6 @@ import lombok.SneakyThrows;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
 import ru.pyatkinmv.pognaleey.dto.*;
-import ru.pyatkinmv.pognaleey.dto.gpt.GptResponseRecommendationDetailsDto;
 import ru.pyatkinmv.pognaleey.model.TravelGuide;
 import ru.pyatkinmv.pognaleey.model.TravelInquiry;
 import ru.pyatkinmv.pognaleey.model.TravelRecommendation;
