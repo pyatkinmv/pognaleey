@@ -7,7 +7,7 @@ image-search-client:
   base-url: url
   api-key: apiKey
   folder-id: folderId
-  sleep-between-requests-ms: 0
+  permits-per-second: 100
 gpt-client:
   # noinspection SpringBootApplicationYaml
   current: null

@@ -1,5 +1,6 @@
 package ru.pyatkinmv.pognaleey.config;
 
+import com.google.common.util.concurrent.RateLimiter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -61,5 +62,12 @@ public class AppConfig {
             @Value("${gpt-client.openai.api-key}") String gptApiKey
     ) {
         return new ChatGptHttpClient(restTemplate, gptBaseUrl, model, gptApiKey);
+    }
+
+    @SuppressWarnings("UnstableApiUsage")
+    @Bean
+    public RateLimiter imagesSearchClientRateLimiter(
+            @Value("${image-search-client.permits-per-second}") double permitsPerSecond) {
+        return RateLimiter.create(permitsPerSecond);
     }
 }

@@ -29,9 +29,9 @@ class TravelRecommendationServiceTest extends DatabaseCleaningTest {
         assertThat(recommendations)
                 .usingRecursiveFieldByFieldElementComparatorIgnoringFields("id", "createdAt")
                 .containsExactly(
-                        new TravelRecommendation(null, null, inquiry.getId(), "Токио", "современный мегаполис", null, null),
-                        new TravelRecommendation(null, null, inquiry.getId(), "Сингапур", "город-государство контрастов", null, null),
-                        new TravelRecommendation(null, null, inquiry.getId(), "Бангкок", "тайский колорит и экзотика", null, null)
+                        new TravelRecommendation(null, null, inquiry.getId(), "Грузия, Тбилиси и винные регионы", "Грузия весна пейзаж", null, null),
+                        new TravelRecommendation(null, null, inquiry.getId(), "Париж, Франция: Город любви", "Париж Эйфелева башня закат", null, null),
+                        new TravelRecommendation(null, null, inquiry.getId(), "Красная Поляна, Сочи: Горнолыжный отдых", "Красная Поляна лыжи снег", null, null)
                 );
     }
 

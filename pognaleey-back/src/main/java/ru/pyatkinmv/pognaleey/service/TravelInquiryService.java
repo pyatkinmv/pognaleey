@@ -99,5 +99,8 @@ public class TravelInquiryService {
         }
     }
 
+    public TravelInquiry findById(Long inquiryId) {
+        return inquiryRepository.findById(inquiryId).orElseThrow();
+    }
 }
 

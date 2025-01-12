@@ -3,7 +3,6 @@ package ru.pyatkinmv.pognaleey.service;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import ru.pyatkinmv.pognaleey.client.GptHttpClient;
@@ -14,12 +13,12 @@ import ru.pyatkinmv.pognaleey.repository.TravelRecommendationRepository;
 import ru.pyatkinmv.pognaleey.util.Utils;
 
 import java.time.Instant;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.regex.Pattern;
 
-import static ru.pyatkinmv.pognaleey.service.GptBullshitResolver.resolveInCaseGeneratedMoreOrLessThanExpected;
+import static ru.pyatkinmv.pognaleey.service.GptAnswerResolveHelper.parseSearchableItems;
+import static ru.pyatkinmv.pognaleey.service.GptAnswerResolveHelper.resolveInCaseGeneratedMoreOrLessThanExpected;
 
 @Slf4j
 @Service
@@ -32,17 +31,14 @@ public class TravelRecommendationService {
     private final TravelRecommendationRepository recommendationRepository;
     private final ExecutorService executorService;
 
-    @Value("${image-search-client.sleep-between-requests-ms}")
-    private Long sleepBetweenRequestsMs;
-
     private static List<TravelRecommendation> parseQuick(Long inquiryId, String quickRecommendationsAnswer) {
-        var parsed = parseQuick(quickRecommendationsAnswer);
+        var parsed = parseSearchableItems(quickRecommendationsAnswer);
 
         return parsed.stream()
                 .map(it -> TravelRecommendation.builder()
                         .inquiryId(inquiryId)
                         .title(it.title().trim())
-                        .shortDescription(it.description().trim())
+                        .shortDescription(it.imageSearchPhrase().trim())
                         .createdAt(Instant.now())
                         .build())
                 .toList();
@@ -61,39 +57,6 @@ public class TravelRecommendationService {
         } else {
             throw new RuntimeException("gptRecommendationsAnswerRaw has wrong format: " + gptRecommendationsAnswerRaw);
         }
-    }
-
-    static List<QuickRecommendation> parseQuick(String quickRecommendationsAnswer) {
-        var regex = "([^|]+)";
-        var pattern = Pattern.compile(regex);
-        var matcher = pattern.matcher(quickRecommendationsAnswer);
-        var result = new ArrayList<QuickRecommendation>();
-
-        while (matcher.find()) {
-            var quickRecommendation = matcher.group();
-
-            if (isValid(quickRecommendation)) {
-                var split = quickRecommendation.split(";");
-                result.add(new QuickRecommendation(split[0], split[1]));
-            } else {
-                log.warn("Wrong format for recommendation: {}", quickRecommendation);
-            }
-        }
-
-        return result;
-    }
-
-    private static boolean isValid(String quickRecommendationRaw) {
-        // Строки, содержащие ровно один символ ";" с текстом с обеих сторон от него
-        var regex = "^[^;]+;[^;]+$";
-        var pattern = Pattern.compile(regex);
-        var matcher = pattern.matcher(quickRecommendationRaw);
-
-        return matcher.matches();
-    }
-
-    private static String recommendationToSearchText(TravelRecommendation recommendation) {
-        return String.format("%s-%s", recommendation.getTitle(), recommendation.getShortDescription());
     }
 
     public List<TravelRecommendation> createQuickRecommendations(Long inquiryId, String inquiryParams) {
@@ -130,26 +93,25 @@ public class TravelRecommendationService {
     @Async
     public void enrichWithImagesAsync(List<TravelRecommendation> recommendations) {
         log.info("begin enrichWithImagesAsync");
-        recommendations.forEach(this::searchSaveAndSleep);
+        recommendations.forEach(this::searchAndSave);
         log.info("end enrichWithImagesAsync");
     }
 
     @SneakyThrows
-    private void searchSaveAndSleep(TravelRecommendation recommendation) {
-        String searchText = recommendationToSearchText(recommendation);
-        var imageUrl = imagesSearchHttpClient.searchImageUrl(searchText);
+    private void searchAndSave(TravelRecommendation recommendation) {
+        var searchText = recommendation.getShortDescription();
+        var imageUrl = imagesSearchHttpClient.searchImageUrlWithRateLimiting(searchText);
         log.info("Update imageUrl {} for recommendation {}", imageUrl, recommendation.getId());
         recommendationRepository.updateImageUrl(recommendation.getId(), imageUrl);
-        // TODO: Current api doesn't allow making more than one request per second
-        //  Implement ParallelRequestLimiter or use another API
-        Thread.sleep(sleepBetweenRequestsMs);
-    }
-
-    record QuickRecommendation(String title, String description) {
-
     }
 
     public List<TravelRecommendation> findAllByIds(List<Long> recommendationIds) {
         return recommendationRepository.findAllByIdIn(recommendationIds);
     }
+
+    public TravelRecommendation findById(long recommendationId) {
+        return recommendationRepository.findById(recommendationId).orElseThrow();
+    }
+
+
 }

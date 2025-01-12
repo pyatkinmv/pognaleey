@@ -29,9 +29,9 @@ class TravelInquiryServiceTest extends DatabaseCleaningTest {
         assertThat(inquiry.getQuickRecommendations())
                 .usingRecursiveFieldByFieldElementComparatorIgnoringFields("id")
                 .containsExactly(
-                        new TravelQuickRecommendationDto(-1L, "Токио", "современный мегаполис"),
-                        new TravelQuickRecommendationDto(-1L, "Сингапур", "город-государство контрастов"),
-                        new TravelQuickRecommendationDto(-1L, "Бангкок", "тайский колорит и экзотика")
+                        new TravelQuickRecommendationDto(-1L, "Грузия, Тбилиси и винные регионы", "Грузия весна пейзаж"),
+                        new TravelQuickRecommendationDto(-1L, "Париж, Франция: Город любви", "Париж Эйфелева башня закат"),
+                        new TravelQuickRecommendationDto(-1L, "Красная Поляна, Сочи: Горнолыжный отдых", "Красная Поляна лыжи снег")
                 );
 
     }

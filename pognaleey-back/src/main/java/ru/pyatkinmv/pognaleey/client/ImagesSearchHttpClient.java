@@ -1,5 +1,6 @@
 package ru.pyatkinmv.pognaleey.client;
 
+import com.google.common.util.concurrent.RateLimiter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -15,12 +16,14 @@ import java.util.ArrayList;
 import java.util.Objects;
 import java.util.regex.Pattern;
 
+@SuppressWarnings("UnstableApiUsage")
 @Slf4j
 @Component
 @RequiredArgsConstructor
 public class ImagesSearchHttpClient {
     private final RestTemplate restTemplate;
     private final RestTemplate restTemplateWithTimeout;
+    private final RateLimiter rateLimiter;
 
     @Value("${image-search-client.api-key}")
     private String imageSearchApiKey;
@@ -31,7 +34,13 @@ public class ImagesSearchHttpClient {
     @Value("${image-search-client.base-url}")
     private String imageSearchBaseUrl;
 
-    public String searchImageUrl(String text) {
+    public String searchImageUrlWithRateLimiting(String text) {
+        rateLimiter.acquire();
+
+        return searchImageUrl(text);
+    }
+
+    private String searchImageUrl(String text) {
         log.info("searchImageUrl for text {}", text);
         var uri = buildUri(text);
         log.info("searchImageUrl uri {}", withoutSecret(uri));

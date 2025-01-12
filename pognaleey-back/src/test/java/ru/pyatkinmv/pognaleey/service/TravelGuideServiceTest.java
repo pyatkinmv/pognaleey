@@ -59,7 +59,10 @@ class TravelGuideServiceTest extends DatabaseCleaningTest {
         assertThat(userGuide.id()).isNotEqualTo(guide.id());
         assertThat(userGuide.id()).isGreaterThan(0);
         assertThat(userGuide.title()).isNotNull();
+        assertThat(userGuide.imageUrl()).isNotNull();
         assertThat(userGuide.owner()).isNotNull();
+        assertThat(userGuide.details()).isNotNull();
+        assertThat(userGuide.totalLikes()).isEqualTo(0);
     }
 
     @Test
@@ -196,12 +199,13 @@ class TravelGuideServiceTest extends DatabaseCleaningTest {
     }
 
     private TravelRecommendation createRecommendation() {
+        // TODO: fix budget (подешевле, комфортно, роскошно)
         var inquiryParams = "duration=1-3 days;to=Russia;budget={from=100, to=800}";
         var inquiry = travelInquiryRepository.save(new TravelInquiry(null, inquiryParams, Instant.now(), null));
         assertThat(inquiry.getParams()).isEqualTo(inquiryParams);
         assertThat(inquiry.getId()).isNotNull();
         var recommendation = travelRecommendationRepository.save(
-                new TravelRecommendation(null, Instant.now(), inquiry.getId(), "Москва", "белокаменная", null, null)
+                new TravelRecommendation(null, Instant.now(), inquiry.getId(), "Москва", "белокаменная", "details", "imageUrl")
         );
         assertThat(recommendation.getId()).isNotNull();
 

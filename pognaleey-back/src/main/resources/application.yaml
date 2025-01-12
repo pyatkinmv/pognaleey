@@ -21,7 +21,7 @@ image-search-client:
   base-url: https://yandex.ru/images-xml
   api-key: ${IMAGE_SEARCH_API_KEY}
   folder-id: ${IMAGE_SEARCH_FOLDER_ID}
-  sleep-between-requests-ms: 1000
+  permits-per-second: 0.7
 gpt-client:
   # noinspection SpringBootApplicationYaml
   current: ${CURRENT_GPT_CLIENT}
