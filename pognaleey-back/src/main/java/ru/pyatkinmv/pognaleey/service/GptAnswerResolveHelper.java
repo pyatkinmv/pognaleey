@@ -65,7 +65,7 @@ public class GptAnswerResolveHelper {
         var result = new ArrayList<SearchableItem>();
 
         while (matcher.find()) {
-            var searchableItemRaw = matcher.group().trim();
+            var searchableItemRaw = matcher.group().trim().replaceAll("\\.", "");
             parseSearchableItem(searchableItemRaw)
                     .ifPresentOrElse(
                             result::add,

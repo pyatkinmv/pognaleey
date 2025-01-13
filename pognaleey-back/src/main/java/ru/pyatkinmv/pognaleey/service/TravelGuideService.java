@@ -33,7 +33,7 @@ import static ru.pyatkinmv.pognaleey.service.GptAnswerResolveHelper.parseSearcha
 @RequiredArgsConstructor
 @Service
 public class TravelGuideService {
-    private static final String MARKDOWN_IMAGE_FORMAT = "<img src=\"%s\" alt=\"%s\" width=\"700\" style=\"display: block; margin: 0 auto;\">";
+    private static final String MARKDOWN_IMAGE_FORMAT = "<img src=\"%s\" alt=\"%s\" style=\"width: 45rem; display: block; margin: 0 auto;\">";
 
     private final TravelGuideRepository guideRepository;
     private final TravelGuideLikeService likeService;
@@ -219,6 +219,7 @@ public class TravelGuideService {
         return result;
     }
 
+    // TODO: Extract all parsing & specific logic outside
     @SneakyThrows
     private void enrichGuide(TravelGuide guide, long inquiryId, String recommendationTitle) {
         log.info("Begin enrichGuide for guide {}", guide.getId());

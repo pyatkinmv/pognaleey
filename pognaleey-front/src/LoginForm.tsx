@@ -1,7 +1,8 @@
-// LoginForm.tsx
 import React, {useState} from "react";
 import {Link, useNavigate} from "react-router-dom";
 import "./LoginForm.css";
+import {validatePassword, validateUsername} from "./validators";
+
 
 const LoginForm: React.FC = () => {
     const [credentials, setCredentials] = useState({
@@ -9,7 +10,26 @@ const LoginForm: React.FC = () => {
         password: "",
     });
 
+    const [errors, setErrors] = useState<{ username?: string; password?: string }>({});
     const navigate = useNavigate();
+
+    const validateForm = () => {
+        const newErrors: { username?: string; password?: string } = {};
+
+        // Используем общие функции
+        const usernameError = validateUsername(credentials.username);
+        if (usernameError) {
+            newErrors.username = usernameError;
+        }
+
+        const passwordError = validatePassword(credentials.password);
+        if (passwordError) {
+            newErrors.password = passwordError;
+        }
+
+        setErrors(newErrors);
+        return Object.keys(newErrors).length === 0;
+    };
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const {name, value} = e.target;
@@ -17,10 +37,20 @@ const LoginForm: React.FC = () => {
             ...credentials,
             [name]: value,
         });
+
+        // Убираем ошибку при вводе исправленных данных
+        setErrors({
+            ...errors,
+            [name]: "",
+        });
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+
+        if (!validateForm()) {
+            return; // Если форма не прошла валидацию, не отправляем запрос
+        }
 
         try {
             const response = await fetch(`${process.env.REACT_APP_API_URL}/auth/login`, {
@@ -44,7 +74,6 @@ const LoginForm: React.FC = () => {
         }
     };
 
-
     return (
         <div className="login-container">
             <div className="header">
@@ -67,6 +96,7 @@ const LoginForm: React.FC = () => {
                         onChange={handleChange}
                         required
                     />
+                    {errors.username && <p className="error-message">{errors.username}</p>}
                 </div>
 
                 <div className="form-group">
@@ -79,6 +109,7 @@ const LoginForm: React.FC = () => {
                         onChange={handleChange}
                         required
                     />
+                    {errors.password && <p className="error-message">{errors.password}</p>}
                 </div>
 
                 <button type="submit" className="login-button">Войти</button>

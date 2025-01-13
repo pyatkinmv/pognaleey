@@ -1,30 +1,60 @@
 import React, {useState} from "react";
 import {useNavigate} from "react-router-dom";
 import "./RegisterForm.css";
+import {validateConfirmPassword, validatePassword, validateUsername} from "./validators";
 
 const RegisterForm: React.FC = () => {
-    const [formData, setFormData] = useState({
+    const [credentials, setCredentials] = useState({
         username: "",
         password: "",
         confirmPassword: "",
     });
-    const [error, setError] = useState("");
+
+    const [errors, setErrors] = useState<{ username?: string; password?: string; confirmPassword?: string }>({});
     const navigate = useNavigate();
+
+    const validateForm = () => {
+        const newErrors: { username?: string; password?: string; confirmPassword?: string } = {};
+
+        // Используем общие функции
+        const usernameError = validateUsername(credentials.username);
+        if (usernameError) {
+            newErrors.username = usernameError;
+        }
+
+        const passwordError = validatePassword(credentials.password);
+        if (passwordError) {
+            newErrors.password = passwordError;
+        }
+
+        const confirmPasswordError = validateConfirmPassword(credentials.password, credentials.confirmPassword);
+        if (confirmPasswordError) {
+            newErrors.confirmPassword = confirmPasswordError;
+        }
+
+        setErrors(newErrors);
+        return Object.keys(newErrors).length === 0;
+    };
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const {name, value} = e.target;
-        setFormData({
-            ...formData,
+        setCredentials({
+            ...credentials,
             [name]: value,
+        });
+
+        // Убираем ошибку при исправлении
+        setErrors({
+            ...errors,
+            [name]: "",
         });
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
-        if (formData.password !== formData.confirmPassword) {
-            setError("Пароли не совпадают.");
-            return;
+        if (!validateForm()) {
+            return; // Если форма не прошла валидацию, не отправляем запрос
         }
 
         try {
@@ -32,8 +62,8 @@ const RegisterForm: React.FC = () => {
                 method: "POST",
                 headers: {"Content-Type": "application/json"},
                 body: JSON.stringify({
-                    username: formData.username,
-                    password: formData.password,
+                    username: credentials.username,
+                    password: credentials.password,
                 }),
             });
 
@@ -46,7 +76,7 @@ const RegisterForm: React.FC = () => {
             }
         } catch (err) {
             console.error("Ошибка:", err);
-            setError("Не удалось зарегистрироваться. Попробуйте позже.");
+            setErrors({username: "Не удалось зарегистрироваться. Попробуйте позже."});
         }
     };
 
@@ -62,18 +92,17 @@ const RegisterForm: React.FC = () => {
             </div>
 
             <form onSubmit={handleSubmit} className="register-form">
-                {error && <div className="error-message">{error}</div>}
-
                 <div className="form-group">
                     <label htmlFor="username">Имя пользователя:</label>
                     <input
                         type="text"
                         id="username"
                         name="username"
-                        value={formData.username}
+                        value={credentials.username}
                         onChange={handleChange}
                         required
                     />
+                    {errors.username && <p className="error-message">{errors.username}</p>}
                 </div>
 
                 <div className="form-group">
@@ -82,10 +111,11 @@ const RegisterForm: React.FC = () => {
                         type="password"
                         id="password"
                         name="password"
-                        value={formData.password}
+                        value={credentials.password}
                         onChange={handleChange}
                         required
                     />
+                    {errors.password && <p className="error-message">{errors.password}</p>}
                 </div>
 
                 <div className="form-group">
@@ -94,10 +124,11 @@ const RegisterForm: React.FC = () => {
                         type="password"
                         id="confirmPassword"
                         name="confirmPassword"
-                        value={formData.confirmPassword}
+                        value={credentials.confirmPassword}
                         onChange={handleChange}
                         required
                     />
+                    {errors.confirmPassword && <p className="error-message">{errors.confirmPassword}</p>}
                 </div>
 
                 <button type="submit" className="register-button">Зарегистрироваться</button>

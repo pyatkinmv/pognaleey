@@ -25,7 +25,9 @@ const isTokenExpired = (token: string): boolean => {
 const PrivateRoute: React.FC<{ children: React.ReactNode }> = ({children}) => {
     const token = localStorage.getItem("jwtToken");
 
-    if (!token || isTokenExpired(token)) {
+    if (token && isTokenExpired(token)) {
+        alert("Ваша сессия истекла. Пожалуйста, войдите снова.");
+        localStorage.removeItem("jwtToken"); // Удаляем токен из локального хранилища
         return <Navigate to="/login" replace/>;
     }
 
