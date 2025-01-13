@@ -1,6 +1,7 @@
 import React, {useEffect, useState} from "react";
 import {useParams} from "react-router-dom";
 import ReactMarkdown from "react-markdown";
+import rehypeRaw from "rehype-raw";
 import apiClient from "./apiClient";
 import "./Guide.css";
 
@@ -59,19 +60,8 @@ const Guide: React.FC = () => {
 
     return (
         <div className="guide-container">
-            <div className="guide-header">
-                <h1>{guide.title}</h1>
-                {guide.imageUrl && (
-                    <img
-                        src={guide.imageUrl}
-                        alt={`Изображение для гида: ${guide.title}`}
-                        className="guide-image"
-                    />
-                )}
-            </div>
-
             <div className="guide-details">
-                <ReactMarkdown>{guide.details}</ReactMarkdown>
+                <ReactMarkdown rehypePlugins={[rehypeRaw]}>{guide.details}</ReactMarkdown>
             </div>
 
             <div className="guide-footer">
