@@ -3,7 +3,6 @@ package ru.pyatkinmv.pognaleey.repository;
 import org.springframework.dao.DataAccessException;
 import org.springframework.data.jdbc.repository.query.Query;
 import org.springframework.data.repository.CrudRepository;
-import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.lang.Nullable;
@@ -16,7 +15,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public interface TravelGuideRepository extends CrudRepository<TravelGuide, Long>, PagingAndSortingRepository<TravelGuide, Long> {
+public interface TravelGuideRepository extends CrudRepository<TravelGuide, Long> {
 
     @Query(value = """
             SELECT g.id AS guideId, COUNT(l.id) AS likesCount

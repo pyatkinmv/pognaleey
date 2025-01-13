@@ -28,6 +28,7 @@ const Guide: React.FC = () => {
     useEffect(() => {
         const fetchGuide = async () => {
             try {
+                setLoading(true); // Устанавливаем состояние загрузки
                 const response = await apiClient(`${process.env.REACT_APP_API_URL}/travel-guides/${guideId}`);
 
                 if (response.ok) {
@@ -39,7 +40,7 @@ const Guide: React.FC = () => {
             } catch (err) {
                 setError((err as Error).message);
             } finally {
-                setLoading(false);
+                setLoading(false); // Снимаем состояние загрузки
             }
         };
 
@@ -47,7 +48,12 @@ const Guide: React.FC = () => {
     }, [guideId]);
 
     if (loading) {
-        return <div className="loading">Загрузка...</div>;
+        return (
+            <div className="loading-container">
+                <div className="loader"></div>
+                <p>Уже готовим ваш путеводитель! Чуть-чуть подождите 😊</p>
+            </div>
+        );
     }
 
     if (error) {

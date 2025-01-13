@@ -26,8 +26,10 @@ public class TravelGuide {
 
     private Instant createdAt;
 
+    @Nullable
     private String title;
 
+    @Nullable
     private String details;
 
     private String imageUrl;

@@ -1,10 +1,10 @@
 import React, {useEffect, useState} from "react";
-import {useLocation, useParams} from "react-router-dom";
+import {useLocation, useNavigate, useParams} from "react-router-dom";
 import "./Recommendations.css";
 import apiClient from "./apiClient"; // Подключаем стили
 
 interface QuickRecommendation {
-    id: string;
+    id: number;
     title: string;
     description: string;
     imageUrl?: string; // Добавляем поле для URL картинки
@@ -21,6 +21,7 @@ interface DetailedRecommendation extends QuickRecommendation {
 
 const Recommendations: React.FC = () => {
     const location = useLocation();
+    const navigate = useNavigate();
     const params = useParams<{ inquiryId: string }>();
 
     // Получаем quickRecommendations из состояния предыдущей страницы
@@ -39,6 +40,27 @@ const Recommendations: React.FC = () => {
 
     const closeModal = () => {
         setSelectedImage(null); // Закрыть модальное окно
+    };
+
+    const handleGenerateGuide = async (recommendationId: number) => {
+        try {
+            const response = await apiClient(
+                `${process.env.REACT_APP_API_URL}/travel-guides?recommendationId=${recommendationId}`,
+                {
+                    method: "POST",
+                }
+            );
+
+            if (!response.ok) {
+                throw new Error(`Failed to generate guide: ${response.status}`);
+            }
+
+            const guide = await response.json();
+            navigate(`/travel-guides/${guide.id}`);
+        } catch (error) {
+            console.error("Error generating guide:", error);
+            alert("Не удалось сгенерировать гайд.");
+        }
     };
 
     useEffect(() => {
@@ -123,6 +145,12 @@ const Recommendations: React.FC = () => {
                                         ))}
                                     </ul>
                                     <p><strong>Дополнительно:</strong> {recommendation.additionalConsideration}</p>
+                                    <button
+                                        className="generate-guide-button"
+                                        onClick={() => handleGenerateGuide(recommendation.id)}
+                                    >
+                                        Сгенерировать гайд
+                                    </button>
                                 </>
                             )}
 

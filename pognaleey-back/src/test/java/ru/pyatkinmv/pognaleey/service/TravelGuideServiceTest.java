@@ -61,14 +61,13 @@ class TravelGuideServiceTest extends DatabaseCleaningTest {
         assertThat(userGuide.title()).isNotNull();
         assertThat(userGuide.imageUrl()).isNotNull();
         assertThat(userGuide.owner()).isNotNull();
-        assertThat(userGuide.details()).isNotNull();
         assertThat(userGuide.totalLikes()).isEqualTo(0);
     }
 
     @Test
     void getFullGuide() {
         var guide = withUser("user-1", this::createTravelGuide);
-        var fullGuideDto = travelGuideService.getFullGuide(guide.getId());
+        var fullGuideDto = travelGuideService.getFullGuide(guide.getId(), 1_000);
         assertThat(fullGuideDto.id()).isGreaterThan(0);
         assertThat(fullGuideDto.details()).isNotNull();
         assertThat(fullGuideDto.owner()).isNotNull();

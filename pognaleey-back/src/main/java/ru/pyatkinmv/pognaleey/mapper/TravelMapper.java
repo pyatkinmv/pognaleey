@@ -33,19 +33,20 @@ public class TravelMapper {
     public static TravelRecommendationListDto toRecommendationListDto(Collection<TravelRecommendation> recommendations) {
         return new TravelRecommendationListDto(
                 recommendations.stream()
-                        .map(it -> toRecommendationDto(it.getDetails(), it.getImageUrl()))
+                        .map(TravelMapper::toRecommendationDto)
                         .toList()
         );
     }
 
     @SneakyThrows
-    public static TravelRecommendationDto toRecommendationDto(String recommendationDetailsJson, String imageUrl) {
+    public static TravelRecommendationDto toRecommendationDto(TravelRecommendation travelRecommendation) {
         var details = Utils.toObject(
-                recommendationDetailsJson,
+                travelRecommendation.getDetails(),
                 GptResponseRecommendationDetailsDto.class
         );
 
         return new TravelRecommendationDto(
+                travelRecommendation.getId(),
                 details.title(),
                 details.budget(),
                 details.reasoning(),
@@ -53,7 +54,7 @@ public class TravelMapper {
                 details.tips(),
                 details.whereToGo(),
                 details.additionalConsideration(),
-                imageUrl
+                travelRecommendation.getImageUrl()
         );
     }
 
@@ -68,24 +69,32 @@ public class TravelMapper {
         );
     }
 
-    public static List<TravelGuideShortDto> toGuideListDto(List<TravelGuide> userGuides,
-                                                           List<User> users,
-                                                           Map<Long, Integer> guideIdToLikesCountMap) {
+    public static List<TravelGuideShortDto> toShortGuideListDto(List<TravelGuide> userGuides,
+                                                                List<User> users,
+                                                                Map<Long, Integer> guideIdToLikesCountMap) {
         var userIdToUser = users.stream().collect(Collectors.toMap(User::getId, it -> it));
 
         return userGuides.stream()
-                .map(it -> new TravelGuideShortDto(
-                                it.getId(),
-                                it.getTitle(),
-                                it.getImageUrl(),
-                                guideIdToLikesCountMap.get(it.getId()),
-                                Optional.ofNullable(userIdToUser.get(it.getUserId()))
-                                        .map(TravelMapper::toUserDto)
-                                        .orElse(null)
+                .map(guide -> toShortGuideDto(
+                                guide,
+                                userIdToUser.get(guide.getUserId()),
+                                guideIdToLikesCountMap.get(guide.getId())
                         )
                 )
                 .sorted(Comparator.comparingInt(TravelGuideShortDto::totalLikes).reversed())
                 .toList();
+    }
+
+    public static TravelGuideShortDto toShortGuideDto(TravelGuide it, @Nullable User user, int totalLikes) {
+        return new TravelGuideShortDto(
+                it.getId(),
+                it.getTitle(),
+                it.getImageUrl(),
+                totalLikes,
+                Optional.ofNullable(user)
+                        .map(TravelMapper::toUserDto)
+                        .orElse(null)
+        );
     }
 
     public static UserDto toUserDto(User user) {

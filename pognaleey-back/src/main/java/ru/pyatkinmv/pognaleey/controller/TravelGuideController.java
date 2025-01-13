@@ -17,9 +17,8 @@ import ru.pyatkinmv.pognaleey.service.TravelGuideService;
 public class TravelGuideController {
     private final TravelGuideService travelGuideService;
 
-    // TODO: Redesign
     @PostMapping
-    public TravelGuideFullDto createGuide(@RequestParam("recommendationId") long recommendationId) {
+    public TravelGuideShortDto createGuide(@RequestParam("recommendationId") long recommendationId) {
         return travelGuideService.createGuide(recommendationId);
     }
 
@@ -35,7 +34,7 @@ public class TravelGuideController {
 
     @GetMapping("/{guideId}")
     public TravelGuideFullDto getGuide(@PathVariable("guideId") long guideId) {
-        return travelGuideService.getFullGuide(guideId);
+        return travelGuideService.getFullGuide(guideId, 30_000L);
     }
 
     @GetMapping("/liked")

@@ -95,3 +95,53 @@
 .not-found {
     color: #888;
 }
+
+
+.loading-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 50vh; /* Контейнер занимает всю высоту экрана */
+    font-family: Arial, sans-serif;
+    text-align: center;
+    position: relative; /* Убедимся, что элементы позиционируются относительно контейнера */
+}
+
+.loader {
+    width: 50px;
+    height: 50px;
+    border: 5px solid #f3f3f3;
+    border-top: 5px solid #4caf50; /* Цвет активной линии */
+    border-radius: 50%;
+    animation: spin 1s linear infinite; /* Классический вращающийся спиннер */
+    margin-bottom: 15px; /* Отступ между спиннером и текстом */
+}
+
+.loading-container p {
+    font-size: 18px;
+    color: #555;
+    margin: 0; /* Убираем лишние отступы */
+    position: relative; /* Убедимся, что текст располагается относительно контейнера */
+    top: 5px; /* Слегка поднимаем текст */
+}
+
+
+/* Прогресс текста */
+.progress-text {
+    font-size: 16px;
+    color: #888;
+    margin-top: 5px;
+}
+
+/* Анимация вращения */
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+

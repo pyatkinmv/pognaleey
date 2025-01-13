@@ -18,6 +18,7 @@ import ru.pyatkinmv.pognaleey.model.TravelGuide;
 import ru.pyatkinmv.pognaleey.model.TravelGuideLike;
 import ru.pyatkinmv.pognaleey.model.User;
 import ru.pyatkinmv.pognaleey.repository.TravelGuideRepository;
+import ru.pyatkinmv.pognaleey.util.LongPolling;
 
 import java.time.Instant;
 import java.util.*;
@@ -32,7 +33,7 @@ import static ru.pyatkinmv.pognaleey.service.GptAnswerResolveHelper.parseSearcha
 @RequiredArgsConstructor
 @Service
 public class TravelGuideService {
-    private static final String MARKDOWN_IMAGE_FORMAT = "<img src=\"%s\" alt=\"%s\" width=\"700\">";
+    private static final String MARKDOWN_IMAGE_FORMAT = "<img src=\"%s\" alt=\"%s\" width=\"700\" style=\"display: block; margin: 0 auto;\">";
 
     private final TravelGuideRepository guideRepository;
     private final TravelGuideLikeService likeService;
@@ -72,9 +73,14 @@ public class TravelGuideService {
         return new TravelGuideLikeDto(guideId, false, totalLikes);
     }
 
-    public TravelGuideFullDto getFullGuide(long guideId) {
-        var guide = guideRepository.findById(guideId)
-                .orElseThrow(() -> new IllegalArgumentException(String.format("Guide %d not found", guideId)));
+    public TravelGuideFullDto getFullGuide(long guideId, long timeoutMs) {
+        var longPoll = new LongPolling<TravelGuide>();
+        var guide = longPoll.execute(
+                () -> findTravelGuideWithContent(guideId),
+                timeoutMs,
+                300
+        );
+
         int totalLikes = likeService.countByGuideId(guideId);
         var owner = Optional.ofNullable(guide.getUserId())
                 .flatMap(userService::findUserById)
@@ -83,13 +89,23 @@ public class TravelGuideService {
         return TravelMapper.toGuideDto(guide, owner, totalLikes);
     }
 
+    private Optional<TravelGuide> findTravelGuideWithContent(long guideId) {
+        var guide = guideRepository.findById(guideId)
+                .orElseThrow(() -> new IllegalArgumentException(String.format("Guide %d not found", guideId)));
+        if (guide.getTitle() != null && guide.getDetails() != null) {
+            return Optional.of(guide);
+        } else {
+            return Optional.empty();
+        }
+    }
+
     public Page<TravelGuideShortDto> getMyGuides(Pageable pageable) {
         var user = getCurrentUserOrThrow();
         var totalCount = guideRepository.countAllByUserId(user.getId());
         var offset = pageable.getPageSize() * pageable.getPageNumber();
         var guideIdToLikesCountMap = guideRepository.findTopGuides(user.getId(), pageable.getPageSize(), offset);
         var userGuides = guideRepository.findAllByIdIn(guideIdToLikesCountMap.keySet());
-        var guides = TravelMapper.toGuideListDto(userGuides, List.of(user), guideIdToLikesCountMap);
+        var guides = TravelMapper.toShortGuideListDto(userGuides, List.of(user), guideIdToLikesCountMap);
 
         return new PageImpl<>(guides, pageable, totalCount);
     }
@@ -107,7 +123,7 @@ public class TravelGuideService {
         var guideIdToLikesCountMap = guideRepository.countLikesByGuideId(likedGuidesIds);
         var totalCount = likeService.countByUserId(user.getId());
         var users = findUsersByGuides(userGuides);
-        var guides = TravelMapper.toGuideListDto(userGuides, users, guideIdToLikesCountMap);
+        var guides = TravelMapper.toShortGuideListDto(userGuides, users, guideIdToLikesCountMap);
 
         return new PageImpl<>(guides, pageable, totalCount);
     }
@@ -118,7 +134,7 @@ public class TravelGuideService {
         var topGuides = guideRepository.findAllByIdIn(topGuideIdToLikeCountMap.keySet());
         var totalCount = guideRepository.count();
         var users = findUsersByGuides(topGuides);
-        var guides = TravelMapper.toGuideListDto(topGuides, users, topGuideIdToLikeCountMap);
+        var guides = TravelMapper.toShortGuideListDto(topGuides, users, topGuideIdToLikeCountMap);
 
         return new PageImpl<>(guides, pageable, totalCount);
     }
@@ -204,13 +220,9 @@ public class TravelGuideService {
     }
 
     @SneakyThrows
-    public TravelGuideFullDto createGuide(long recommendationId) {
-        log.info("begin createGuide for recommendation: {}", recommendationId);
-        var user = getCurrentUser().orElse(null);
-        var recommendation = recommendationService.findById(recommendationId);
-        var inquiry = inquiryService.findById(recommendation.getInquiryId());
-
-        var recommendationTitle = recommendation.getTitle();
+    private void enrichGuide(TravelGuide guide, long inquiryId, String recommendationTitle) {
+        log.info("Begin enrichGuide for guide {}", guide.getId());
+        var inquiry = inquiryService.findById(inquiryId);
         var guideImagesPrompt = PromptService.generateGuideImagesPrompt(recommendationTitle, inquiry.getParams());
         var imagesGuideResponseRaw = gptHttpClient.ask(guideImagesPrompt);
         var searchableGuideItems = parseSearchableItems(imagesGuideResponseRaw);
@@ -225,24 +237,36 @@ public class TravelGuideService {
 
         var guideContent = Optional.of(guideContentRaw)
                 .map(it -> enrichGuideWithContentImages(guideContentRaw, titleToImageUrlMap))
-                .map(it -> enrichGuideWithTitleImage(it, guideContentTitle, recommendation.getImageUrl()))
+                .map(it -> enrichGuideWithTitleImage(it, guideContentTitle, guide.getImageUrl()))
                 .map(GptAnswerResolveHelper::stripCurlyBraces)
+//                .map(it -> Utils.peek(() -> Utils.writeFile(it, guide.getId()), it))
                 .orElseThrow();
 
+        guide.setTitle(Optional.ofNullable(guideContentTitle).orElse(recommendationTitle));
+        guide.setDetails(guideContent);
+
+        guideRepository.save(guide);
+        log.info("end enrichGuide for guide: {}", guide.getId());
+    }
+
+    public TravelGuideShortDto createGuide(long recommendationId) {
+        log.info("begin createGuide for recommendation: {}", recommendationId);
+        var user = getCurrentUser().orElse(null);
+        var recommendation = recommendationService.findById(recommendationId);
         var guide = guideRepository.save(
                 TravelGuide.builder()
-                        .title(Optional.ofNullable(guideContentTitle).orElse(recommendationTitle))
-                        .details(guideContent)
+                        .title(null)
+                        .details(null)
                         .imageUrl(recommendation.getImageUrl())
                         .recommendationId(recommendationId)
                         .userId(Optional.ofNullable(user).map(User::getId).orElse(null))
                         .createdAt(Instant.now())
                         .build()
         );
-        var guideDto = TravelMapper.toGuideDto(guide, user, 0);
-        log.info("end createGuide for recommendation: {}, guide: {}", recommendationId, guide.getId());
 
-        return guideDto;
+        executorService.execute(() -> enrichGuide(guide, recommendation.getInquiryId(), recommendation.getTitle()));
+
+        return TravelMapper.toShortGuideDto(guide, user, 0);
     }
 
     private Map<String, String> searchImagesWithSleepAndBuildTitleToImageMap(List<GptAnswerResolveHelper.SearchableItem> titlesWithImageSearchPhrases) {
