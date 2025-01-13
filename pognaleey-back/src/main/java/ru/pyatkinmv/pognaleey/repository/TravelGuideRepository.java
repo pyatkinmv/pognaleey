@@ -42,6 +42,26 @@ public interface TravelGuideRepository extends CrudRepository<TravelGuide, Long>
 
     int countAllByUserId(Long userId);
 
+    @Query(value = """
+            SELECT g.recommendation_id AS recommendationId, g.id AS guideId
+            FROM travel_guides g
+            WHERE g.recommendation_id IN (:recommendationsIds)
+            """, resultSetExtractorClass = RecommendationToGuideExtractor.class)
+    Map<Long, Long> getRecommendationToGuideMap(List<Long> recommendationsIds);
+
+    class RecommendationToGuideExtractor implements ResultSetExtractor<Map<Long, Long>> {
+        @Override
+        public Map<Long, Long> extractData(ResultSet rs) throws SQLException, DataAccessException {
+            Map<Long, Long> result = new HashMap<>();
+            while (rs.next()) {
+                Long guideId = rs.getLong("guideId");
+                Long recommendationId = rs.getLong("recommendationId");
+                result.put(recommendationId, guideId);
+            }
+            return result;
+        }
+    }
+
     class GuideLikesExtractor implements ResultSetExtractor<Map<Long, Integer>> {
 
         @Override

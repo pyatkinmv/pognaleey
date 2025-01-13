@@ -30,16 +30,18 @@ public class TravelMapper {
                 .build();
     }
 
-    public static TravelRecommendationListDto toRecommendationListDto(Collection<TravelRecommendation> recommendations) {
+    public static TravelRecommendationListDto toRecommendationListDto(Collection<TravelRecommendation> recommendations,
+                                                                      Map<Long, Long> recommendationIdToGuideIdMap) {
         return new TravelRecommendationListDto(
                 recommendations.stream()
-                        .map(TravelMapper::toRecommendationDto)
+                        .map(it -> toRecommendationDto(it, recommendationIdToGuideIdMap.get(it.getId())))
                         .toList()
         );
     }
 
     @SneakyThrows
-    public static TravelRecommendationDto toRecommendationDto(TravelRecommendation travelRecommendation) {
+    public static TravelRecommendationDto toRecommendationDto(TravelRecommendation travelRecommendation,
+                                                              @Nullable Long guideId) {
         var details = Utils.toObject(
                 travelRecommendation.getDetails(),
                 GptResponseRecommendationDetailsDto.class
@@ -54,7 +56,8 @@ public class TravelMapper {
                 details.tips(),
                 details.whereToGo(),
                 details.additionalConsideration(),
-                travelRecommendation.getImageUrl()
+                travelRecommendation.getImageUrl(),
+                guideId
         );
     }
 

@@ -1,5 +1,7 @@
 package ru.pyatkinmv.pognaleey.dto;
 
+import org.springframework.lang.Nullable;
+
 import java.util.List;
 
 public record TravelRecommendationDto(
@@ -11,6 +13,7 @@ public record TravelRecommendationDto(
         String tips,
         List<String> whereToGo,
         String additionalConsideration,
-        String imageUrl
+        String imageUrl,
+        @Nullable Long guideId
 ) {
 }

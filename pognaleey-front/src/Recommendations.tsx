@@ -17,6 +17,7 @@ interface DetailedRecommendation extends QuickRecommendation {
     tips: string;
     whereToGo: string[];
     additionalConsideration: string;
+    guideId?: number
 }
 
 const Recommendations: React.FC = () => {
@@ -147,9 +148,17 @@ const Recommendations: React.FC = () => {
                                     <p><strong>Дополнительно:</strong> {recommendation.additionalConsideration}</p>
                                     <button
                                         className="generate-guide-button"
-                                        onClick={() => handleGenerateGuide(recommendation.id)}
+                                        onClick={() => {
+                                            if ("guideId" in recommendation && recommendation.guideId) {
+                                                // Если guideId существует, перенаправляем на гайд
+                                                navigate(`/travel-guides/${recommendation.guideId}`);
+                                            } else {
+                                                // Если guideId отсутствует, генерируем новый гайд
+                                                handleGenerateGuide(recommendation.id);
+                                            }
+                                        }}
                                     >
-                                        Сгенерировать гайд
+                                        {recommendation.guideId ? "Перейти на гайд" : "Сгенерировать гайд"}
                                     </button>
                                 </>
                             )}

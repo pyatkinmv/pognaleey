@@ -7,6 +7,7 @@ import ru.pyatkinmv.pognaleey.dto.TravelRecommendationListDto;
 import ru.pyatkinmv.pognaleey.mapper.TravelMapper;
 import ru.pyatkinmv.pognaleey.model.TravelInquiry;
 import ru.pyatkinmv.pognaleey.model.TravelRecommendation;
+import ru.pyatkinmv.pognaleey.repository.TravelGuideRepository;
 import ru.pyatkinmv.pognaleey.repository.TravelInquiryRepository;
 import ru.pyatkinmv.pognaleey.util.LongPolling;
 
@@ -22,6 +23,7 @@ import java.util.stream.Collectors;
 public class TravelInquiryService {
     private final TravelInquiryRepository inquiryRepository;
     private final TravelRecommendationService recommendationService;
+    private final TravelGuideRepository travelGuideRepository;
 
     private static String toStringFilteringNonEmpty(Map<String, Object> params) {
         var filteredMap = params.entrySet()
@@ -83,8 +85,10 @@ public class TravelInquiryService {
                 timeoutMillis,
                 300
         );
+        var recommendationsIds = recommendations.stream().map(TravelRecommendation::getId).toList();
+        var recommendationIdToGuideIdMap = travelGuideRepository.getRecommendationToGuideMap(recommendationsIds);
 
-        return TravelMapper.toRecommendationListDto(recommendations);
+        return TravelMapper.toRecommendationListDto(recommendations, recommendationIdToGuideIdMap);
     }
 
     private Optional<List<TravelRecommendation>> findRecommendationsFilteringDetailsAndImages(Long inquiryId) {
