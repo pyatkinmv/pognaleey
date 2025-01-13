@@ -2,77 +2,78 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    margin: 0 auto;
-    max-width: 400px;
-    padding: 20px;
+    justify-content: center;
+    text-align: center;
+    margin-top: 10%;
 }
 
 .header {
-    text-align: center;
-    margin-bottom: 20px;
+    margin-bottom: 1.25rem;
+}
+
+.register-container .logo {
+    width: 7rem;
+    height: 7rem;
 }
 
 .register-title {
-    font-size: 24px;
+    font-size: 1.5rem; /* 24px -> 1.5rem */
     font-weight: bold;
-    color: #333;
 }
 
 .register-form {
-    width: 100%;
+    width: 18rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem; /* 15px -> 1rem */
 }
 
 .form-group {
-    margin-bottom: 15px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
 }
 
-label {
-    display: block;
+.form-group label {
+    font-size: 0.875rem; /* 14px -> 0.875rem */
     font-weight: bold;
-    margin-bottom: 5px;
+    margin-bottom: 0.3125rem; /* 5px -> 0.3125rem */
 }
 
-input {
-    width: 100%;
-    padding: 8px;
+.register-form .form-group input {
+    width: 94%;
+    padding: 0.5rem; /* 8px -> 0.5rem */
+    font-size: 0.875rem; /* 14px -> 0.875rem */
     border: 1px solid #ccc;
-    border-radius: 5px;
+    border-radius: 0.25rem; /* 4px -> 0.25rem */
 }
 
-button.register-button {
-    width: 100%;
-    padding: 10px;
-    background-color: #4caf50;
-    color: white;
+.register-button {
+    padding: 0.625rem; /* 10px -> 0.625rem */
+    font-size: 1rem; /* 16px -> 1rem */
+    font-weight: bold;
     border: none;
-    border-radius: 5px;
+    border-radius: 0.25rem; /* 4px -> 0.25rem */
     cursor: pointer;
-    font-size: 16px;
-}
-
-button.register-button:hover {
-    background-color: #45a049;
-}
-
-.error-message {
-    color: red;
-    margin-bottom: 15px;
-    text-align: center;
+    transition: background-color 0.3s;
 }
 
 .login-prompt {
-    margin-top: 20px;
-    font-size: 14px;
-    color: #555;
-    text-align: center;
+    margin-top: 1.25rem; /* 20px -> 1.25rem */
+    font-size: 0.875rem; /* 14px -> 0.875rem */
 }
 
 .login-link {
-    color: #007bff;
     text-decoration: none;
     font-weight: bold;
 }
 
 .login-link:hover {
     text-decoration: underline;
+}
+
+.error-message {
+    color: red;
+    margin-bottom: 1rem; /* 15px -> 1rem */
+    text-align: center;
 }

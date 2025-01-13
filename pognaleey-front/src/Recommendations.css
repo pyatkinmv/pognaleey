@@ -217,11 +217,11 @@ strong {
 }
 
 /* Логотип */
-.logo {
-    width: 92px; /* Ширина логотипа */
-    height: 92px; /* Высота логотипа */
+.recommendations-container .logo {
+    width: 7rem; /* Ширина логотипа */
+    height: 7rem; /* Высота логотипа */
     object-fit: contain; /* Сохраняем пропорции логотипа */
-    margin-right: 20px; /* Отступ справа от логотипа до текста */
+    margin-right: 1.5rem; /* Отступ справа от логотипа до текста */
 }
 
 /* Заголовок */

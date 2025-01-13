@@ -42,7 +42,7 @@ const RegisterForm: React.FC = () => {
                 navigate("/login"); // Редирект на страницу логина
             } else {
                 const errorMessage = await response.text();
-                setError(errorMessage || "Ошибка регистрации.");
+                alert(errorMessage || "Ошибка регистрации");
             }
         } catch (err) {
             console.error("Ошибка:", err);
