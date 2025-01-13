@@ -4,6 +4,7 @@ import Recommendations from "./Recommendations";
 import LoginForm from "./LoginForm";
 import RegisterForm from "./RegisterForm";
 import PrivateRoute from "./PrivateRoute";
+import Guide from "./Guide";
 import React from "react";
 
 const AppRouter: React.FC = () => {
@@ -28,6 +29,14 @@ const AppRouter: React.FC = () => {
                     element={
                         <PrivateRoute>
                             <Recommendations/>
+                        </PrivateRoute>
+                    }
+                />
+                <Route
+                    path="/travel-guides/:guideId"
+                    element={
+                        <PrivateRoute>
+                            <Guide/>
                         </PrivateRoute>
                     }
                 />
