@@ -1,0 +1,58 @@
+/* Main.css */
+
+/* Стиль для фона сайта */
+.main-container {
+    background-color: #aeb6bd; /* Матовый фон сайта */
+    display: flex;
+    flex-direction: column; /* Шапка сверху, контент снизу */
+    align-items: center;
+    height: 100vh; /* Высота экрана */
+    margin: 0; /* Убираем отступы */
+}
+
+/* Основной контейнер */
+.content-container {
+    background-color: #c6c0bb; /* Матовый цвет для основного контейнера */
+    width: 60%; /* Задайте ширину контейнера */
+    border-radius: 10px; /* Закругленные углы */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); /* Легкая тень для глубины */
+    overflow: hidden; /* Убираем прокрутку содержимого */
+    /*margin-top: 20px;*/
+    min-height: 600px; /* Добавьте минимальную высоту */
+
+}
+
+/* Картинка в верхней части */
+.banner-image {
+    width: 100%; /* Картинка заполняет весь контейнер по ширине */
+    height: auto; /* Сохраняет пропорции */
+    display: block; /* Убираем лишние отступы */
+    margin-top: 0;
+}
+
+/* Шапка сайта */
+.header {
+    height: 1px;
+    /*background-color: #c6c0bb; !* Цвет контейнера *!*/
+    width: 100%; /* Растягиваем шапку на всю ширину */
+    padding: 10px 0; /* Внутренние отступы */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Тень под шапкой */
+}
+
+.navbar {
+    display: flex;
+    justify-content: center; /* Центрируем кнопки */
+    gap: 20px; /* Расстояние между ссылками */
+}
+
+.nav-link {
+    text-decoration: none; /* Убираем подчёркивание */
+    color: #333; /* Цвет текста */
+    font-weight: bold; /* Жирный текст */
+    font-size: 1rem; /* Размер текста */
+    transition: color 0.3s; /* Плавный переход цвета при наведении */
+}
+
+.nav-link:hover {
+    color: #007bff; /* Цвет при наведении */
+}

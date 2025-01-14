@@ -1,11 +1,11 @@
 import {BrowserRouter as Router, Route, Routes} from "react-router-dom";
-import App from "./App";
 import Recommendations from "./Recommendations";
 import LoginForm from "./LoginForm";
 import RegisterForm from "./RegisterForm";
 import PrivateRoute from "./PrivateRoute";
 import Guide from "./Guide";
 import React from "react";
+import Main from "./Main";
 
 const AppRouter: React.FC = () => {
     return (
@@ -20,7 +20,7 @@ const AppRouter: React.FC = () => {
                     path="/"
                     element={
                         <PrivateRoute>
-                            <App/>
+                            <Main/>
                         </PrivateRoute>
                     }
                 />
