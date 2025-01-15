@@ -1,12 +1,19 @@
-import React from "react";
+import React, {useState} from "react";
 import "./Main.css";
 import {useNavigate} from "react-router-dom";
 
 const Main: React.FC = () => {
     const navigate = useNavigate();
 
+    const [selectedFilter, setSelectedFilter] = useState<string>("best"); // "Недавнее" выбрано по умолчанию
+
     const handleButtonClick = () => {
         navigate(`/travel-inquiries`);
+    };
+
+    const handleFilterChange = (value: string) => {
+        setSelectedFilter(value);
+        console.log("Выбран фильтр:", value); // Обработчик фильтрации (можно добавить логику)
     };
 
     // Пример данных для плитки
@@ -65,6 +72,41 @@ const Main: React.FC = () => {
                     </div>
                     <button className="action-button" onClick={handleButtonClick}>Погнали!</button>
                 </div>
+                {/* Радиокнопки */}
+                <div className="radio-buttons-container">
+
+                    <label className={`radio-button ${selectedFilter === "best" ? "active" : ""}`}>
+                        <input
+                            type="radio"
+                            name="filter"
+                            value="best"
+                            checked={selectedFilter === "best"}
+                            onChange={() => handleFilterChange("best")}
+                        />
+                        Лучшее
+                    </label>
+                    <label className={`radio-button ${selectedFilter === "liked" ? "active" : ""}`}>
+                        <input
+                            type="radio"
+                            name="filter"
+                            value="liked"
+                            checked={selectedFilter === "liked"}
+                            onChange={() => handleFilterChange("liked")}
+                        />
+                        Понравилось
+                    </label>
+
+                    <label className={`radio-button ${selectedFilter === "mine" ? "active" : ""}`}>
+                        <input
+                            type="radio"
+                            name="filter"
+                            value="mine"
+                            checked={selectedFilter === "mine"}
+                            onChange={() => handleFilterChange("mine")}
+                        />
+                        Моё
+                    </label>
+                </div>
                 {/* Плитка */}
                 <div className="tile-container">
                     {tiles.map((tile, index) => (
@@ -73,7 +115,6 @@ const Main: React.FC = () => {
                                 <img src={tile.imageUrl} alt={tile.title} className="tile-image"/>
                             </div>
                             <div className="tile-title">{tile.title}</div>
-                            {/*<div className="tile-text">{tile.text}</div>*/}
                             <div className="tile-likes">❤️ {tile.likes}</div>
                         </div>
                     ))}

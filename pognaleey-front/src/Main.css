@@ -94,13 +94,13 @@ body {
 /* Кнопка */
 .action-button {
     position: absolute; /* Позиционируем кнопку относительно .image-container */
-    width: 14rem;
-    top: 58%; /* Позиция текста по вертикали */
+    width: 16rem;
+    top: 56%; /* Позиция текста по вертикали */
     left: 49%; /* Позиция текста по горизонтали */
     padding: 1rem 1.5rem; /* Уменьшаем размеры кнопки */
     background-color: #f87f76; /* Основной цвет кнопки */
     color: white; /* Цвет текста кнопки */
-    font-size: 1.8rem; /* Размер текста кнопки */
+    font-size: 2.2rem; /* Размер текста кнопки */
     font-weight: bold; /* Жирный текст */
     border: none; /* Убираем границы */
     border-radius: 2rem; /* Закругленные углы */
@@ -125,10 +125,12 @@ body {
 
 /* Контейнер для плитки */
 .tile-container {
+    /*border: 1px solid black;*/
     display: grid; /* Используем CSS Grid */
     grid-template-columns: repeat(4, 1fr); /* 4 колонки равной ширины */
-    gap: 3rem; /* Расстояние между плитками */
-    padding: 3rem; /* Отступы вокруг плитки */
+    gap: 2rem; /* Расстояние между плитками */
+    /* Отступы вокруг плитки */
+    padding: 1rem 2rem 2rem;
     justify-items: center; /* Центрируем плитки по горизонтали */
 }
 
@@ -139,7 +141,7 @@ body {
     box-shadow: 0 0.25rem 2rem rgba(0, 0, 0, 0.5); /* Легкая тень */
     /*padding: 0.7rem; !* Внутренние отступы *!*/
     text-align: center; /* Центрируем текст */
-    width: 16rem; /* Фиксированная ширина плитки */
+    width: 17rem; /* Фиксированная ширина плитки */
     display: flex; /* Включаем Flexbox */
     flex-direction: column; /* Размещаем элементы вертикально */
     justify-content: space-between; /* Распределяем элементы по вертикали */
@@ -183,4 +185,49 @@ body {
     margin-top: auto;
     /*border: 1px solid black; !* Граница элемента *!*/
     /* Убираем отступы и притягиваем к низу */
+}
+
+/* Контейнер для радиокнопок */
+.radio-buttons-container {
+    display: flex; /* Располагаем кнопки в одну линию */
+    justify-content: center; /* Центрируем кнопки по горизонтали */
+    gap: 3rem; /* Расстояние между кнопками */
+    margin: 1rem 0; /* Отступы сверху и снизу */
+}
+
+/* Радиокнопка */
+.radio-button {
+    font-size: 2.2rem; /* Размер текста */
+    font-weight: bold; /* Жирный текст */
+    color: #333; /* Цвет текста */
+    cursor: pointer; /* Курсор-указатель при наведении */
+    position: relative;
+    /*border: 1px solid black;*/
+    /*margin: 0 1.5rem; !* Отступы сверху и снизу *!*/
+    /*padding: 1rem;*/
+}
+
+/*.radio-button:hover {*/
+/*    background-color: rgba(221, 116, 107, 0.1); !* Лёгкая заливка *!*/
+/*    border-radius: 0.5rem; !* Закругляем углы *!*/
+/*    padding: 0.3rem 0.6rem; !* Увеличиваем размер *!*/
+/*    transition: background-color 0.3s ease; !* Плавность *!*/
+/*}*/
+
+
+/* Убираем стандартный вид радиокнопки */
+.radio-button input[type="radio"] {
+    display: none;
+}
+
+/* Стили активной кнопки */
+.radio-button.active {
+    color: #dd746b; /* Цвет активной кнопки */
+    transform: scale(1.1); /* Эффект нажатия */
+    text-shadow: 0 0.3rem 0.5rem rgba(0, 0, 0, 0.2); /* Добавляем тень для кнопки */
+}
+
+/* Ховер эффект */
+.radio-button:hover {
+    color: #c66059;
 }
