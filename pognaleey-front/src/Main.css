@@ -23,7 +23,7 @@ body {
 
 /* Основной контейнер */
 .content-container {
-    background-color: #c6c0bb; /* Матовый цвет для основного контейнера */
+    background-color: #d0c9c7; /* Матовый цвет для основного контейнера */
     width: 70rem; /* Ширина контейнера */
     border-radius: 0.625rem; /* Закругленные углы (10px) */
     box-shadow: 0 0.25rem 0.625rem rgba(0, 0, 0, 0.2); /* Легкая тень для глубины */
@@ -85,6 +85,7 @@ body {
     font-size: 2.4rem; /* Размер текста */
     color: white; /* Белый цвет текста */
     text-align: left; /* Текст выровнен по левому краю */
+    user-select: none;
     text-shadow: 0.125rem 0.125rem 0.25rem rgba(0, 0, 0, 0.6); /* Тень для читаемости */
 }
 
@@ -107,14 +108,15 @@ body {
     transition: all 0.3s ease; /* Плавный переход для эффектов */
 }
 
-/*!* Ховер эффект *!*/
-/*.action-button:hover {*/
-/*    background-color: #c66059; !* Темнее при наведении *!*/
-/*    box-shadow: 0 0.375rem 0.625rem rgba(0, 0, 0, 0.3); !* Более выраженная тень *!*/
-/*}*/
+/* Ховер эффект */
+.action-button:hover {
+    background-color: #c66059; /* Темнее при наведении */
+    box-shadow: 0 0.375rem 0.625rem rgba(0, 0, 0, 0.4); /* Более выраженная тень */
+}
 
-/*!* Фокус эффект *!*/
-/*.action-button:focus {*/
-/*    outline: none; !* Убираем стандартную обводку *!*/
-/*    box-shadow: 0 0.25rem 0.625rem rgba(0, 0, 0, 0.4); !* Подсветка кнопки *!*/
-/*}*/
+/* Состояние "нажатия" */
+.action-button:active {
+    background-color: #b74e49; /* Более тёмный цвет при нажатии */
+    transform: scale(0.97); /* Лёгкое уменьшение размера */
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.7); /* Уменьшенная тень */
+}
