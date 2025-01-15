@@ -74,26 +74,30 @@ public class TravelMapper {
 
     public static List<TravelGuideShortDto> toShortGuideListDto(List<TravelGuide> userGuides,
                                                                 List<User> users,
-                                                                Map<Long, Integer> guideIdToLikesCountMap) {
+                                                                Map<Long, Integer> guideIdToLikesCountMap,
+                                                                Set<Long> currentUserLikedGuidesIds) {
         var userIdToUser = users.stream().collect(Collectors.toMap(User::getId, it -> it));
 
         return userGuides.stream()
                 .map(guide -> toShortGuideDto(
                                 guide,
                                 userIdToUser.get(guide.getUserId()),
-                                guideIdToLikesCountMap.get(guide.getId())
+                        guideIdToLikesCountMap.get(guide.getId()),
+                        currentUserLikedGuidesIds.contains(guide.getId())
                         )
                 )
                 .sorted(Comparator.comparingInt(TravelGuideShortDto::totalLikes).reversed())
                 .toList();
     }
 
-    public static TravelGuideShortDto toShortGuideDto(TravelGuide it, @Nullable User user, int totalLikes) {
+    public static TravelGuideShortDto toShortGuideDto(TravelGuide it, @Nullable User user, int totalLikes,
+                                                      boolean currentUserLiked) {
         return new TravelGuideShortDto(
                 it.getId(),
                 it.getTitle(),
                 it.getImageUrl(),
                 totalLikes,
+                currentUserLiked,
                 Optional.ofNullable(user)
                         .map(TravelMapper::toUserDto)
                         .orElse(null)

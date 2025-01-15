@@ -5,8 +5,8 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 import ru.pyatkinmv.pognaleey.model.TravelGuideLike;
 
-import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 
 public interface TravelGuideLikeRepository extends CrudRepository<TravelGuideLike, Long> {
@@ -21,7 +21,7 @@ public interface TravelGuideLikeRepository extends CrudRepository<TravelGuideLik
             ORDER BY l.created_at DESC
             LIMIT :limit OFFSET :offset
             """)
-    List<Long> findGuidesIdsByUserId(@Param("userId") Long userId, @Param("limit") int limit, @Param("offset") int offset);
+    Set<Long> findGuidesIdsByUserId(@Param("userId") Long userId, @Param("limit") int limit, @Param("offset") int offset);
 
     int countByUserId(Long userId);
 }

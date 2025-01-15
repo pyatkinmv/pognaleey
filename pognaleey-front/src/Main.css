@@ -175,17 +175,6 @@ body {
     /* Отступы сверху и снизу */
 }
 
-/* Лайки в плитке */
-.tile-likes {
-    font-size: 1rem; /* Размер текста лайков */
-    padding: 0.5rem;
-    color: #dd746b; /* Красный цвет сердечка */
-    font-weight: bold; /* Жирный текст */
-    margin-top: auto;
-    /*border: 1px solid black; !* Граница элемента *!*/
-    /* Убираем отступы и притягиваем к низу */
-}
-
 /* Контейнер для радиокнопок */
 .radio-buttons-container {
     display: flex; /* Располагаем кнопки в одну линию */
@@ -196,6 +185,7 @@ body {
 
 /* Радиокнопка */
 .radio-button {
+    /*border: 1px solid black;*/
     font-size: 2.2rem; /* Размер текста */
     font-weight: bold; /* Жирный текст */
     color: #333; /* Цвет текста */
@@ -206,12 +196,33 @@ body {
     /*padding: 1rem;*/
 }
 
-/*.radio-button:hover {*/
-/*    background-color: rgba(221, 116, 107, 0.1); !* Лёгкая заливка *!*/
-/*    border-radius: 0.5rem; !* Закругляем углы *!*/
-/*    padding: 0.3rem 0.6rem; !* Увеличиваем размер *!*/
-/*    transition: background-color 0.3s ease; !* Плавность *!*/
-/*}*/
+/* Лайки в плитке */
+.tile-likes {
+    font-size: 1.5rem; /* Размер текста лайков */
+    padding: 0;
+    /*color: #e61300; !* Красный цвет сердечка *!*/
+    font-weight: bold; /* Жирный текст */
+    margin-top: auto;
+    /*border: 1px solid black; !* Граница элемента *!*/
+    /* Убираем отступы и притягиваем к низу */
+}
+
+.like-button {
+    font-size: 1.5rem; /* Размер сердечка */
+    cursor: pointer; /* Указатель при наведении */
+    transition: color 0.3s ease; /* Плавный переход цвета */
+    color: lightcoral; /* Цвет сердечка по умолчанию */
+}
+
+.like-button.liked {
+    color: red; /* Красный цвет для лайкнутого сердечка */
+}
+
+.like-button:hover {
+    color: red;
+    /*color: #c66059; !* Темнее при наведении *!*/
+    text-shadow: 0.125rem 0.125rem 0.5rem rgba(0, 0, 0, 0.5); /* Тень для читаемости */
+}
 
 
 /* Убираем стандартный вид радиокнопки */

@@ -105,7 +105,11 @@ public class TravelGuideService {
         var offset = pageable.getPageSize() * pageable.getPageNumber();
         var guideIdToLikesCountMap = guideRepository.findTopGuides(user.getId(), pageable.getPageSize(), offset);
         var userGuides = guideRepository.findAllByIdIn(guideIdToLikesCountMap.keySet());
-        var guides = TravelMapper.toShortGuideListDto(userGuides, List.of(user), guideIdToLikesCountMap);
+        var currentUserLikedGuidesIds = getCurrentUser()
+                .map(it -> likeService.findGuidesIdsByUserId(it.getId(), Integer.MAX_VALUE, 0))
+                .orElseGet(Set::of);
+        var guides = TravelMapper.toShortGuideListDto(userGuides, List.of(user), guideIdToLikesCountMap,
+                currentUserLikedGuidesIds);
 
         return new PageImpl<>(guides, pageable, totalCount);
     }
@@ -123,7 +127,7 @@ public class TravelGuideService {
         var guideIdToLikesCountMap = guideRepository.countLikesByGuideId(likedGuidesIds);
         var totalCount = likeService.countByUserId(user.getId());
         var users = findUsersByGuides(userGuides);
-        var guides = TravelMapper.toShortGuideListDto(userGuides, users, guideIdToLikesCountMap);
+        var guides = TravelMapper.toShortGuideListDto(userGuides, users, guideIdToLikesCountMap, likedGuidesIds);
 
         return new PageImpl<>(guides, pageable, totalCount);
     }
@@ -134,7 +138,11 @@ public class TravelGuideService {
         var topGuides = guideRepository.findAllByIdIn(topGuideIdToLikeCountMap.keySet());
         var totalCount = guideRepository.count();
         var users = findUsersByGuides(topGuides);
-        var guides = TravelMapper.toShortGuideListDto(topGuides, users, topGuideIdToLikeCountMap);
+        var currentUserLikedGuidesIds = getCurrentUser()
+                .map(it -> likeService.findGuidesIdsByUserId(it.getId(), Integer.MAX_VALUE, 0))
+                .orElseGet(Set::of);
+        var guides = TravelMapper.toShortGuideListDto(topGuides, users, topGuideIdToLikeCountMap,
+                currentUserLikedGuidesIds);
 
         return new PageImpl<>(guides, pageable, totalCount);
     }
@@ -267,7 +275,7 @@ public class TravelGuideService {
 
         executorService.execute(() -> enrichGuide(guide, recommendation.getInquiryId(), recommendation.getTitle()));
 
-        return TravelMapper.toShortGuideDto(guide, user, 0);
+        return TravelMapper.toShortGuideDto(guide, user, 0, false);
     }
 
     private Map<String, String> searchImagesWithSleepAndBuildTitleToImageMap(List<GptAnswerResolveHelper.SearchableItem> titlesWithImageSearchPhrases) {

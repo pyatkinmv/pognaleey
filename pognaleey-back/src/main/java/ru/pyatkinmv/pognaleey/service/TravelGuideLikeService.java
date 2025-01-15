@@ -6,8 +6,8 @@ import org.springframework.stereotype.Service;
 import ru.pyatkinmv.pognaleey.model.TravelGuideLike;
 import ru.pyatkinmv.pognaleey.repository.TravelGuideLikeRepository;
 
-import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -33,7 +33,7 @@ public class TravelGuideLikeService {
         likeRepository.delete(like);
     }
 
-    public List<Long> findGuidesIdsByUserId(Long id, int pageSize, int offset) {
+    public Set<Long> findGuidesIdsByUserId(Long id, int pageSize, int offset) {
         return likeRepository.findGuidesIdsByUserId(id, pageSize, offset);
     }
 

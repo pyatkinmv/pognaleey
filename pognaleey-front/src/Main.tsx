@@ -22,7 +22,6 @@ const Main: React.FC = () => {
         navigate(`/travel-inquiries`);
     };
 
-
     const loadTiles = async (filter: string = selectedFilter, reset: boolean = false) => {
         if (isLoading || (!reset && !hasMore)) return;
 
@@ -68,6 +67,35 @@ const Main: React.FC = () => {
         loadTiles(value, true).catch((err) => {
             console.error("Ошибка загрузки плиток:", err);
         }); // Передаём выбранный фильтр явно
+    };
+
+    const handleLike = async (id: number, isCurrentlyLiked: boolean) => {
+        try {
+            const endpoint = isCurrentlyLiked
+                ? `${process.env.REACT_APP_API_URL}/travel-guides/${id}/unlike`
+                : `${process.env.REACT_APP_API_URL}/travel-guides/${id}/like`;
+
+            const response = await apiClient(endpoint, {
+                method: isCurrentlyLiked ? "DELETE" : "PUT",
+            });
+
+            if (!response.ok) {
+                throw new Error("Ошибка при обработке лайка");
+            }
+
+            const {guideId, isLiked, totalLikes} = await response.json();
+
+            // Обновляем состояние плиток
+            setTiles((prevTiles) =>
+                prevTiles.map((tile) =>
+                    tile.id === guideId
+                        ? {...tile, isLiked, totalLikes} // Обновляем лайк и количество лайков
+                        : tile
+                )
+            );
+        } catch (error) {
+            console.error("Ошибка обработки лайка:", error);
+        }
     };
 
 
@@ -166,7 +194,15 @@ const Main: React.FC = () => {
                                 <img src={tile.imageUrl} alt={tile.title} className="tile-image"/>
                             </div>
                             <div className="tile-title">{tile.title}</div>
-                            <div className="tile-likes">❤️ {tile.totalLikes}</div>
+                            <div className="tile-likes">
+                                <span
+                                    className={`like-button ${tile.isLiked ? "liked" : ""}`}
+                                    onClick={() => handleLike(tile.id, tile.isLiked)}>
+                                    ❤
+                                </span>
+                                {tile.totalLikes}
+                            </div>
+
                         </div>
                     ))}
                     {isLoading &&
