@@ -9,6 +9,7 @@ body {
     margin: 0;
     padding: 0;
     background-color: #aeb6bd; /* Матовый фон сайта */
+    font-size: 1rem; /* Устанавливаем базовый размер шрифта (16px = 1rem) */
 }
 
 /* Стиль для контейнера страницы */
@@ -23,8 +24,8 @@ body {
 /* Основной контейнер */
 .content-container {
     background-color: #c6c0bb; /* Матовый цвет для основного контейнера */
-    width: 60%; /* Задайте ширину контейнера */
-    border-radius: 0.625rem; /* Закругленные углы */
+    width: 70rem; /* Ширина контейнера */
+    border-radius: 0.625rem; /* Закругленные углы (10px) */
     box-shadow: 0 0.25rem 0.625rem rgba(0, 0, 0, 0.2); /* Легкая тень для глубины */
     overflow: hidden; /* Убираем прокрутку содержимого */
     height: 100vh; /* Высота экрана */
@@ -42,28 +43,47 @@ body {
 
 .navbar {
     display: flex;
-    justify-content: space-evenly; /* Центрируем и равномерно распределяем кнопки */
+    justify-content: center; /* Центрируем ссылки */
     align-items: center; /* Центрирование по вертикали */
-    padding: 0.625rem; /* Внутренние отступы */
+    padding: 0.5rem; /* Отступы от краёв контейнера */
+    gap: 10rem; /* Расстояние между элементами */
 }
 
 .nav-link {
-    text-decoration: none; /* Убираем подчёркивание */
-    color: #333; /* Цвет текста */
-    font-weight: bold; /* Жирный текст */
-    font-size: 1rem; /* Размер текста */
-    margin: 0 1rem; /* Отступы между ссылками */
-
-    transition: color 0.3s; /* Плавный переход цвета при наведении */
+    text-decoration: none;
+    color: #333;
+    font-weight: bold;
+    font-size: 1.25rem; /* Размер текста 20px */
+    transition: color 0.3s;
 }
 
 .nav-link:hover {
-    color: #007bff; /* Цвет при наведении */
+    color: #dd746b; /* Цвет при наведении */
 }
 
-/* Картинка в верхней части */
+/* Контейнер изображения */
+.image-container {
+    position: relative; /* Устанавливаем контекст позиционирования */
+    width: 70rem; /* Ширина в фиксированных единицах rem */
+    margin: 0 auto; /* Центрируем контейнер горизонтально */
+    overflow: hidden; /* Убираем содержимое за пределами контейнера */
+}
+
 .banner-image {
-    width: 100%; /* Картинка заполняет весь контейнер по ширине */
-    height: auto; /* Сохраняет пропорции */
+    width: 100%; /* Картинка занимает всю ширину контейнера */
+    height: auto; /* Сохраняем пропорции */
     display: block; /* Убираем лишние отступы */
 }
+
+.banner-text {
+    position: absolute; /* Позиционируем текст относительно контейнера */
+    top: 40%; /* Позиция текста по вертикали */
+    left: 62.5%; /* Позиция текста по горизонтали */
+    transform: translate(-50%, -50%); /* Точное центрирование */
+    font-size: 2.4rem; /* Размер текста 36.8px */
+    color: white; /* Белый цвет текста */
+    text-align: center; /* Центрируем текст */
+    text-shadow: 0.125rem 0.125rem 0.25rem rgba(0, 0, 0, 0.6); /* Тень для читаемости */
+}
+
+

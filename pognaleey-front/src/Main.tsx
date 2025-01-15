@@ -10,14 +10,20 @@ const Main: React.FC = () => {
                     <nav className="navbar">
                         <a href="/" className="nav-link">Главная</a>
                         <a href="/contacts" className="nav-link">Контакты</a>
+                        <a href="/language" className="nav-link">Язык</a>
                         <a href="/login" className="nav-link">Войти</a>
                     </nav>
                 </header>
-                <img
-                    src="/main.webp" // Замените на путь к вашей картинке
-                    alt="Main Banner"
-                    className="banner-image"
-                />
+                <div className="image-container">
+                    <img
+                        src="/main.webp" // Замените на путь к вашей картинке
+                        alt="Main Banner"
+                        className="banner-image"
+                    />
+                    <div className="banner-text">
+                        Каждое путешествие <br/> начинается с идеи!
+                    </div>
+                </div>
             </div>
         </div>
     );
