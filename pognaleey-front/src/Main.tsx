@@ -21,8 +21,9 @@ const Main: React.FC = () => {
                         className="banner-image"
                     />
                     <div className="banner-text">
-                        Каждое путешествие <br/> начинается с идеи!
+                        Каждое путешествие<br/>начинается с идеи!
                     </div>
+                    <button className="action-button">Погнали!</button>
                 </div>
             </div>
         </div>
