@@ -6,6 +6,7 @@ import PrivateRoute from "./PrivateRoute";
 import Guide from "./Guide";
 import React from "react";
 import Main from "./Main";
+import Inquiry from "./Inquiry";
 
 const AppRouter: React.FC = () => {
     return (
@@ -21,6 +22,14 @@ const AppRouter: React.FC = () => {
                     element={
                         <PrivateRoute>
                             <Main/>
+                        </PrivateRoute>
+                    }
+                />
+                <Route
+                    path="/travel-inquiries"
+                    element={
+                        <PrivateRoute>
+                            <Inquiry/>
                         </PrivateRoute>
                     }
                 />

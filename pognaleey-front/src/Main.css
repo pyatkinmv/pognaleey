@@ -92,11 +92,11 @@ body {
 /* Кнопка */
 .action-button {
     position: absolute; /* Позиционируем кнопку относительно .image-container */
-    width: 10rem;
+    width: 11rem;
     top: 58%; /* Позиция текста по вертикали */
-    left: 52%; /* Позиция текста по горизонтали */
-    padding: 0.6rem 1.5rem; /* Уменьшаем размеры кнопки */
-    background-color: #dd746b; /* Основной цвет кнопки */
+    left: 51%; /* Позиция текста по горизонтали */
+    padding: 0.7rem 1.5rem; /* Уменьшаем размеры кнопки */
+    background-color: #f87f76; /* Основной цвет кнопки */
     color: white; /* Цвет текста кнопки */
     font-size: 1.4rem; /* Размер текста кнопки */
     font-weight: bold; /* Жирный текст */
@@ -116,7 +116,7 @@ body {
 
 /* Состояние "нажатия" */
 .action-button:active {
-    background-color: #b74e49; /* Более тёмный цвет при нажатии */
+    background-color: #c15550; /* Более тёмный цвет при нажатии */
     transform: scale(0.97); /* Лёгкое уменьшение размера */
     box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.7); /* Уменьшенная тень */
 }

@@ -1,9 +1,9 @@
 import React, {useState} from "react";
 import {useNavigate} from "react-router-dom"; // Для перехода между страницами
-import "./App.css";
+import "./Inquiry.css";
 import apiClient from "./apiClient"; // Подключаем стили
 
-const App: React.FC = () => {
+const Inquiry: React.FC = () => {
     const [formData, setFormData] = useState({
         purpose: [] as string[],
         preferences: [] as string[],
@@ -342,4 +342,4 @@ const QuestionContainer: React.FC<QuestionContainerProps> = ({label, children}) 
     </div>
 );
 
-export default App;
+export default Inquiry;

@@ -1,8 +1,16 @@
 // Main.tsx
 import React from "react";
 import "./Main.css";
+import {useNavigate} from "react-router-dom"; // Для перехода между страницами
+
 
 const Main: React.FC = () => {
+    const navigate = useNavigate(); // Для редиректа
+
+    const handleButtonClick = () => {
+        navigate(`/travel-inquiries`)
+    };
+
     return (
         <div className="main-container">
             <div className="content-container">
@@ -23,7 +31,7 @@ const Main: React.FC = () => {
                     <div className="banner-text">
                         Каждое путешествие<br/>начинается с идеи!
                     </div>
-                    <button className="action-button">Погнали!</button>
+                    <button className="action-button" onClick={handleButtonClick}>Погнали!</button>
                 </div>
             </div>
         </div>
