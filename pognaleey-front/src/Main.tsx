@@ -12,32 +12,32 @@ const Main: React.FC = () => {
     // Пример данных для плитки
     const tiles = [
         {
-            title: "Путешествие в Париж",
-            imageUrl: "/logo192.png", // Замените на путь к вашей картинке
+            title: "Посетите Эйфелеву башню и наслаждайтесь французской кухней",
+            imageUrl: "https://avatars.dzeninfra.ru/get-zen_doc/5298771/pub_63f50f153bf62367f23b0695_63f51059cdd48e720ff93c7b/scale_1200", // Замените на путь к вашей картинке
             text: "Посетите Эйфелеву башню и наслаждайтесь французской кухней.",
             likes: 120,
         },
         {
-            title: "Горы Саян",
-            imageUrl: "/logo192.png",
+            title: "Погрузитесь в атмосферу сибирской природы",
+            imageUrl: "https://baldezh.top/uploads/posts/2022-08/1660780372_36-funart-pro-p-vodorosli-baikala-priroda-krasivo-foto-39.jpg",
             text: "Погрузитесь в атмосферу сибирской природы.",
             likes: 95,
         },
         {
-            title: "Мальдивы",
-            imageUrl: "/logo192.png",
+            title: "Райские пляжи и бирюзовые воды",
+            imageUrl: "https://cff2.earth.com/uploads/2021/12/17122657/Extreme-weather-scaled.jpg",
             text: "Райские пляжи и бирюзовые воды.",
             likes: 200,
         },
         {
-            title: "Амстердам",
-            imageUrl: "/logo192.png",
+            title: "Каналы, музеи и уютные улочки",
+            imageUrl: "http://img.goodfon.ru/original/2560x1600/0/7f/vesna-reka-tsvetenie-buildings-canal-netherlands-amsterdam-b.jpg",
             text: "Каналы, музеи и уютные улочки.",
             likes: 180,
         },
         {
-            title: "Япония",
-            imageUrl: "/logo192.png",
+            title: "Культура и природа Киото",
+            imageUrl: "https://i.ytimg.com/vi/TWaNuGeXv4E/maxresdefault.jpg",
             text: "Культура и природа Киото",
             likes: 201,
         }
@@ -69,9 +69,11 @@ const Main: React.FC = () => {
                 <div className="tile-container">
                     {tiles.map((tile, index) => (
                         <div className="tile" key={index}>
-                            <img src={tile.imageUrl} alt={tile.title} className="tile-image"/>
-                            <h3 className="tile-title">{tile.title}</h3>
-                            <p className="tile-text">{tile.text}</p>
+                            <div className="tile-image-wrapper">
+                                <img src={tile.imageUrl} alt={tile.title} className="tile-image"/>
+                            </div>
+                            <div className="tile-title">{tile.title}</div>
+                            {/*<div className="tile-text">{tile.text}</div>*/}
                             <div className="tile-likes">❤️ {tile.likes}</div>
                         </div>
                     ))}

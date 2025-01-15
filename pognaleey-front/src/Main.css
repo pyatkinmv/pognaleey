@@ -94,13 +94,13 @@ body {
 /* Кнопка */
 .action-button {
     position: absolute; /* Позиционируем кнопку относительно .image-container */
-    width: 11rem;
+    width: 14rem;
     top: 58%; /* Позиция текста по вертикали */
-    left: 51%; /* Позиция текста по горизонтали */
-    padding: 0.7rem 1.5rem; /* Уменьшаем размеры кнопки */
+    left: 49%; /* Позиция текста по горизонтали */
+    padding: 1rem 1.5rem; /* Уменьшаем размеры кнопки */
     background-color: #f87f76; /* Основной цвет кнопки */
     color: white; /* Цвет текста кнопки */
-    font-size: 1.4rem; /* Размер текста кнопки */
+    font-size: 1.8rem; /* Размер текста кнопки */
     font-weight: bold; /* Жирный текст */
     border: none; /* Убираем границы */
     border-radius: 2rem; /* Закругленные углы */
@@ -127,45 +127,60 @@ body {
 .tile-container {
     display: grid; /* Используем CSS Grid */
     grid-template-columns: repeat(4, 1fr); /* 4 колонки равной ширины */
-    gap: 1.5rem; /* Расстояние между плитками */
-    padding: 2rem; /* Отступы вокруг плитки */
+    gap: 3rem; /* Расстояние между плитками */
+    padding: 3rem; /* Отступы вокруг плитки */
     justify-items: center; /* Центрируем плитки по горизонтали */
 }
 
 /* Стили для плитки */
 .tile {
-    background-color: #ffffff; /* Белый фон для плитки */
-    border-radius: 0.625rem; /* Закругленные углы */
-    box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.2); /* Легкая тень */
-    padding: 1rem; /* Внутренние отступы */
+    background-color: #f1e7dd; /* Белый фон для плитки */
+    border-radius: 1.2rem; /* Закругленные углы */
+    box-shadow: 0 0.25rem 2rem rgba(0, 0, 0, 0.5); /* Легкая тень */
+    /*padding: 0.7rem; !* Внутренние отступы *!*/
     text-align: center; /* Центрируем текст */
-    width: 16rem; /* Ширина плитки */
+    width: 16rem; /* Фиксированная ширина плитки */
+    display: flex; /* Включаем Flexbox */
+    flex-direction: column; /* Размещаем элементы вертикально */
+    justify-content: space-between; /* Распределяем элементы по вертикали */
+    /*height: 16rem; !* Фиксированная высота плитки *!*/
+}
+
+/* Обертка для изображения */
+.tile-image-wrapper {
+    width: 100%; /* Ширина по размеру плитки */
+    padding-top: 66%; /* Высота равна ширине для квадрата */
+    position: relative; /* Устанавливаем контекст позиционирования */
+    overflow: hidden; /* Скрываем содержимое за границами */
+    border-radius: 1.2rem 1.2rem 0 0; /* Закругляем углы у изображения */
 }
 
 /* Изображение в плитке */
 .tile-image {
-    width: 100%; /* Картинка занимает всю ширину плитки */
-    border-radius: 0.5rem; /* Закругленные углы у картинки */
-    margin-bottom: 1rem; /* Отступ снизу */
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%; /* Заполняет всю обертку */
+    height: 100%; /* Пропорции подстраиваются под квадрат */
+    object-fit: cover; /* Обрезает изображение по размеру квадрата */
 }
 
 /* Заголовок в плитке */
 .tile-title {
-    font-size: 1.2rem; /* Размер заголовка */
+    font-size: 1.05rem; /* Размер заголовка */
     font-weight: bold; /* Жирный текст */
-    margin: 0.5rem 0; /* Отступы сверху и снизу */
-}
-
-/* Текст в плитке */
-.tile-text {
-    font-size: 1rem; /* Размер текста */
-    color: #555; /* Серый цвет текста */
-    margin-bottom: 1rem; /* Отступ снизу */
+    margin: 0.4rem 0.2rem;
+    /*border: 1px solid black; !* Граница элемента *!*/
+    /* Отступы сверху и снизу */
 }
 
 /* Лайки в плитке */
 .tile-likes {
     font-size: 1rem; /* Размер текста лайков */
+    padding: 0.5rem;
     color: #dd746b; /* Красный цвет сердечка */
     font-weight: bold; /* Жирный текст */
+    margin-top: auto;
+    /*border: 1px solid black; !* Граница элемента *!*/
+    /* Убираем отступы и притягиваем к низу */
 }
