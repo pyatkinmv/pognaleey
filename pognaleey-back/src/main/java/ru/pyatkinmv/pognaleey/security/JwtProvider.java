@@ -27,7 +27,7 @@ public class JwtProvider {
 
     public String generateToken(String username) {
         return Jwts.builder()
-                .setSubject(username)
+                .setSubject(username.toLowerCase())
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + MILLIS_IN_MINUTE * tokenValidityTimeMinutes))
                 .signWith(signingKey(secret))

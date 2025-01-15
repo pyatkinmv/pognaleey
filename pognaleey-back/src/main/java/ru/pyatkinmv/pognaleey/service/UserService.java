@@ -74,7 +74,7 @@ public class UserService implements UserDetailsService {
         validateUsername(registerRequest.username());
         validatePassword(registerRequest.password());
 
-        if (userRepository.existsByUsername(registerRequest.username())) {
+        if (userRepository.existsByUsername(registerRequest.username().toLowerCase())) {
             throw new IllegalArgumentException(
                     String.format("Username %s is already taken", registerRequest.username())
             );
@@ -82,7 +82,7 @@ public class UserService implements UserDetailsService {
 
         return TravelMapper.toUserDto(userRepository.save(
                         User.builder()
-                                .username(registerRequest.username())
+                                .username(registerRequest.username().toLowerCase())
                                 .password(passwordEncoder.encode(registerRequest.password()))
                                 .createdAt(Instant.now())
                                 .build()

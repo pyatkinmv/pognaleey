@@ -1,4 +1,3 @@
-// Main.tsx
 import React, {useEffect, useRef, useState} from "react";
 import "./Main.css";
 import {useNavigate} from "react-router-dom";
@@ -7,15 +6,15 @@ import apiClient from "./apiClient"; // Импортируем API клиент
 const Main: React.FC = () => {
     const navigate = useNavigate();
 
-    const [selectedFilter, setSelectedFilter] = useState<string>("feed"); // "Недавнее" выбрано по умолчанию
-    const [tiles, setTiles] = useState<any[]>([]); // Данные для плиток
-    const [isLoading, setIsLoading] = useState<boolean>(false); // Индикатор загрузки
-    const [error, setError] = useState<string | null>(null); // Сообщение об ошибке
-    const [page, setPage] = useState<number>(0); // Текущая страница
-    const [hasMore, setHasMore] = useState<boolean>(true); // Есть ли ещё данные для загрузки
+    const [selectedFilter, setSelectedFilter] = useState<string>("feed");
+    const [tiles, setTiles] = useState<any[]>([]);
+    const [isLoading, setIsLoading] = useState<boolean>(false);
+    const [error, setError] = useState<string | null>(null);
+    const [page, setPage] = useState<number>(0);
+    const [hasMore, setHasMore] = useState<boolean>(true);
+    const [showLoginPopup, setShowLoginPopup] = useState<boolean>(false); // Видимость попапа
 
     const observer = useRef<IntersectionObserver | null>(null);
-
     const lastTileRef = useRef<HTMLDivElement | null>(null);
 
     const handleButtonClick = () => {
@@ -58,7 +57,6 @@ const Main: React.FC = () => {
         }
     };
 
-
     const handleFilterChange = (value: string) => {
         setSelectedFilter(value); // Обновляем фильтр
         setPage(0); // Сбрасываем страницу
@@ -71,6 +69,12 @@ const Main: React.FC = () => {
 
     const handleLike = async (id: number, isCurrentlyLiked: boolean) => {
         try {
+            const token = localStorage.getItem("jwtToken");
+            if (!token) {
+                setShowLoginPopup(true); // Показываем попап
+                return;
+            }
+
             const endpoint = isCurrentlyLiked
                 ? `${process.env.REACT_APP_API_URL}/travel-guides/${id}/unlike`
                 : `${process.env.REACT_APP_API_URL}/travel-guides/${id}/like`;
@@ -201,7 +205,8 @@ const Main: React.FC = () => {
                                     onClick={(e) => {
                                         e.stopPropagation(); // Предотвращаем клик по плитке
                                         handleLike(tile.id, tile.isLiked);
-                                    }}>
+                                    }}
+                                >
                                     ❤
                                 </span>
                                 {tile.totalLikes}
@@ -210,8 +215,20 @@ const Main: React.FC = () => {
 
                     ))}
                     {isLoading &&
-                        <div className="loading">Загрузка...</div>} {/* Прелоадер остаётся, но данные не пропадают */}
+                        <div className="loading">Загрузка...</div>}
                 </div>
+
+                {showLoginPopup && (
+                    <div className="popup-overlay" onClick={() => setShowLoginPopup(false)}>
+                        <div className="popup-content" onClick={(e) => e.stopPropagation()}>
+                            <h3>Вы не авторизованы</h3>
+                            <p>Чтобы поставить лайк, войдите в аккаунт.</p>
+                            <button onClick={() => navigate("/login")} className="login-button-popup">
+                                Войти
+                            </button>
+                        </div>
+                    </div>
+                )}
             </div>
         </div>
     );
