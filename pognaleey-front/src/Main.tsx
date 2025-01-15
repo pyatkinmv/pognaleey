@@ -2,12 +2,12 @@
 import React, {useEffect, useState} from "react";
 import "./Main.css";
 import {useNavigate} from "react-router-dom";
-import apiClient from "./apiClient";
+import apiClient from "./apiClient"; // Импортируем API клиент
 
 const Main: React.FC = () => {
     const navigate = useNavigate();
 
-    const [selectedFilter, setSelectedFilter] = useState<string>("best");
+    const [selectedFilter, setSelectedFilter] = useState<string>("best"); // "Недавнее" выбрано по умолчанию
     const [tiles, setTiles] = useState<any[]>([]); // Данные для плиток
     const [isLoading, setIsLoading] = useState<boolean>(false); // Индикатор загрузки
     const [error, setError] = useState<string | null>(null); // Сообщение об ошибке
@@ -21,8 +21,21 @@ const Main: React.FC = () => {
         setIsLoading(true); // Показываем прелоадер
         setError(null); // Сбрасываем ошибки
 
+        const url = `${process.env.REACT_APP_API_URL}/travel-guides/${value}?page=0&size=20`;
+
         try {
-            const response = await apiClient(`${process.env.REACT_APP_API_URL}/travel-guides/${value}?page=0&size=20`);
+            let response;
+
+            if (value === "liked" || value === "my") {
+                // Проверяем авторизацию для "Понравилось" и "Моё"
+                const token = localStorage.getItem("jwtToken");
+                if (!token) {
+                    navigate("/login");
+                    return;
+                }
+            }
+
+            response = await apiClient(url);
 
             if (!response.ok) {
                 throw new Error("Ошибка загрузки данных");
