@@ -35,7 +35,7 @@ const Main: React.FC = () => {
             if (filter === "liked" || filter === "my") {
                 const token = localStorage.getItem("jwtToken");
                 if (!token) {
-                    navigate("/login");
+                    setShowLoginPopup(true); // Показываем попап
                     return;
                 }
             }
@@ -58,13 +58,18 @@ const Main: React.FC = () => {
     };
 
     const handleFilterChange = (value: string) => {
-        setSelectedFilter(value); // Обновляем фильтр
-        setPage(0); // Сбрасываем страницу
-        setTiles([]); // Очищаем текущие плитки
-        setHasMore(true); // Устанавливаем, что данные ещё есть
+        if ((value === "liked" || value === "my") && !localStorage.getItem("jwtToken")) {
+            setShowLoginPopup(true); // Показываем попап, если пользователь не авторизован
+            return;
+        }
+
+        setSelectedFilter(value);
+        setPage(0);
+        setTiles([]);
+        setHasMore(true);
         loadTiles(value, true).catch((err) => {
             console.error("Ошибка загрузки плиток:", err);
-        }); // Передаём выбранный фильтр явно
+        });
     };
 
     const handleLike = async (id: number, isCurrentlyLiked: boolean) => {
@@ -222,7 +227,7 @@ const Main: React.FC = () => {
                     <div className="popup-overlay" onClick={() => setShowLoginPopup(false)}>
                         <div className="popup-content" onClick={(e) => e.stopPropagation()}>
                             <h3>Вы не авторизованы</h3>
-                            <p>Чтобы поставить лайк, войдите в аккаунт.</p>
+                            <p>Чтобы воспользоваться этой функцией, войдите в аккаунт.</p>
                             <button onClick={() => navigate("/login")} className="login-button-popup">
                                 Войти
                             </button>
