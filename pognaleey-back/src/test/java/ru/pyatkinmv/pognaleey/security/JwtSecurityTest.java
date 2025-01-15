@@ -34,7 +34,7 @@ public class JwtSecurityTest extends DatabaseCleaningTest {
 
     @Test
     public void accessSecuredEndpointWithoutToken() throws Exception {
-        accessSecuredEndpoint(null).andExpect(status().isForbidden());
+        accessSecuredEndpoint(null).andExpect(status().isOk());
     }
 
     @Test

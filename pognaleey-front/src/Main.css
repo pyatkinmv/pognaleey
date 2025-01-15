@@ -147,6 +147,23 @@ body {
     justify-content: space-between; /* Распределяем элементы по вертикали */
 }
 
+/* Эффект наведения для плитки */
+.tile {
+    cursor: pointer; /* Указатель при наведении */
+    transition: transform 0.3s ease, box-shadow 0.3s ease; /* Плавный переход для эффекта */
+}
+
+.tile:hover {
+    transform: translateY(-0.5rem); /* Лёгкое поднятие плитки */
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.3); /* Увеличение тени при наведении */
+}
+
+/* Эффект для изображения */
+.tile-image-wrapper img:hover {
+    filter: brightness(1.1); /* Увеличение яркости изображения */
+}
+
+
 /* Обертка для изображения */
 .tile-image-wrapper {
     width: 100%; /* Ширина по размеру плитки */

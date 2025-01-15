@@ -189,6 +189,7 @@ const Main: React.FC = () => {
                             className="tile"
                             key={tile.id}
                             ref={index === tiles.length - 1 ? lastTileRef : null} /* Отслеживаем последний элемент */
+                            onClick={() => navigate(`/travel-guides/${tile.id}`)} // Добавляем переход
                         >
                             <div className="tile-image-wrapper">
                                 <img src={tile.imageUrl} alt={tile.title} className="tile-image"/>
@@ -197,13 +198,16 @@ const Main: React.FC = () => {
                             <div className="tile-likes">
                                 <span
                                     className={`like-button ${tile.isLiked ? "liked" : ""}`}
-                                    onClick={() => handleLike(tile.id, tile.isLiked)}>
+                                    onClick={(e) => {
+                                        e.stopPropagation(); // Предотвращаем клик по плитке
+                                        handleLike(tile.id, tile.isLiked);
+                                    }}>
                                     ❤
                                 </span>
                                 {tile.totalLikes}
                             </div>
-
                         </div>
+
                     ))}
                     {isLoading &&
                         <div className="loading">Загрузка...</div>} {/* Прелоадер остаётся, но данные не пропадают */}
