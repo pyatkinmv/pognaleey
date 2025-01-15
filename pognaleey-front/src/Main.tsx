@@ -1,5 +1,5 @@
 // Main.tsx
-import React, {useEffect, useState} from "react";
+import React, {useEffect, useRef, useState} from "react";
 import "./Main.css";
 import {useNavigate} from "react-router-dom";
 import apiClient from "./apiClient"; // Импортируем API клиент
@@ -7,27 +7,34 @@ import apiClient from "./apiClient"; // Импортируем API клиент
 const Main: React.FC = () => {
     const navigate = useNavigate();
 
-    const [selectedFilter, setSelectedFilter] = useState<string>("best"); // "Недавнее" выбрано по умолчанию
+    const [selectedFilter, setSelectedFilter] = useState<string>("feed"); // "Недавнее" выбрано по умолчанию
     const [tiles, setTiles] = useState<any[]>([]); // Данные для плиток
     const [isLoading, setIsLoading] = useState<boolean>(false); // Индикатор загрузки
     const [error, setError] = useState<string | null>(null); // Сообщение об ошибке
+    const [page, setPage] = useState<number>(0); // Текущая страница
+    const [hasMore, setHasMore] = useState<boolean>(true); // Есть ли ещё данные для загрузки
+
+    const observer = useRef<IntersectionObserver | null>(null);
+
+    const lastTileRef = useRef<HTMLDivElement | null>(null);
 
     const handleButtonClick = () => {
         navigate(`/travel-inquiries`);
     };
 
-    const handleFilterChange = async (value: string) => {
-        setSelectedFilter(value);
-        setIsLoading(true); // Показываем прелоадер
-        setError(null); // Сбрасываем ошибки
 
-        const url = `${process.env.REACT_APP_API_URL}/travel-guides/${value}?page=0&size=20`;
+    const loadTiles = async (filter: string = selectedFilter, reset: boolean = false) => {
+        if (isLoading || (!reset && !hasMore)) return;
+
+        setIsLoading(true);
+        setError(null);
+
+        const url = `${process.env.REACT_APP_API_URL}/travel-guides/${filter}?page=${reset ? 0 : page}&size=8`;
 
         try {
             let response;
 
-            if (value === "liked" || value === "my") {
-                // Проверяем авторизацию для "Понравилось" и "Моё"
+            if (filter === "liked" || filter === "my") {
                 const token = localStorage.getItem("jwtToken");
                 if (!token) {
                     navigate("/login");
@@ -42,17 +49,52 @@ const Main: React.FC = () => {
             }
 
             const data = await response.json();
-            setTiles(data.content); // Обновляем плитки
+            setTiles((prevTiles) => (reset ? data.content : [...prevTiles, ...data.content]));
+            setPage((prevPage) => (reset ? 1 : prevPage + 1));
+            setHasMore(!data.last);
         } catch (err: any) {
             setError(err.message || "Неизвестная ошибка");
         } finally {
-            setIsLoading(false); // Скрываем прелоадер
+            setIsLoading(false);
         }
     };
 
+
+    const handleFilterChange = (value: string) => {
+        setSelectedFilter(value); // Обновляем фильтр
+        setPage(0); // Сбрасываем страницу
+        setTiles([]); // Очищаем текущие плитки
+        setHasMore(true); // Устанавливаем, что данные ещё есть
+        loadTiles(value, true).catch((err) => {
+            console.error("Ошибка загрузки плиток:", err);
+        }); // Передаём выбранный фильтр явно
+    };
+
+
     useEffect(() => {
-        handleFilterChange("feed"); // Загружаем данные по умолчанию ("Лучшее")
+        loadTiles("feed", true).catch((err) => {
+            console.error("Ошибка загрузки плиток:", err);
+        }); // Загружаем начальные данные при монтировании
     }, []);
+
+    useEffect(() => {
+        if (observer.current) observer.current.disconnect();
+
+        observer.current = new IntersectionObserver(
+            (entries) => {
+                if (entries[0].isIntersecting && hasMore && !isLoading) {
+                    loadTiles(selectedFilter, false);
+                }
+            },
+            {threshold: 1.0}
+        );
+
+        if (lastTileRef.current) {
+            observer.current.observe(lastTileRef.current);
+        }
+
+        return () => observer.current?.disconnect();
+    }, [lastTileRef, hasMore, isLoading]);
 
     return (
         <div className="main-container">
@@ -113,10 +155,13 @@ const Main: React.FC = () => {
 
                 {/* Плитка */}
                 <div className="tile-container">
-                    {isLoading && <div className="loading">Загрузка...</div>} {/* Прелоадер */}
                     {error && <div className="error">{error}</div>} {/* Сообщение об ошибке */}
-                    {!isLoading && !error && tiles.map((tile, index) => (
-                        <div className="tile" key={index}>
+                    {tiles.map((tile, index) => (
+                        <div
+                            className="tile"
+                            key={tile.id}
+                            ref={index === tiles.length - 1 ? lastTileRef : null} /* Отслеживаем последний элемент */
+                        >
                             <div className="tile-image-wrapper">
                                 <img src={tile.imageUrl} alt={tile.title} className="tile-image"/>
                             </div>
@@ -124,6 +169,8 @@ const Main: React.FC = () => {
                             <div className="tile-likes">❤️ {tile.totalLikes}</div>
                         </div>
                     ))}
+                    {isLoading &&
+                        <div className="loading">Загрузка...</div>} {/* Прелоадер остаётся, но данные не пропадают */}
                 </div>
             </div>
         </div>

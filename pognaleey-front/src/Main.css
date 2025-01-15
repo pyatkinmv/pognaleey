@@ -145,7 +145,6 @@ body {
     display: flex; /* Включаем Flexbox */
     flex-direction: column; /* Размещаем элементы вертикально */
     justify-content: space-between; /* Распределяем элементы по вертикали */
-    /*height: 16rem; !* Фиксированная высота плитки *!*/
 }
 
 /* Обертка для изображения */
