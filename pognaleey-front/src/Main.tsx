@@ -137,6 +137,13 @@ const Main: React.FC = () => {
         <div className="main-container">
             <div className="content-container">
                 <header className="header">
+                    {/* Логотип слева */}
+                    <img
+                        src="/logo-circle192.png"
+                        alt="Логотип"
+                        className="logo"
+                    />
+                    {/* Навигация */}
                     <nav className="navbar">
                         <a href="/" className="nav-link">Главная</a>
                         <a href="/contacts" className="nav-link">Контакты</a>

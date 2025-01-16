@@ -35,7 +35,10 @@ body {
 
 /* Шапка сайта */
 .header {
-    justify-content: center;
+    /*border: 1px solid black;*/
+    display: flex; /* Используем Flexbox для выравнивания элементов */
+    align-items: center; /* Центрируем элементы по вертикали */
+    justify-content: space-between; /* Распределяем логотип и меню */
     background-color: #c6c0bb; /* Цвет контейнера */
     width: 100%; /* Растягиваем шапку на всю ширину */
     padding: 0; /* Убираем отступы по вертикали */
@@ -43,15 +46,27 @@ body {
     box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.1); /* Тень под шапкой */
 }
 
-.navbar {
-    display: flex;
-    justify-content: center; /* Центрируем ссылки */
-    align-items: center; /* Центрирование по вертикали */
-    padding: 0.5rem; /* Отступы от краёв контейнера */
-    gap: 10rem; /* Расстояние между элементами */
+/* Логотип */
+.logo {
+    /*border: 1px solid black;*/
+    height: 3rem; /* Высота логотипа */
+    width: auto; /* Сохраняем пропорции */
 }
 
+/* Навигационное меню */
+.navbar {
+    /*border: 1px solid black;*/
+    flex-grow: 1; /* Навигация занимает оставшееся пространство */
+    display: flex; /* Flexbox для меню */
+    justify-content: center; /* Центрируем элементы внутри меню */
+    align-items: center; /* Центрирование по вертикали */
+    padding: 0.5rem; /* Отступы от краёв контейнера */
+    gap: 8rem;
+}
+
+/* Ссылка */
 .nav-link {
+    /*border: 1px solid black;*/
     text-decoration: none;
     color: #333;
     font-weight: bold;
@@ -62,6 +77,7 @@ body {
 .nav-link:hover {
     color: #dd746b; /* Цвет при наведении */
 }
+
 
 /* Контейнер для изображения */
 .image-container {
@@ -215,9 +231,8 @@ body {
 
 /* Лайки в плитке */
 .tile-likes {
-    font-size: 1.5rem; /* Размер текста лайков */
+    font-size: 1.2rem; /* Размер текста лайков */
     padding: 0;
-    /*color: #e61300; !* Красный цвет сердечка *!*/
     font-weight: bold; /* Жирный текст */
     margin-top: auto;
     /*border: 1px solid black; !* Граница элемента *!*/
