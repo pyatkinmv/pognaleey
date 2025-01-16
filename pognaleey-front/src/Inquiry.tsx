@@ -172,7 +172,7 @@ const Inquiry: React.FC = () => {
             <div className="header">
                 <img
                     className="logo"
-                    src="/logo-circle192.png" // Путь к логотипу
+                    src="/logo192.png" // Путь к логотипу
                     alt="Логотип"
                 />
                 <h1 className="recommendations-title">Погнали?</h1>

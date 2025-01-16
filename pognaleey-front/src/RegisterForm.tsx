@@ -85,7 +85,7 @@ const RegisterForm: React.FC = () => {
             <div className="header">
                 <img
                     className="logo"
-                    src="/logo-circle192.png"
+                    src="/logo192.png"
                     alt="Логотип"
                 />
                 <h1 className="register-title">Создайте аккаунт</h1>

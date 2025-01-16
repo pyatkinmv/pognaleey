@@ -79,7 +79,7 @@ const LoginForm: React.FC = () => {
             <div className="header">
                 <img
                     className="logo"
-                    src="/logo-circle192.png"
+                    src="/logo192.png"
                     alt="Логотип"
                 />
                 <h1 className="login-title">Добро пожаловать!</h1>
