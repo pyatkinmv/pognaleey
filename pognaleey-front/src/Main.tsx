@@ -17,43 +17,9 @@ const Main: React.FC = () => {
     const [page, setPage] = useState<number>(0);
     const [hasMore, setHasMore] = useState<boolean>(true);
     const [showLoginPopup, setShowLoginPopup] = useState<boolean>(false);
-    const [user, setUser] = useState<{ username: string | null }>({username: null});
-    const [language, setLanguage] = useState<string>("ru");
-
-    const languages = [
-        {code: "ru", label: "Русский"},
-        {code: "en", label: "English"},
-    ];
 
     const observer = useRef<IntersectionObserver | null>(null);
     const lastTileRef = useRef<HTMLDivElement | null>(null);
-
-    const handleLanguageChange = (code: string) => setLanguage(code);
-
-    useEffect(() => {
-        const token = localStorage.getItem("jwtToken");
-        if (token) {
-            const username = getUsernameFromToken(token);
-            setUser({username});
-        }
-    }, []);
-
-    const getUsernameFromToken = (token: string) => {
-        try {
-            const payloadBase64 = token.split(".")[1];
-            const decodedPayload = JSON.parse(atob(payloadBase64));
-            return decodedPayload.name || decodedPayload.sub || null;
-        } catch (error) {
-            console.error(error);
-            return null;
-        }
-    };
-
-    const handleLogout = () => {
-        localStorage.removeItem("jwtToken");
-        setUser({username: null});
-        navigate("/");
-    };
 
     const handleFilterChange = (value: string) => {
         if ((value === "liked" || value === "my") && !localStorage.getItem("jwtToken")) {
@@ -157,13 +123,7 @@ const Main: React.FC = () => {
     return (
         <div className="main-container">
             <div className="content-container">
-                <Header
-                    user={user}
-                    language={language}
-                    languages={languages}
-                    onLogout={handleLogout}
-                    onLanguageChange={handleLanguageChange}
-                />
+                <Header/>
                 <div className="image-container">
                     <img src="/main.webp" alt="Main Banner" className="banner-image"/>
                     <div className="banner-text">Каждое путешествие<br/>начинается с идеи!</div>

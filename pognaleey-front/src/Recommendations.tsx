@@ -1,7 +1,8 @@
 import React, {useEffect, useState} from "react";
 import {useLocation, useNavigate, useParams} from "react-router-dom";
 import "./Recommendations.css";
-import apiClient from "./apiClient"; // Подключаем стили
+import apiClient from "./apiClient";
+import Header from "./Header"; // Подключаем стили
 
 interface QuickRecommendation {
     id: number;
@@ -102,15 +103,7 @@ const Recommendations: React.FC = () => {
 
     return (
         <div className="recommendations-container">
-            {/* Заголовок с логотипом */}
-            <div className="header">
-                <img
-                    className="logo"
-                    src="/logo192.png" // Путь к логотипу
-                    alt="Логотип"
-                />
-                <h1 className="recommendations-title">Погнали!</h1>
-            </div>
+            <Header/>
             <div className="recommendations-list">
                 {recommendations.map((recommendation) => (
                     <div className="recommendation-card" key={recommendation.id}>

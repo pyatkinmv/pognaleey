@@ -1,18 +1,11 @@
 import React from "react";
-import {useNavigate} from "react-router-dom";
+import {useAppContext} from "./AppContext";
 import DropdownMenu from "./DropdownMenu";
 import "./Header.css";
 
-interface HeaderProps {
-    user: { username: string | null };
-    language: string;
-    languages: { code: string; label: string }[];
-    onLogout: () => void;
-    onLanguageChange: (code: string) => void;
-}
+const Header: React.FC = () => {
+    const {user, language, languages, handleLogout, handleLanguageChange} = useAppContext();
 
-const Header: React.FC<HeaderProps> = ({user, language, languages, onLogout, onLanguageChange}) => {
-    const navigate = useNavigate();
     const currentLanguage = languages.find((lang) => lang.code === language);
 
     return (
@@ -34,7 +27,7 @@ const Header: React.FC<HeaderProps> = ({user, language, languages, onLogout, onL
                     }
                     items={languages.map((lang) => ({
                         label: lang.label,
-                        onClick: () => onLanguageChange(lang.code),
+                        onClick: () => handleLanguageChange(lang.code),
                         icon: (
                             <img
                                 src={`/flags/${lang.code}.svg`}
@@ -56,7 +49,7 @@ const Header: React.FC<HeaderProps> = ({user, language, languages, onLogout, onL
                             items={[
                                 {
                                     label: "Выйти",
-                                    onClick: onLogout,
+                                    onClick: handleLogout,
                                 },
                             ]}
                         />

@@ -1,7 +1,8 @@
 import React, {useState} from "react";
 import {useNavigate} from "react-router-dom"; // Для перехода между страницами
 import "./Inquiry.css";
-import apiClient from "./apiClient"; // Подключаем стили
+import apiClient from "./apiClient";
+import Header from "./Header"; // Подключаем стили
 
 const Inquiry: React.FC = () => {
     const [formData, setFormData] = useState({
@@ -168,15 +169,7 @@ const Inquiry: React.FC = () => {
 
     return (
         <div>
-            {/* Заголовок с логотипом */}
-            <div className="header">
-                <img
-                    className="logo"
-                    src="/logo192.png" // Путь к логотипу
-                    alt="Логотип"
-                />
-                <h1 className="recommendations-title">Погнали?</h1>
-            </div>
+            <Header/>
 
             <form onSubmit={handleSubmit}>
                 <div className="form-heading">

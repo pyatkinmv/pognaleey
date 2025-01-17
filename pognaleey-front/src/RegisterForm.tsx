@@ -2,6 +2,7 @@ import React, {useState} from "react";
 import {useNavigate} from "react-router-dom";
 import "./RegisterForm.css";
 import {validateConfirmPassword, validatePassword, validateUsername} from "./validators";
+import Header from "./Header";
 
 const RegisterForm: React.FC = () => {
     const [credentials, setCredentials] = useState({
@@ -82,14 +83,7 @@ const RegisterForm: React.FC = () => {
 
     return (
         <div className="register-container">
-            <div className="header">
-                <img
-                    className="logo"
-                    src="/logo192.png"
-                    alt="Логотип"
-                />
-                <h1 className="register-title">Создайте аккаунт</h1>
-            </div>
+            <Header/>
 
             <form onSubmit={handleSubmit} className="register-form">
                 <div className="form-group">

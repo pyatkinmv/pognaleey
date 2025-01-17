@@ -1,16 +1,22 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import AppRouter from "./AppRouter";
-
+import {AppProvider} from "./AppContext";
 import './index.css';
+import {BrowserRouter as Router} from "react-router-dom"; // Перемещаем сюда Router
 import reportWebVitals from './reportWebVitals';
 
 const root = ReactDOM.createRoot(
-  document.getElementById('root') as HTMLElement
+    document.getElementById('root') as HTMLElement
 );
+
 root.render(
     <React.StrictMode>
-        <AppRouter/>
+        <Router>
+            <AppProvider>
+                <AppRouter/>
+            </AppProvider>
+        </Router>
     </React.StrictMode>,
 );
 

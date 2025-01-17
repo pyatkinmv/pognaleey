@@ -209,13 +209,6 @@ strong {
     background: #c74d27;
 }
 
-/* Контейнер заголовка */
-.header {
-    display: flex; /* Расположить элементы в строку */
-    align-items: center; /* Вертикально выравниваем логотип и текст */
-    margin: 20px 0; /* Отступ сверху и снизу для заголовка */
-}
-
 /* Логотип */
 .recommendations-container .logo {
     width: 7rem; /* Ширина логотипа */

@@ -2,6 +2,7 @@ import React, {useState} from "react";
 import {Link, useNavigate} from "react-router-dom";
 import "./LoginForm.css";
 import {validatePassword, validateUsername} from "./validators";
+import Header from "./Header";
 
 
 const LoginForm: React.FC = () => {
@@ -76,15 +77,7 @@ const LoginForm: React.FC = () => {
 
     return (
         <div className="login-container">
-            <div className="header">
-                <img
-                    className="logo"
-                    src="/logo192.png"
-                    alt="Логотип"
-                />
-                <h1 className="login-title">Добро пожаловать!</h1>
-            </div>
-
+            <Header/>
             <form onSubmit={handleSubmit} className="login-form">
                 <div className="form-group">
                     <label htmlFor="username">Имя пользователя:</label>

@@ -4,6 +4,7 @@ import ReactMarkdown from "react-markdown";
 import rehypeRaw from "rehype-raw";
 import apiClient from "./apiClient";
 import "./Guide.css";
+import Header from "./Header";
 
 interface UserDto {
     id: number;
@@ -66,6 +67,7 @@ const Guide: React.FC = () => {
 
     return (
         <div className="guide-container">
+            <Header/>
             <div className="guide-details">
                 <ReactMarkdown rehypePlugins={[rehypeRaw]}>{guide.details}</ReactMarkdown>
             </div>
