@@ -5,7 +5,10 @@
 
 /* Общий стиль для страницы */
 body {
-    font-family: 'Nunito', sans-serif; /* Используем шрифт Nunito */
+    /*font-family: 'Segoe UI Emoji', sans-serif;*/
+    font-family: 'Nunito', 'Segoe UI Emoji', 'Noto Color Emoji', sans-serif;
+
+    /*font-family: 'Nunito', sans-serif; !* Используем шрифт Nunito *!*/
     margin: 0;
     padding: 0;
     background-color: #aeb6bd; /* Матовый фон сайта */
@@ -103,6 +106,10 @@ body {
     color: #dd746b;
 }
 
+.user-menu:hover .profile-icon {
+    background-color: #dd746b; /* Цвет при наведении */
+}
+
 .profile-icon {
     mask: url('../public/profile.svg') center/contain no-repeat;
     -webkit-mask: url('../public/profile.svg') center/contain no-repeat;
@@ -113,51 +120,6 @@ body {
     margin-right: 0.5rem;
 }
 
-.user-menu:hover .profile-icon {
-    background-color: #dd746b; /* Цвет при наведении */
-}
-
-
-/* Выпадающее меню */
-.dropdown-menu {
-    position: absolute;
-    top: 100%;
-    /*left: 50%;*/
-    /*transform: translateX(-50%);*/
-    background-color: white;
-    border: 1px solid #ddd;
-    border-radius: 0.5rem;
-    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.5);
-    padding: 0.2rem 1.0rem;
-    z-index: 1000;
-    text-align: center;
-    /* Начальное состояние */
-    visibility: hidden; /* Элемент невиден */
-    opacity: 0; /* Элемент полностью прозрачный */
-}
-
-/* Показываем меню при наведении */
-.user-menu:hover .dropdown-menu {
-    visibility: visible; /* Делаем видимым */
-    opacity: 1; /* Устанавливаем полную непрозрачность */
-}
-
-/* Кнопка внутри выпадающего меню */
-.dropdown-menu button {
-    background-color: transparent;
-    border: none;
-    color: #333;
-    font-size: 1rem;
-    font-weight: bold;
-    cursor: pointer;
-    transition: color 0.2s;
-}
-
-/* Эффект наведения */
-.dropdown-menu button:hover {
-    color: #dd746b;
-    transition: color 0.2s;
-}
 
 /* Контейнер для изображения */
 .image-container {
@@ -395,3 +357,9 @@ body {
     background-color: #c66059;
 }
 
+.language-flag {
+    width: 1.5rem; /* Размер флага */
+    height: auto; /* Сохраняем пропорции */
+    margin-right: 0.5rem; /* Отступ справа */
+    vertical-align: middle; /* Центрирование с текстом */
+}

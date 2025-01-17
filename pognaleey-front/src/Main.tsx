@@ -1,7 +1,8 @@
 import React, {useEffect, useRef, useState} from "react";
 import "./Main.css";
 import {useNavigate} from "react-router-dom";
-import apiClient from "./apiClient"; // Импортируем API клиент
+import apiClient from "./apiClient";
+import DropdownMenu from "./DropdownMenu"; // Импортируем API клиент
 
 const Main: React.FC = () => {
     const navigate = useNavigate();
@@ -16,6 +17,18 @@ const Main: React.FC = () => {
 
     const observer = useRef<IntersectionObserver | null>(null);
     const lastTileRef = useRef<HTMLDivElement | null>(null);
+    const [language, setLanguage] = useState<string>("ru"); // Текущий язык
+
+    const languages = [
+        {code: "ru", label: "Русский"},
+        {code: "en", label: "English"},
+    ];
+
+    const handleLanguageChange = (code: string) => {
+        setLanguage(code);
+    };
+
+    const currentLanguage = languages.find((lang) => lang.code === language);
 
     // Загрузка информации о пользователе
     useEffect(() => {
@@ -167,23 +180,52 @@ const Main: React.FC = () => {
                     <img src="/logo-circle192.png" alt="Логотип" className="logo"/>
                     <nav className="navbar">
                         <a href="/" className="nav-link">Главная</a>
-                        <a href="/contacts" className="nav-link">Контакты</a>
-                        <a href="/language" className="nav-link">🌐 Язык</a>
+                        <a href="https://t.me/pyatkinmv" className="nav-link">Контакты</a>
+                        <DropdownMenu
+                            label={
+                                <>
+                                    <img
+                                        src={`/flags/${language}.svg`}
+                                        alt={currentLanguage?.label}
+                                        className="language-flag"
+                                    />
+                                    <span className="menu-label">{currentLanguage!.label}</span>
+                                </>
+                            }
+                            items={languages.map((lang) => ({
+                                label: lang.label,
+                                onClick: () => handleLanguageChange(lang.code),
+                                icon: (
+                                    <img
+                                        src={`/flags/${lang.code}.svg`}
+                                        alt={lang.label}
+                                        className="language-flag"
+                                    />
+                                ),
+                            }))}
+                        />
                         <div className="user-menu">
                             {user.username ? (
-                                <>
-                                    <div className="profile-icon"></div>
-                                    <span className="user-name">{user.username}</span>
-                                    {
-                                        <div className="dropdown-menu">
-                                            <button onClick={handleLogout}>Выйти</button>
-                                        </div>
+                                <DropdownMenu
+                                    label={
+                                        <>
+                                            <div className="profile-icon"></div>
+                                            <span className="user-name">{user.username}</span>
+                                        </>
                                     }
-                                </>
+                                    items={[
+                                        {
+                                            label: "Выйти",
+                                            onClick: handleLogout,
+                                        },
+                                    ]}
+                                />
                             ) : (
                                 <a href="/login" className="nav-link">🔒 Войти</a>
                             )}
                         </div>
+
+
                     </nav>
                 </header>
                 <div className="image-container">
