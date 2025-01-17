@@ -5,229 +5,88 @@
 
 /* Общий стиль для страницы */
 body {
-    /*font-family: 'Segoe UI Emoji', sans-serif;*/
     font-family: 'Nunito', 'Segoe UI Emoji', 'Noto Color Emoji', sans-serif;
-
-    /*font-family: 'Nunito', sans-serif; !* Используем шрифт Nunito *!*/
     margin: 0;
     padding: 0;
-    background-color: #aeb6bd; /* Матовый фон сайта */
-    font-size: 1rem; /* Устанавливаем базовый размер шрифта (16px = 1rem) */
+    background-color: #aeb6bd;
+    font-size: 1rem;
 }
 
-/* Стиль для контейнера страницы */
+/* Контейнер страницы */
 .main-container {
     display: flex;
-    flex-direction: column; /* Шапка сверху, контент снизу */
+    flex-direction: column;
     align-items: center;
-    min-height: 100vh; /* Минимальная высота экрана */
-    margin: 0; /* Убираем отступы */
+    min-height: 100vh;
 }
 
-/* Основной контейнер */
+/* Контент */
 .content-container {
-    background-color: #d0c9c7; /* Матовый цвет для основного контейнера */
-    width: 80rem; /* Ширина контейнера */
-    border-radius: 0.625rem; /* Закругленные углы (10px) */
-    box-shadow: 0 0.25rem 0.625rem rgba(0, 0, 0, 0.2); /* Легкая тень для глубины */
-    overflow: hidden; /* Убираем прокрутку содержимого */
-    min-height: 100vh; /* Минимальная высота экрана */
-    height: auto; /* Автоматическая высота для содержимого */
-    margin-bottom: 2rem; /* Отступ снизу, чтобы добавить пространство */
+    background-color: #d0c9c7;
+    width: 80rem;
+    border-radius: 0.625rem;
+    box-shadow: 0 0.25rem 0.625rem rgba(0, 0, 0, 0.2);
+    overflow: hidden;
+    min-height: 100vh;
+    height: auto;
+    margin-bottom: 2rem;
 }
 
 /* Контейнер для изображения */
 .image-container {
-    position: relative; /* Создаем контекст позиционирования для дочерних элементов */
-    width: 80rem; /* Ширина в rem */
-    margin: 0 auto; /* Центрируем контейнер горизонтально */
-    overflow: hidden; /* Убираем содержимое за пределами контейнера */
+    position: relative;
+    width: 80rem;
+    margin: 0 auto;
+    overflow: hidden;
 }
 
 /* Изображение */
 .banner-image {
-    width: 100%; /* Картинка занимает всю ширину контейнера */
-    height: auto; /* Сохраняем пропорции */
-    display: block; /* Убираем лишние отступы */
+    width: 100%;
+    height: auto;
+    display: block;
 }
 
 /* Текст */
 .banner-text {
-    position: absolute; /* Позиционируем текст относительно контейнера */
-    top: 40%; /* Позиция текста по вертикали */
-    left: 62.5%; /* Позиция текста по горизонтали */
-    transform: translate(-50%, -50%); /* Центрирование текста */
-    font-size: 2.4rem; /* Размер текста */
-    color: white; /* Белый цвет текста */
-    text-align: left; /* Текст выровнен по левому краю */
+    position: absolute;
+    top: 40%;
+    left: 62.5%;
+    transform: translate(-50%, -50%);
+    font-size: 2.4rem;
+    color: white;
+    text-align: left;
     user-select: none;
-    text-shadow: 0.125rem 0.125rem 0.25rem rgba(0, 0, 0, 0.6); /* Тень для читаемости */
+    text-shadow: 0.125rem 0.125rem 0.25rem rgba(0, 0, 0, 0.6);
 }
 
 /* Кнопка */
 .action-button {
-    position: absolute; /* Позиционируем кнопку относительно .image-container */
-    width: 16rem;
-    top: 56%; /* Позиция текста по вертикали */
-    left: 49%; /* Позиция текста по горизонтали */
-    padding: 1rem 1.5rem; /* Уменьшаем размеры кнопки */
-    background-color: #f87f76; /* Основной цвет кнопки */
-    color: white; /* Цвет текста кнопки */
-    font-size: 2.2rem; /* Размер текста кнопки */
-    font-weight: bold; /* Жирный текст */
-    border: none; /* Убираем границы */
-    border-radius: 2rem; /* Закругленные углы */
-    cursor: pointer; /* Указатель при наведении */
-    text-shadow: 0.125rem 0.125rem 0.25rem rgba(0, 0, 0, 0.6); /* Тень для читаемости */
-    box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.5); /* Добавляем тень для кнопки */
-    transition: all 0.2s ease; /* Плавный переход для эффектов */
-}
-
-/* Ховер эффект */
-.action-button:hover {
-    background-color: #c66059; /* Темнее при наведении */
-    box-shadow: 0 0.375rem 0.625rem rgba(0, 0, 0, 0.4);
-    transform: translateY(-0.2rem)
-}
-
-/* Состояние "нажатия" */
-.action-button:active {
-    background-color: #c15550; /* Более тёмный цвет при нажатии */
-    transform: scale(0.97); /* Лёгкое уменьшение размера */
-    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.7); /* Уменьшенная тень */
-}
-
-/* Контейнер для плитки */
-.tile-container {
-    /*border: 1px solid black;*/
-    display: grid; /* Используем CSS Grid */
-    grid-template-columns: repeat(4, 1fr); /* 4 колонки равной ширины */
-    gap: 2rem; /* Расстояние между плитками */
-    /* Отступы вокруг плитки */
-    padding: 1rem 2rem 2rem;
-    justify-items: center; /* Центрируем плитки по горизонтали */
-}
-
-/* Стили для плитки */
-.tile {
-    background-color: #f1e7dd; /* Белый фон для плитки */
-    border-radius: 1.2rem; /* Закругленные углы */
-    box-shadow: 0 0.25rem 2rem rgba(0, 0, 0, 0.5); /* Легкая тень */
-    /*padding: 0.7rem; !* Внутренние отступы *!*/
-    text-align: center; /* Центрируем текст */
-    width: 17rem; /* Фиксированная ширина плитки */
-    display: flex; /* Включаем Flexbox */
-    flex-direction: column; /* Размещаем элементы вертикально */
-    justify-content: space-between; /* Распределяем элементы по вертикали */
-}
-
-/* Эффект наведения для плитки */
-.tile {
-    cursor: pointer; /* Указатель при наведении */
-    transition: transform 0.2s ease, box-shadow 0.2s ease; /* Плавный переход для эффекта */
-}
-
-.tile:hover {
-    transform: translateY(-0.5rem); /* Лёгкое поднятие плитки */
-    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.3); /* Увеличение тени при наведении */
-}
-
-/* Эффект для изображения */
-.tile-image-wrapper img:hover {
-    filter: brightness(1.1); /* Увеличение яркости изображения */
-}
-
-
-/* Обертка для изображения */
-.tile-image-wrapper {
-    width: 100%; /* Ширина по размеру плитки */
-    padding-top: 66%; /* Высота равна ширине для квадрата */
-    position: relative; /* Устанавливаем контекст позиционирования */
-    overflow: hidden; /* Скрываем содержимое за границами */
-    border-radius: 1.2rem 1.2rem 0 0; /* Закругляем углы у изображения */
-}
-
-/* Изображение в плитке */
-.tile-image {
     position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%; /* Заполняет всю обертку */
-    height: 100%; /* Пропорции подстраиваются под квадрат */
-    object-fit: cover; /* Обрезает изображение по размеру квадрата */
+    width: 16rem;
+    top: 56%;
+    left: 49%;
+    padding: 1rem 1.5rem;
+    background-color: #f87f76;
+    color: white;
+    font-size: 2.2rem;
+    font-weight: bold;
+    border: none;
+    border-radius: 2rem;
+    cursor: pointer;
+    text-shadow: 0.125rem 0.125rem 0.25rem rgba(0, 0, 0, 0.6);
+    box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.5);
+    transition: all 0.2s ease;
 }
 
-/* Заголовок в плитке */
-.tile-title {
-    font-size: 1.05rem; /* Размер заголовка */
-    font-weight: bold; /* Жирный текст */
-    margin: 0.4rem 0.2rem;
-    /*border: 1px solid black; !* Граница элемента *!*/
-    /* Отступы сверху и снизу */
+.action-button:hover {
+    background-color: #c66059;
+    box-shadow: 0 0.375rem 0.625rem rgba(0, 0, 0, 0.4);
+    transform: translateY(-0.2rem);
 }
 
-/* Контейнер для радиокнопок */
-.radio-buttons-container {
-    display: flex; /* Располагаем кнопки в одну линию */
-    justify-content: center; /* Центрируем кнопки по горизонтали */
-    gap: 3rem; /* Расстояние между кнопками */
-    margin: 1rem 0; /* Отступы сверху и снизу */
-}
-
-/* Радиокнопка */
-.radio-button {
-    /*border: 1px solid black;*/
-    font-size: 2.2rem; /* Размер текста */
-    font-weight: bold; /* Жирный текст */
-    color: #333; /* Цвет текста */
-    cursor: pointer; /* Курсор-указатель при наведении */
-    position: relative;
-    /*border: 1px solid black;*/
-    /*margin: 0 1.5rem; !* Отступы сверху и снизу *!*/
-    /*padding: 1rem;*/
-}
-
-/* Лайки в плитке */
-.tile-likes {
-    font-size: 1.2rem; /* Размер текста лайков */
-    padding: 0;
-    font-weight: bold; /* Жирный текст */
-    margin-top: auto;
-    /*border: 1px solid black; !* Граница элемента *!*/
-    /* Убираем отступы и притягиваем к низу */
-}
-
-.like-button {
-    font-size: 1.5rem; /* Размер сердечка */
-    cursor: pointer; /* Указатель при наведении */
-    transition: color 0.2s ease; /* Плавный переход цвета */
-    color: lightcoral; /* Цвет сердечка по умолчанию */
-}
-
-.like-button.liked {
-    color: red; /* Красный цвет для лайкнутого сердечка */
-}
-
-.like-button:hover {
-    color: red;
-    /*color: #c66059; !* Темнее при наведении *!*/
-    text-shadow: 0.125rem 0.125rem 0.5rem rgba(0, 0, 0, 0.5); /* Тень для читаемости */
-}
-
-
-/* Убираем стандартный вид радиокнопки */
-.radio-button input[type="radio"] {
-    display: none;
-}
-
-/* Стили активной кнопки */
-.radio-button.active {
-    color: #dd746b; /* Цвет активной кнопки */
-    transform: scale(1.1); /* Эффект нажатия */
-    text-shadow: 0 0.3rem 0.5rem rgba(0, 0, 0, 0.2); /* Добавляем тень для кнопки */
-}
-
-/* Ховер эффект */
-.radio-button:hover {
-    color: #c66059;
+.action-button:active {
+    background-color: #c15550;
+    transform: scale(0.97);
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.7);
 }

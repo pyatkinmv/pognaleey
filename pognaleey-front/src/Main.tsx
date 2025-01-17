@@ -1,8 +1,12 @@
+// Main.tsx (Refactored)
 import React, {useEffect, useRef, useState} from "react";
 import "./Main.css";
 import {useNavigate} from "react-router-dom";
+import Header from "./Header";
+import FilterButtons from "./FilterButtons";
+import TileGrid from "./TileGrid";
+import LoginPopup from "./LoginPopup";
 import apiClient from "./apiClient";
-import Header from "./Header"; // Импортируем API клиент
 
 const Main: React.FC = () => {
     const navigate = useNavigate();
@@ -12,37 +16,31 @@ const Main: React.FC = () => {
     const [error, setError] = useState<string | null>(null);
     const [page, setPage] = useState<number>(0);
     const [hasMore, setHasMore] = useState<boolean>(true);
-    const [showLoginPopup, setShowLoginPopup] = useState<boolean>(false); // Видимость попапа
-    const [user, setUser] = useState<{ username: string | null }>({username: null}); // Информация о пользователе
-
-    const observer = useRef<IntersectionObserver | null>(null);
-    const lastTileRef = useRef<HTMLDivElement | null>(null);
-    const [language, setLanguage] = useState<string>("ru"); // Текущий язык
+    const [showLoginPopup, setShowLoginPopup] = useState<boolean>(false);
+    const [user, setUser] = useState<{ username: string | null }>({username: null});
+    const [language, setLanguage] = useState<string>("ru");
 
     const languages = [
         {code: "ru", label: "Русский"},
         {code: "en", label: "English"},
     ];
 
-    const handleLanguageChange = (code: string) => {
-        setLanguage(code);
-    };
+    const observer = useRef<IntersectionObserver | null>(null);
+    const lastTileRef = useRef<HTMLDivElement | null>(null);
 
-    const currentLanguage = languages.find((lang) => lang.code === language);
+    const handleLanguageChange = (code: string) => setLanguage(code);
 
-    // Загрузка информации о пользователе
     useEffect(() => {
         const token = localStorage.getItem("jwtToken");
         if (token) {
-            // Замените это на реальный запрос к API для получения информации о пользователе
-            const username = token ? getUsernameFromToken(token) : null;
-            setUser({username: username});
+            const username = getUsernameFromToken(token);
+            setUser({username});
         }
     }, []);
 
     const getUsernameFromToken = (token: string) => {
         try {
-            const payloadBase64 = token.split('.')[1];
+            const payloadBase64 = token.split(".")[1];
             const decodedPayload = JSON.parse(atob(payloadBase64));
             return decodedPayload.name || decodedPayload.sub || null;
         } catch (error) {
@@ -57,11 +55,20 @@ const Main: React.FC = () => {
         navigate("/");
     };
 
-    const handleButtonClick = () => {
-        navigate(`/travel-inquiries`);
+    const handleFilterChange = (value: string) => {
+        if ((value === "liked" || value === "my") && !localStorage.getItem("jwtToken")) {
+            setShowLoginPopup(true);
+            return;
+        }
+
+        setSelectedFilter(value);
+        setPage(0);
+        setTiles([]);
+        setHasMore(true);
+        loadTiles(value, true);
     };
 
-    const loadTiles = async (filter: string = selectedFilter, reset: boolean = false) => {
+    const loadTiles = async (filter: string, reset: boolean = false) => {
         if (isLoading || (!reset && !hasMore)) return;
 
         setIsLoading(true);
@@ -70,17 +77,12 @@ const Main: React.FC = () => {
         const url = `${process.env.REACT_APP_API_URL}/travel-guides/${filter}?page=${reset ? 0 : page}&size=8`;
 
         try {
-            let response;
-
-            if (filter === "liked" || filter === "my") {
-                const token = localStorage.getItem("jwtToken");
-                if (!token) {
-                    setShowLoginPopup(true); // Показываем попап
-                    return;
-                }
+            if ((filter === "liked" || filter === "my") && !localStorage.getItem("jwtToken")) {
+                setShowLoginPopup(true);
+                return;
             }
 
-            response = await apiClient(url);
+            const response = await apiClient(url);
 
             if (!response.ok) {
                 throw new Error("Ошибка загрузки данных");
@@ -97,26 +99,11 @@ const Main: React.FC = () => {
         }
     };
 
-    const handleFilterChange = (value: string) => {
-        if ((value === "liked" || value === "my") && !localStorage.getItem("jwtToken")) {
-            setShowLoginPopup(true); // Показываем попап, если пользователь не авторизован
-            return;
-        }
-
-        setSelectedFilter(value);
-        setPage(0);
-        setTiles([]);
-        setHasMore(true);
-        loadTiles(value, true).catch((err) => {
-            console.error("Ошибка загрузки плиток:", err);
-        });
-    };
-
     const handleLike = async (id: number, isCurrentlyLiked: boolean) => {
         try {
             const token = localStorage.getItem("jwtToken");
             if (!token) {
-                setShowLoginPopup(true); // Показываем попап
+                setShowLoginPopup(true);
                 return;
             }
 
@@ -134,12 +121,9 @@ const Main: React.FC = () => {
 
             const {guideId, isLiked, totalLikes} = await response.json();
 
-            // Обновляем состояние плиток
             setTiles((prevTiles) =>
                 prevTiles.map((tile) =>
-                    tile.id === guideId
-                        ? {...tile, isLiked, totalLikes} // Обновляем лайк и количество лайков
-                        : tile
+                    tile.id === guideId ? {...tile, isLiked, totalLikes} : tile
                 )
             );
         } catch (error) {
@@ -147,11 +131,8 @@ const Main: React.FC = () => {
         }
     };
 
-
     useEffect(() => {
-        loadTiles("feed", true).catch((err) => {
-            console.error("Ошибка загрузки плиток:", err);
-        }); // Загружаем начальные данные при монтировании
+        loadTiles("feed", true);
     }, []);
 
     useEffect(() => {
@@ -184,94 +165,18 @@ const Main: React.FC = () => {
                     onLanguageChange={handleLanguageChange}
                 />
                 <div className="image-container">
-                    <img
-                        src="/main.webp"
-                        alt="Main Banner"
-                        className="banner-image"
-                    />
-                    <div className="banner-text">
-                        Каждое путешествие<br/>начинается с идеи!
-                    </div>
-                    <button className="action-button" onClick={handleButtonClick}>Погнали!</button>
+                    <img src="/main.webp" alt="Main Banner" className="banner-image"/>
+                    <div className="banner-text">Каждое путешествие<br/>начинается с идеи!</div>
+                    <button className="action-button" onClick={() => navigate("/travel-inquiries")}>Погнали!</button>
                 </div>
 
-                {/* Радиокнопки */}
-                <div className="radio-buttons-container">
-                    <label className={`radio-button ${selectedFilter === "feed" ? "active" : ""}`}>
-                        <input
-                            type="radio"
-                            name="filter"
-                            value="feed"
-                            checked={selectedFilter === "feed"}
-                            onChange={() => handleFilterChange("feed")}
-                        />
-                        Лучшее
-                    </label>
-                    <label className={`radio-button ${selectedFilter === "liked" ? "active" : ""}`}>
-                        <input
-                            type="radio"
-                            name="filter"
-                            value="liked"
-                            checked={selectedFilter === "liked"}
-                            onChange={() => handleFilterChange("liked")}
-                        />
-                        Понравилось
-                    </label>
-                    <label className={`radio-button ${selectedFilter === "my" ? "active" : ""}`}>
-                        <input
-                            type="radio"
-                            name="filter"
-                            value="my"
-                            checked={selectedFilter === "my"}
-                            onChange={() => handleFilterChange("my")}
-                        />
-                        Моё
-                    </label>
-                </div>
+                <FilterButtons selectedFilter={selectedFilter} onFilterChange={handleFilterChange}/>
 
-                {/* Плитка */}
-                <div className="tile-container">
-                    {error && <div className="error">{error}</div>} {/* Сообщение об ошибке */}
-                    {tiles.map((tile, index) => (
-                        <div
-                            className="tile"
-                            key={tile.id}
-                            ref={index === tiles.length - 1 ? lastTileRef : null} /* Отслеживаем последний элемент */
-                            onClick={() => navigate(`/travel-guides/${tile.id}`)} // Добавляем переход
-                        >
-                            <div className="tile-image-wrapper">
-                                <img src={tile.imageUrl} alt={tile.title} className="tile-image"/>
-                            </div>
-                            <div className="tile-title">{tile.title}</div>
-                            <div className="tile-likes">
-                                <span
-                                    className={`like-button ${tile.isLiked ? "liked" : ""}`}
-                                    onClick={(e) => {
-                                        e.stopPropagation(); // Предотвращаем клик по плитке
-                                        handleLike(tile.id, tile.isLiked);
-                                    }}
-                                >
-                                    ❤
-                                </span>
-                                {tile.totalLikes}
-                            </div>
-                        </div>
-
-                    ))}
-                    {isLoading &&
-                        <div className="loading">Загрузка...</div>}
-                </div>
+                <TileGrid tiles={tiles} onLike={handleLike} lastTileRef={lastTileRef} isLoading={isLoading}
+                          error={error}/>
 
                 {showLoginPopup && (
-                    <div className="popup-overlay" onClick={() => setShowLoginPopup(false)}>
-                        <div className="popup-content" onClick={(e) => e.stopPropagation()}>
-                            <h3>Вы не авторизованы</h3>
-                            <p>Чтобы воспользоваться этой функцией, войдите в аккаунт.</p>
-                            <button onClick={() => navigate("/login")} className="login-button-popup">
-                                Войти
-                            </button>
-                        </div>
-                    </div>
+                    <LoginPopup onClose={() => setShowLoginPopup(false)} onLogin={() => navigate("/login")}/>
                 )}
             </div>
         </div>
