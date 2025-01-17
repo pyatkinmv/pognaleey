@@ -72,7 +72,7 @@ body {
     color: #333;
     font-weight: bold;
     font-size: 1.25rem; /* Размер текста 20px */
-    transition: color 0.3s;
+    transition: color 0.2s;
 }
 
 .nav-link:hover {
@@ -85,7 +85,8 @@ body {
     /*margin: 0 0 0 0;*/
     padding: 0.25rem;
     position: relative; /* Создаем контекст для позиционирования dropdown */
-    display: inline-block;
+    display: inline-flex; /* Используем flexbox для размещения иконки и текста */
+    align-items: center; /* Центрируем элементы по вертикали */
     cursor: pointer;
 }
 
@@ -95,8 +96,27 @@ body {
     font-weight: bold;
     color: #333;
     text-align: center; /* Центрируем текст */
-    transition: color 0.3s;
+    transition: color 0.2s ease; /* Плавная анимация при наведении */
 }
+
+.user-menu:hover .user-name {
+    color: #dd746b;
+}
+
+.profile-icon {
+    mask: url('../public/profile.svg') center/contain no-repeat;
+    -webkit-mask: url('../public/profile.svg') center/contain no-repeat;
+    background-color: #333; /* Основной цвет */
+    transition: background-color 0.2s ease;
+    width: 1.5rem;
+    height: 1.5rem;
+    margin-right: 0.5rem;
+}
+
+.user-menu:hover .profile-icon {
+    background-color: #dd746b; /* Цвет при наведении */
+}
+
 
 /* Выпадающее меню */
 .dropdown-menu {
@@ -116,10 +136,6 @@ body {
     opacity: 0; /* Элемент полностью прозрачный */
 }
 
-.user-name:hover {
-    color: #dd746b;
-}
-
 /* Показываем меню при наведении */
 .user-menu:hover .dropdown-menu {
     visibility: visible; /* Делаем видимым */
@@ -134,13 +150,13 @@ body {
     font-size: 1rem;
     font-weight: bold;
     cursor: pointer;
-    transition: color 0.3s;
+    transition: color 0.2s;
 }
 
 /* Эффект наведения */
 .dropdown-menu button:hover {
     color: #dd746b;
-    transition: color 0.3s;
+    transition: color 0.2s;
 }
 
 /* Контейнер для изображения */
@@ -187,7 +203,7 @@ body {
     cursor: pointer; /* Указатель при наведении */
     text-shadow: 0.125rem 0.125rem 0.25rem rgba(0, 0, 0, 0.6); /* Тень для читаемости */
     box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.5); /* Добавляем тень для кнопки */
-    transition: all 0.3s ease; /* Плавный переход для эффектов */
+    transition: all 0.2s ease; /* Плавный переход для эффектов */
 }
 
 /* Ховер эффект */
@@ -231,7 +247,7 @@ body {
 /* Эффект наведения для плитки */
 .tile {
     cursor: pointer; /* Указатель при наведении */
-    transition: transform 0.3s ease, box-shadow 0.3s ease; /* Плавный переход для эффекта */
+    transition: transform 0.2s ease, box-shadow 0.2s ease; /* Плавный переход для эффекта */
 }
 
 .tile:hover {
@@ -307,7 +323,7 @@ body {
 .like-button {
     font-size: 1.5rem; /* Размер сердечка */
     cursor: pointer; /* Указатель при наведении */
-    transition: color 0.3s ease; /* Плавный переход цвета */
+    transition: color 0.2s ease; /* Плавный переход цвета */
     color: lightcoral; /* Цвет сердечка по умолчанию */
 }
 
@@ -372,7 +388,7 @@ body {
     font-size: 1rem;
     font-weight: bold;
     cursor: pointer;
-    transition: background-color 0.3s ease;
+    transition: background-color 0.2s ease;
 }
 
 .login-button-popup:hover {

@@ -38,9 +38,6 @@ const Main: React.FC = () => {
         }
     };
 
-    const [isDropdownVisible, setIsDropdownVisible] = useState<boolean>(false); // Состояние для показа меню
-
-
     const handleLogout = () => {
         localStorage.removeItem("jwtToken");
         setUser({username: null});
@@ -172,19 +169,16 @@ const Main: React.FC = () => {
                         <a href="/" className="nav-link">Главная</a>
                         <a href="/contacts" className="nav-link">Контакты</a>
                         <a href="/language" className="nav-link">🌐 Язык</a>
-                        <div
-                            className="user-menu"
-                            onMouseEnter={() => setIsDropdownVisible(true)}
-                            onMouseLeave={() => setIsDropdownVisible(false)}
-                        >
+                        <div className="user-menu">
                             {user.username ? (
                                 <>
-                                    <span className="user-name">✨ {user.username}</span>
-                                    {isDropdownVisible && (
+                                    <div className="profile-icon"></div>
+                                    <span className="user-name">{user.username}</span>
+                                    {
                                         <div className="dropdown-menu">
                                             <button onClick={handleLogout}>Выйти</button>
                                         </div>
-                                    )}
+                                    }
                                 </>
                             ) : (
                                 <a href="/login" className="nav-link">🔒 Войти</a>
