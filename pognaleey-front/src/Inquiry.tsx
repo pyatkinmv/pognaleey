@@ -2,7 +2,8 @@ import React, {useState} from "react";
 import {useNavigate} from "react-router-dom"; // Для перехода между страницами
 import "./Inquiry.css";
 import apiClient from "./apiClient";
-import Header from "./Header"; // Подключаем стили
+import Header from "./Header";
+import MainContainer from "./MainContainer";
 
 const Inquiry: React.FC = () => {
     const [formData, setFormData] = useState({
@@ -13,6 +14,7 @@ const Inquiry: React.FC = () => {
         transport: [] as string[],
         season: "",
         to: "",
+        from: "", // Добавляем поле "откуда"
         companions: "",
         additionalPreferences: "",
     });
@@ -98,11 +100,10 @@ const Inquiry: React.FC = () => {
     ];
 
     const budgetOptions = [
-        {value: "до 20 000", label: "До 20 000 ₽", icon: "🪙"},
-        {value: "20 000 - 50 000", label: "20 000 - 50 000 ₽", icon: "💵"},
-        {value: "50 000 - 100 000", label: "50 000 - 100 000 ₽", icon: "💳"},
-        {value: "100 000 - 200 000", label: "100 000 - 200 000 ₽", icon: "💼"},
-        {value: "от 200 000", label: "Свыше 200 000 ₽", icon: "💎"}
+        {value: "economy", label: "Хочу сэкономить", icon: "🪙"}, // Economy — Экономичный
+        {value: "standard", label: "Стандартный", icon: "💵"}, // Standard — Стандартный
+        {value: "comfort", label: "Комфортный", icon: "💳"}, // Comfort — Комфортный
+        {value: "luxury", label: "Максимальный комфорт", icon: "💎"} // Luxury — Роскошный
     ];
 
     const preferencesOptions = [
@@ -159,6 +160,25 @@ const Inquiry: React.FC = () => {
         });
     };
 
+    const fetchLocation = async () => {
+        try {
+            const response = await fetch("https://cors-anywhere.herokuapp.com/https://ipapi.co/json/");
+            if (response.ok) {
+                const data = await response.json();
+                const city: string = data.city;
+                const country = data.country_name;
+
+                console.log(`Примерное местоположение: Город - ${city}, Страна - ${country}`);
+                return city
+
+            } else {
+                console.error("Ошибка получения данных местоположения.");
+            }
+        } catch (error) {
+            console.error("Ошибка при запросе:", error);
+        }
+    };
+
     const handleCardSingleSelect = (field: keyof typeof formData, value: string) => {
         setFormData((prevData) => ({
             ...prevData,
@@ -168,158 +188,172 @@ const Inquiry: React.FC = () => {
 
 
     return (
-        <div>
+        <MainContainer>
             <Header/>
+            {/*<LocationInput></LocationInput>*/}
+            {/*<form onSubmit={handleSubmit}>*/}
+            <div className="form-heading">
+                Заполните, чтобы мы могли предложить для вас идеальное путешествие!
+            </div>
 
-            <form onSubmit={handleSubmit}>
-                <div className="form-heading">
-                    Заполните, чтобы мы могли предложить для вас идеальное путешествие!
+            {/* Цель поездки */}
+            <QuestionContainer label="Какова цель вашего путешествия?">
+                <div className="card-grid">
+                    {purposeOptions.map((option) => (
+                        <div
+                            key={option.value}
+                            className={`card ${formData.purpose.includes(option.value) ? "selected" : ""}`}
+                            onClick={() => handleCardMultiSelect("purpose", option.value)}
+                        >
+                            <div className="card-icon">{option.icon}</div>
+                            <div className="card-label">{option.label}</div>
+                        </div>
+                    ))}
                 </div>
-
-                {/* Цель поездки */}
-                <QuestionContainer label="Какова цель вашего путешествия?">
-                    <div className="card-grid">
-                        {purposeOptions.map((option) => (
-                            <div
-                                key={option.value}
-                                className={`card ${formData.purpose.includes(option.value) ? "selected" : ""}`}
-                                onClick={() => handleCardMultiSelect("purpose", option.value)}
-                            >
-                                <div className="card-icon">{option.icon}</div>
-                                <div className="card-label">{option.label}</div>
-                            </div>
-                        ))}
-                    </div>
-                </QuestionContainer>
+            </QuestionContainer>
 
 
-                {/* Вопрос о компаньонах */}
-                {/* Цель поездки */}
-                <QuestionContainer label="С кем вы путешествуете?">
-                    <div className="card-grid">
-                        {companionOptions.map((option) => (
-                            <div
-                                key={option.value}
-                                className={`card ${formData.companions === option.value ? "selected" : ""}`}
-                                onClick={() => handleCardSingleSelect("companions", option.value)}
-                            >
-                                <div className="card-icon">{option.icon}</div>
-                                <div className="card-label">{option.label}</div>
-                            </div>
-                        ))}
-                    </div>
-                </QuestionContainer>
+            {/* Вопрос о компаньонах */}
+            {/* Цель поездки */}
+            <QuestionContainer label="С кем вы путешествуете?">
+                <div className="card-grid">
+                    {companionOptions.map((option) => (
+                        <div
+                            key={option.value}
+                            className={`card ${formData.companions === option.value ? "selected" : ""}`}
+                            onClick={() => handleCardSingleSelect("companions", option.value)}
+                        >
+                            <div className="card-icon">{option.icon}</div>
+                            <div className="card-label">{option.label}</div>
+                        </div>
+                    ))}
+                </div>
+            </QuestionContainer>
 
-                <QuestionContainer label="Какой вид транспорта вы предпочитаете?">
-                    <div className="card-grid">
-                        {transportOptions.map((option) => (
-                            <div
-                                key={option.value}
-                                className={`card ${formData.transport.includes(option.value) ? "selected" : ""}`}
-                                onClick={() => handleCardMultiSelect("transport", option.value)}
-                            >
-                                <div className="card-icon">{option.icon}</div>
-                                <div className="card-label">{option.label}</div>
-                            </div>
-                        ))}
-                    </div>
-                </QuestionContainer>
+            <QuestionContainer label="Какой вид транспорта вы предпочитаете?">
+                <div className="card-grid">
+                    {transportOptions.map((option) => (
+                        <div
+                            key={option.value}
+                            className={`card ${formData.transport.includes(option.value) ? "selected" : ""}`}
+                            onClick={() => handleCardMultiSelect("transport", option.value)}
+                        >
+                            <div className="card-icon">{option.icon}</div>
+                            <div className="card-label">{option.label}</div>
+                        </div>
+                    ))}
+                </div>
+            </QuestionContainer>
 
-                {/* Бюджет */}
-                <QuestionContainer label="Каков ваш примерный бюджет на человека?">
-                    <div className="card-grid">
-                        {budgetOptions.map((option) => (
-                            <div
-                                key={option.value}
-                                className={`card ${formData.budget === option.value ? "selected" : ""}`}
-                                onClick={() => handleCardSingleSelect("budget", option.value)}
-                            >
-                                <div className="card-icon">{option.icon}</div>
-                                <div className="card-label">{option.label}</div>
-                            </div>
-                        ))}
-                    </div>
-                </QuestionContainer>
+            {/* Бюджет */}
+            <QuestionContainer label="Каков ваш бюджет на путешествие?">
+                <div className="card-grid">
+                    {budgetOptions.map((option) => (
+                        <div
+                            key={option.value}
+                            className={`card ${formData.budget === option.value ? "selected" : ""}`}
+                            onClick={() => handleCardSingleSelect("budget", option.value)}
+                        >
+                            <div className="card-icon">{option.icon}</div>
+                            <div className="card-label">{option.label}</div>
+                        </div>
+                    ))}
+                </div>
+            </QuestionContainer>
 
-                {/* Куда */}
-                <QuestionContainer label="Куда вы хотите поехать?">
-                    <div className="card-grid">
-                        {regionOptions.map((option) => (
-                            <div
-                                key={option.value}
-                                className={`card ${formData.to === option.value ? "selected" : ""} card-narrow`}
-                                onClick={() => handleCardSingleSelect("to", option.value)}
-                            >
-                                <div className="card-icon">{option.icon}</div>
-                                <div className="card-label">{option.label}</div>
-                            </div>
-                        ))}
-                    </div>
-                </QuestionContainer>
+            {/* Куда */}
+            <QuestionContainer label="Куда вы хотите поехать?">
+                <div className="card-grid">
+                    {regionOptions.map((option) => (
+                        <div
+                            key={option.value}
+                            className={`card ${formData.to === option.value ? "selected" : ""} card-narrow`}
+                            onClick={() => handleCardSingleSelect("to", option.value)}
+                        >
+                            <div className="card-icon">{option.icon}</div>
+                            <div className="card-label">{option.label}</div>
+                        </div>
+                    ))}
+                </div>
+            </QuestionContainer>
 
-                {/* Вопрос о предпочтениях */}
-                <QuestionContainer label="Какие направления и условия отдыха вас интересуют?">
-                    <div className="card-grid">
-                        {preferencesOptions.map((option) => (
-                            <div
-                                key={option.value}
-                                className={`card ${formData.preferences.includes(option.value) ? "selected" : ""} card-small`}
-                                onClick={() => handleCardMultiSelect("preferences", option.value)}
-                            >
-                                <div className="card-icon">{option.icon}</div>
-                                <div className="card-label">{option.label}</div>
-                            </div>
-                        ))}
-                    </div>
-                </QuestionContainer>
+            {/* Вопрос о предпочтениях */}
+            <QuestionContainer label="Какие направления и условия отдыха вас интересуют?">
+                <div className="card-grid">
+                    {preferencesOptions.map((option) => (
+                        <div
+                            key={option.value}
+                            className={`card ${formData.preferences.includes(option.value) ? "selected" : ""} card-small`}
+                            onClick={() => handleCardMultiSelect("preferences", option.value)}
+                        >
+                            <div className="card-icon">{option.icon}</div>
+                            <div className="card-label">{option.label}</div>
+                        </div>
+                    ))}
+                </div>
+            </QuestionContainer>
 
-                {/* Сезон */}
-                <QuestionContainer label="Когда вы планируете путешествовать?">
-                    <div className="card-grid">
-                        {seasonOptions.map((option) => (
-                            <div
-                                key={option.value}
-                                className={`card ${formData.season === option.value ? "selected" : ""}`}
-                                onClick={() => handleCardSingleSelect("season", option.value)}
-                            >
-                                <div className="card-icon">{option.icon}</div>
-                                <div className="card-label">{option.label}</div>
-                            </div>
-                        ))}
-                    </div>
-                </QuestionContainer>
+            {/* Сезон */}
+            <QuestionContainer label="Когда вы планируете путешествовать?">
+                <div className="card-grid">
+                    {seasonOptions.map((option) => (
+                        <div
+                            key={option.value}
+                            className={`card ${formData.season === option.value ? "selected" : ""}`}
+                            onClick={() => handleCardSingleSelect("season", option.value)}
+                        >
+                            <div className="card-icon">{option.icon}</div>
+                            <div className="card-label">{option.label}</div>
+                        </div>
+                    ))}
+                </div>
+            </QuestionContainer>
 
-                {/* Вопрос о продолжительности */}
-                <QuestionContainer label="Какова продолжительность вашей поездки?">
-                    <div className="card-grid">
-                        {durationOptions.map((option) => (
-                            <div
-                                key={option.value}
-                                className={`card ${formData.duration === option.value ? "selected" : ""} card-short`}
-                                onClick={() => handleCardSingleSelect("duration", option.value)}
-                            >
-                                <div className="card-label">{option.label}</div>
-                            </div>
-                        ))}
-                    </div>
-                </QuestionContainer>
+            {/* Вопрос о продолжительности */}
+            <QuestionContainer label="Какова продолжительность вашей поездки?">
+                <div className="card-grid">
+                    {durationOptions.map((option) => (
+                        <div
+                            key={option.value}
+                            className={`card ${formData.duration === option.value ? "selected" : ""} card-short`}
+                            onClick={() => handleCardSingleSelect("duration", option.value)}
+                        >
+                            <div className="card-label">{option.label}</div>
+                        </div>
+                    ))}
+                </div>
+            </QuestionContainer>
 
-                {/* Дополнительные предпочтения */}
-                <QuestionContainer label="Есть ли у вас дополнительные предпочтения?">
-                    <textarea
-                        id="additionalPreferences"
-                        name="additionalPreferences"
-                        rows={4}
-                        placeholder="Напишите любые дополнительные детали"
-                        value={formData.additionalPreferences}
-                        onChange={handleChange}
-                    />
-                </QuestionContainer>
+            {/* Вопрос: Откуда вы начнете путешествие? */}
+            <QuestionContainer label="Откуда вы начнете путешествие?">
+                <input
+                    type="text"
+                    name="from"
+                    value={formData.from}
+                    onChange={handleChange}
+                    maxLength={25} // Ограничение на количество символов
+                    placeholder="Введите ваш город"
+                    className="text-input"
+                />
+            </QuestionContainer>
 
-                {/* Кнопка отправки */}
-                <button type="submit">Отправить</button>
-            </form>
-        </div>
+            {/* Дополнительные предпочтения */}
+            <QuestionContainer label="Есть ли у вас дополнительные предпочтения?">
+                <input
+                    type="text"
+                    name="additionalPreferences"
+                    value={formData.additionalPreferences}
+                    onChange={handleChange}
+                    maxLength={50} // Ограничение на количество символов
+                    placeholder="Напишите любые дополнительные детали"
+                    className="text-input"
+                />
+            </QuestionContainer>
+
+            {/* Кнопка отправки */}
+            <button type="submit">Отправить</button>
+            {/*</form>*/}
+        </MainContainer>
     );
 };
 
