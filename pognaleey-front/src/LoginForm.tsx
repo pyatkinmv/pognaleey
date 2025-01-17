@@ -3,6 +3,7 @@ import {Link, useNavigate} from "react-router-dom";
 import "./LoginForm.css";
 import {validatePassword, validateUsername} from "./validators";
 import Header from "./Header";
+import {useAppContext} from "./AppContext";
 
 
 const LoginForm: React.FC = () => {
@@ -46,6 +47,8 @@ const LoginForm: React.FC = () => {
         });
     };
 
+    const {loginUser} = useAppContext(); // Используем loginUser из контекста
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
@@ -62,7 +65,7 @@ const LoginForm: React.FC = () => {
 
             if (response.ok) {
                 const token = await response.text(); // Получаем токен как текст
-                localStorage.setItem("jwtToken", token); // Сохраняем токен в локальное хранилище
+                loginUser(token); // Обновляем контекст пользователя
 
                 alert("Успешный вход в систему!");
                 navigate("/"); // Редирект на главную страницу
