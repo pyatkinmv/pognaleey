@@ -7,6 +7,7 @@ import FilterButtons from "./FilterButtons";
 import TileGrid from "./TileGrid";
 import LoginPopup from "./LoginPopup";
 import apiClient from "./apiClient";
+import MainContainer from "./MainContainer";
 
 const Main: React.FC = () => {
     const navigate = useNavigate();
@@ -121,25 +122,22 @@ const Main: React.FC = () => {
     }, [lastTileRef, hasMore, isLoading]);
 
     return (
-        <div className="main-container">
-            <div className="content-container">
-                <Header/>
-                <div className="image-container">
-                    <img src="/main.webp" alt="Main Banner" className="banner-image"/>
-                    <div className="banner-text">Каждое путешествие<br/>начинается с идеи!</div>
-                    <button className="action-button" onClick={() => navigate("/travel-inquiries")}>Погнали!</button>
-                </div>
-
-                <FilterButtons selectedFilter={selectedFilter} onFilterChange={handleFilterChange}/>
-
-                <TileGrid tiles={tiles} onLike={handleLike} lastTileRef={lastTileRef} isLoading={isLoading}
-                          error={error}/>
-
-                {showLoginPopup && (
-                    <LoginPopup onClose={() => setShowLoginPopup(false)} onLogin={() => navigate("/login")}/>
-                )}
+        <MainContainer>
+            <Header/>
+            <div className="image-container">
+                <img src="/main.webp" alt="Main Banner" className="banner-image"/>
+                <div className="banner-text">Каждое путешествие<br/>начинается с идеи!</div>
+                <button className="action-button" onClick={() => navigate("/travel-inquiries")}>Погнали!</button>
             </div>
-        </div>
+
+            <FilterButtons selectedFilter={selectedFilter} onFilterChange={handleFilterChange}/>
+
+            <TileGrid tiles={tiles} onLike={handleLike} lastTileRef={lastTileRef} isLoading={isLoading} error={error}/>
+
+            {showLoginPopup && (
+                <LoginPopup onClose={() => setShowLoginPopup(false)} onLogin={() => navigate("/login")}/>
+            )}
+        </MainContainer>
     );
 };
 

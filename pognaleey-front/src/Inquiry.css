@@ -96,8 +96,10 @@
   font-size: 12px; /* Уменьшение размера текста */
 }
 
+
 .question-container {
   display: flex;
+  margin-bottom: 20px;
   flex-direction: column;
   align-items: center; /* Центрирование по горизонтали */
   justify-content: center; /* Центрирование по вертикали, если нужно */

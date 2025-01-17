@@ -67,19 +67,6 @@ button {
   width: 100%;
 }
 
-/* Анимация при наведении на кнопку */
-/*button:hover {*/
-/*  background-color: #EB6B3B; !* При наведении — оранжевый *!*/
-/*  transform: translateY(-2px);*/
-/*}*/
-
-/* Контейнер для каждого вопроса */
-.question-container {
-  margin-bottom: 20px;
-  display: flex;
-  flex-direction: column;
-}
-
 /* Заголовок формы */
 .form-heading {
   text-align: center;

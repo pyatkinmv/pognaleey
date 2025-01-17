@@ -36,4 +36,4 @@ gpt-client:
     api-key: ${CHAT_GPT_API_KEY}
 jwt:
   secret: ${JWT_SECRET}
-  token-validity-time-minutes: 1440 # 24 hours
+  token-validity-time-minutes: 34560 # 1 week

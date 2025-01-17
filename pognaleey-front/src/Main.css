@@ -12,26 +12,6 @@ body {
     font-size: 1rem;
 }
 
-/* Контейнер страницы */
-.main-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    min-height: 100vh;
-}
-
-/* Контент */
-.content-container {
-    background-color: #d0c9c7;
-    width: 80rem;
-    border-radius: 0.625rem;
-    box-shadow: 0 0.25rem 0.625rem rgba(0, 0, 0, 0.2);
-    overflow: hidden;
-    min-height: 100vh;
-    height: auto;
-    margin-bottom: 2rem;
-}
-
 /* Контейнер для изображения */
 .image-container {
     position: relative;
