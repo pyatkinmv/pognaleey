@@ -5,7 +5,6 @@ import apiClient from "./apiClient"; // Импортируем API клиент
 
 const Main: React.FC = () => {
     const navigate = useNavigate();
-
     const [selectedFilter, setSelectedFilter] = useState<string>("feed");
     const [tiles, setTiles] = useState<any[]>([]);
     const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -13,9 +12,40 @@ const Main: React.FC = () => {
     const [page, setPage] = useState<number>(0);
     const [hasMore, setHasMore] = useState<boolean>(true);
     const [showLoginPopup, setShowLoginPopup] = useState<boolean>(false); // Видимость попапа
+    const [user, setUser] = useState<{ username: string | null }>({username: null}); // Информация о пользователе
 
     const observer = useRef<IntersectionObserver | null>(null);
     const lastTileRef = useRef<HTMLDivElement | null>(null);
+
+    // Загрузка информации о пользователе
+    useEffect(() => {
+        const token = localStorage.getItem("jwtToken");
+        if (token) {
+            // Замените это на реальный запрос к API для получения информации о пользователе
+            const username = token ? getUsernameFromToken(token) : null;
+            setUser({username: username});
+        }
+    }, []);
+
+    const getUsernameFromToken = (token: string) => {
+        try {
+            const payloadBase64 = token.split('.')[1];
+            const decodedPayload = JSON.parse(atob(payloadBase64));
+            return decodedPayload.name || decodedPayload.sub || null;
+        } catch (error) {
+            console.error(error);
+            return null;
+        }
+    };
+
+    const [isDropdownVisible, setIsDropdownVisible] = useState<boolean>(false); // Состояние для показа меню
+
+
+    const handleLogout = () => {
+        localStorage.removeItem("jwtToken");
+        setUser({username: null});
+        navigate("/");
+    };
 
     const handleButtonClick = () => {
         navigate(`/travel-inquiries`);
@@ -137,18 +167,29 @@ const Main: React.FC = () => {
         <div className="main-container">
             <div className="content-container">
                 <header className="header">
-                    {/* Логотип слева */}
-                    <img
-                        src="/logo-circle192.png"
-                        alt="Логотип"
-                        className="logo"
-                    />
-                    {/* Навигация */}
+                    <img src="/logo-circle192.png" alt="Логотип" className="logo"/>
                     <nav className="navbar">
                         <a href="/" className="nav-link">Главная</a>
                         <a href="/contacts" className="nav-link">Контакты</a>
-                        <a href="/language" className="nav-link">Язык</a>
-                        <a href="/login" className="nav-link">Войти</a>
+                        <a href="/language" className="nav-link">🌐 Язык</a>
+                        <div
+                            className="user-menu"
+                            onMouseEnter={() => setIsDropdownVisible(true)}
+                            onMouseLeave={() => setIsDropdownVisible(false)}
+                        >
+                            {user.username ? (
+                                <>
+                                    <span className="user-name">✨ {user.username}</span>
+                                    {isDropdownVisible && (
+                                        <div className="dropdown-menu">
+                                            <button onClick={handleLogout}>Выйти</button>
+                                        </div>
+                                    )}
+                                </>
+                            ) : (
+                                <a href="/login" className="nav-link">🔒 Войти</a>
+                            )}
+                        </div>
                     </nav>
                 </header>
                 <div className="image-container">

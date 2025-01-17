@@ -49,6 +49,7 @@ body {
 /* Логотип */
 .logo {
     /*border: 1px solid black;*/
+    padding: 0.2rem 0 0.2rem 1rem;
     height: 3rem; /* Высота логотипа */
     width: auto; /* Сохраняем пропорции */
 }
@@ -75,9 +76,72 @@ body {
 }
 
 .nav-link:hover {
-    color: #dd746b; /* Цвет при наведении */
+    color: #dd746b;
 }
 
+/* Меню пользователя */
+.user-menu {
+    /*border: 1px solid black;*/
+    /*margin: 0 0 0 0;*/
+    padding: 0.25rem;
+    position: relative; /* Создаем контекст для позиционирования dropdown */
+    display: inline-block;
+    cursor: pointer;
+}
+
+/* Имя пользователя */
+.user-name {
+    font-size: 1.25rem;
+    font-weight: bold;
+    color: #333;
+    text-align: center; /* Центрируем текст */
+    transition: color 0.3s;
+}
+
+/* Выпадающее меню */
+.dropdown-menu {
+    position: absolute;
+    top: 100%;
+    /*left: 50%;*/
+    /*transform: translateX(-50%);*/
+    background-color: white;
+    border: 1px solid #ddd;
+    border-radius: 0.5rem;
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.5);
+    padding: 0.2rem 1.0rem;
+    z-index: 1000;
+    text-align: center;
+    /* Начальное состояние */
+    visibility: hidden; /* Элемент невиден */
+    opacity: 0; /* Элемент полностью прозрачный */
+}
+
+.user-name:hover {
+    color: #dd746b;
+}
+
+/* Показываем меню при наведении */
+.user-menu:hover .dropdown-menu {
+    visibility: visible; /* Делаем видимым */
+    opacity: 1; /* Устанавливаем полную непрозрачность */
+}
+
+/* Кнопка внутри выпадающего меню */
+.dropdown-menu button {
+    background-color: transparent;
+    border: none;
+    color: #333;
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: color 0.3s;
+}
+
+/* Эффект наведения */
+.dropdown-menu button:hover {
+    color: #dd746b;
+    transition: color 0.3s;
+}
 
 /* Контейнер для изображения */
 .image-container {
@@ -129,7 +193,8 @@ body {
 /* Ховер эффект */
 .action-button:hover {
     background-color: #c66059; /* Темнее при наведении */
-    box-shadow: 0 0.375rem 0.625rem rgba(0, 0, 0, 0.4); /* Более выраженная тень */
+    box-shadow: 0 0.375rem 0.625rem rgba(0, 0, 0, 0.4);
+    transform: translateY(-0.2rem)
 }
 
 /* Состояние "нажатия" */

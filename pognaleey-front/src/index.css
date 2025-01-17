@@ -69,10 +69,10 @@ button {
 }
 
 /* Анимация при наведении на кнопку */
-button:hover {
-  background-color: #EB6B3B; /* При наведении — оранжевый */
-  transform: translateY(-2px);
-}
+/*button:hover {*/
+/*  background-color: #EB6B3B; !* При наведении — оранжевый *!*/
+/*  transform: translateY(-2px);*/
+/*}*/
 
 /* Контейнер для каждого вопроса */
 .question-container {
