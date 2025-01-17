@@ -1,0 +1,78 @@
+.header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background-color: #c6c0bb;
+    width: 100%;
+    padding: 0;
+    margin: 0;
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.1);
+}
+
+.logo {
+    padding: 0.2rem 0 0.2rem 1rem;
+    height: 3rem;
+    width: auto;
+}
+
+.navbar {
+    flex-grow: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 0.5rem;
+    gap: 8rem;
+}
+
+.nav-link {
+    text-decoration: none;
+    color: #333;
+    font-weight: bold;
+    font-size: 1.25rem;
+    transition: color 0.2s;
+}
+
+.nav-link:hover {
+    color: #dd746b;
+}
+
+.user-menu {
+    padding: 0.25rem;
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    cursor: pointer;
+}
+
+.user-name {
+    font-size: 1.25rem;
+    font-weight: bold;
+    color: #333;
+    text-align: center;
+    transition: color 0.2s ease;
+}
+
+.user-menu:hover .user-name {
+    color: #dd746b;
+}
+
+.user-menu:hover .profile-icon {
+    background-color: #dd746b;
+}
+
+.profile-icon {
+    mask: url('../public/profile.svg') center/contain no-repeat;
+    -webkit-mask: url('../public/profile.svg') center/contain no-repeat;
+    background-color: #333;
+    transition: background-color 0.2s ease;
+    width: 1.5rem;
+    height: 1.5rem;
+    margin-right: 0.5rem;
+}
+
+.language-flag {
+    width: 1.5rem;
+    height: auto;
+    margin-right: 0.5rem;
+    vertical-align: middle;
+}
