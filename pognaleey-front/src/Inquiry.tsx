@@ -13,8 +13,8 @@ const Inquiry: React.FC = () => {
         duration: "",
         transport: [] as string[],
         season: "",
-        to: "",
-        from: "", // Добавляем поле "откуда"
+        locationTo: "",
+        locationFrom: "", // Добавляем поле "откуда"
         companions: "",
         additionalPreferences: "",
     });
@@ -110,8 +110,8 @@ const Inquiry: React.FC = () => {
         {value: "море и пляжи", label: "Море и пляжи", icon: "🏖️"}, // Пляжный отдых
         {value: "спа", label: "СПА", icon: "🛀"}, // СПА и релакс
         {value: "горы", label: "Горы", icon: "🏔️"}, // Активный отдых в горах
-        {value: "город", label: "Мегаполисы", icon: "🏙️"}, // Экскурсии и культурный туризм
-        {value: "село", label: "Сельская местность", icon: "🐓"},
+        {value: "мегаполис", label: "Мегаполисы", icon: "🏙️"}, // Экскурсии и культурный туризм
+        {value: "сельская местность", label: "Сельская местность", icon: "🐓"},
         {value: "кемпинг", label: "Кемпинг", icon: "⛺"}, // СПА и релакс
         {value: "история и культура", label: "История и культура", icon: "🎭"}, // Исторический туризм
         {value: "лыжи", label: "Горнолыжка", icon: "🎿"}, // Лыжи, снег
@@ -160,25 +160,6 @@ const Inquiry: React.FC = () => {
         });
     };
 
-    const fetchLocation = async () => {
-        try {
-            const response = await fetch("https://cors-anywhere.herokuapp.com/https://ipapi.co/json/");
-            if (response.ok) {
-                const data = await response.json();
-                const city: string = data.city;
-                const country = data.country_name;
-
-                console.log(`Примерное местоположение: Город - ${city}, Страна - ${country}`);
-                return city
-
-            } else {
-                console.error("Ошибка получения данных местоположения.");
-            }
-        } catch (error) {
-            console.error("Ошибка при запросе:", error);
-        }
-    };
-
     const handleCardSingleSelect = (field: keyof typeof formData, value: string) => {
         setFormData((prevData) => ({
             ...prevData,
@@ -193,7 +174,7 @@ const Inquiry: React.FC = () => {
             {/*<LocationInput></LocationInput>*/}
             {/*<form onSubmit={handleSubmit}>*/}
             <div className="form-heading">
-                Заполните, чтобы мы могли предложить для вас идеальное путешествие!
+                Ответьте на вопросы, чтобы мы могли подобрать идеальное путешествие!
             </div>
 
             {/* Цель поездки */}
@@ -267,8 +248,8 @@ const Inquiry: React.FC = () => {
                     {regionOptions.map((option) => (
                         <div
                             key={option.value}
-                            className={`card ${formData.to === option.value ? "selected" : ""} card-narrow`}
-                            onClick={() => handleCardSingleSelect("to", option.value)}
+                            className={`card ${formData.locationTo === option.value ? "selected" : ""} card-narrow`}
+                            onClick={() => handleCardSingleSelect("locationTo", option.value)}
                         >
                             <div className="card-icon">{option.icon}</div>
                             <div className="card-label">{option.label}</div>
@@ -328,8 +309,8 @@ const Inquiry: React.FC = () => {
             <QuestionContainer label="Откуда вы начнете путешествие?">
                 <input
                     type="text"
-                    name="from"
-                    value={formData.from}
+                    name="locationFrom"
+                    value={formData.locationFrom}
                     onChange={handleChange}
                     maxLength={25} // Ограничение на количество символов
                     placeholder="Введите ваш город"
@@ -351,7 +332,7 @@ const Inquiry: React.FC = () => {
             </QuestionContainer>
 
             {/* Кнопка отправки */}
-            <button type="submit">Отправить</button>
+            <button className="button" type="submit" onClick={handleSubmit}>Отправить</button>
             {/*</form>*/}
         </MainContainer>
     );

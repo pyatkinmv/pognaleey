@@ -8,7 +8,6 @@
     max-width: 80%; /* Фиксированная часть от content-container */
     margin-left: auto;
     margin-right: auto;
-    /*border: 1px solid;*/
 }
 
 .card {
@@ -18,41 +17,26 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    border: 0.125rem solid #ccc; /* 2px */
+    border: 0.1rem solid #c6c0bb; /* Основной цвет границы */
     border-radius: 0.625rem; /* 10px */
-    background-color: #f1e7dd;
+    background-color: #f1e7dd; /* Светлый фон, согласованный с Main.css */
     cursor: pointer;
     transition: all 0.3s ease;
-    box-shadow: 0 0.25rem 0.375rem rgba(0, 0, 0, 0.1); /* 4px 6px */
+    box-shadow: 0 0.25rem 0.375rem rgba(0, 0, 0, 0.2); /* Легкая тень */
 }
 
 .card:hover {
-    border-color: #4caf50;
-}
-
-/* Заголовок формы */
-.form-heading {
-    /*border: 1px solid;*/
-    text-align: center;
-    font-size: 2em;
-    font-weight: bold;
-    color: #2c3e50;
-}
-
-/* Стиль формы */
-form {
-    /*border: 1px solid;*/
-    max-width: 50rem; /* 800px */
-    /*margin: 1.25rem auto; !* 20px *!*/
-    background: #ffffff; /* Белый фон для контраста */
-    padding: 1.25rem 1.875rem; /* 20px 30px */
-    border-radius: 0.9375rem; /* 15px */
-    box-shadow: 0 0.375rem 0.9375rem rgba(0, 0, 0, 0.1); /* 6px 15px */
+    border-color: darkseagreen; /* Цвет выделения */
+    background-color: #dfe1cc; /* Фон при наведении */
+    box-shadow: 0 0.375rem 0.625rem rgba(0, 0, 0, 0.3); /* Увеличенная тень */
+    transform: translateY(-0.2rem); /* Лёгкое поднятие плитки */
 }
 
 .card.selected {
-    border-color: #4caf50;
-    background-color: #e8f5e9;
+    transform: translateY(-0.2rem); /* Лёгкое поднятие плитки */
+    border-color: darkseagreen; /* Цвет выделения */
+    background-color: #dfebcc; /* Цвет выделенной карточки */
+    box-shadow: 0 0.375rem 0.625rem rgba(0, 0, 0, 0.3); /* Увеличенная тень */
 }
 
 .card-icon {
@@ -64,48 +48,40 @@ form {
     text-align: center;
     font-weight: bold;
     font-size: 0.875rem; /* 14px */
+    color: #333; /* Основной цвет текста */
 }
 
-/* Дополнительные стили для уменьшенных карточек */
-.card-small {
-    width: 5rem; /* 80px */
-    height: 4.375rem; /* 70px */
+/* Заголовок формы */
+.form-heading {
+    text-align: center;
+    font-size: 2em;
+    font-weight: bold;
+    color: #2c3e50;
+    margin-bottom: 1rem;
 }
 
-/* Дополнительные стили для уменьшенных карточек */
-.card-narrow {
-    width: 8rem; /* 118px */
-    height: 6rem; /* 100px */
-}
-
-/* Дополнительные стили для уменьшенных карточек */
-.card-short {
-    width: 9rem; /* 130px */
-    height: 3.125rem; /* 50px */
-}
-
-.card-small .card-icon {
-    font-size: 1.5rem; /* 24px */
-}
-
-.card-small .card-label {
-    font-size: 0.75rem; /* 12px */
+/* Стиль формы */
+form {
+    max-width: 50rem; /* 800px */
+    background: #ffffff; /* Белый фон для контраста */
+    padding: 1.25rem 1.875rem; /* 20px 30px */
+    border-radius: 0.9375rem; /* 15px */
+    box-shadow: 0 0.375rem 0.9375rem rgba(0, 0, 0, 0.1); /* Тень формы */
 }
 
 .question-container {
     margin-top: 1rem;
-    /*border: 1px solid;*/
     display: flex;
     flex-direction: column;
-    align-items: center; /* Центрирование по горизонтали */
-    justify-content: center; /* Центрирование по вертикали, если нужно */
-    text-align: center; /* Центрирование текста внутри label */
+    align-items: center;
+    justify-content: center;
+    text-align: center;
 }
 
 .question-container label {
-    /*border: 1px solid;*/
     font-size: 1.25rem; /* 20px */
-    font-weight: bold; /* Настройте стиль текста, если нужно */
+    font-weight: bold;
+    color: #2c3e50; /* Основной цвет текста */
 }
 
 .text-input {
@@ -117,11 +93,58 @@ form {
     font-size: 1rem;
     margin-top: 0.5rem;
     box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.1);
-    transition: border-color 0.3s ease;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
 }
 
 .text-input:focus {
     outline: none;
-    border-color: #4caf50;
+    border-color: #f87f76; /* Цвет выделения */
     box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.2);
 }
+
+/* Дополнительные стили для уменьшенных карточек */
+.card-small {
+    width: 5rem; /* 80px */
+    height: 4.375rem; /* 70px */
+}
+
+.card-small .card-icon {
+    font-size: 1.5rem; /* 24px */
+    color: #333;
+}
+
+.card-small .card-label {
+    font-size: 0.75rem; /* 12px */
+    color: #333;
+}
+
+/*Стили кнопки*/
+.button {
+    background-color: #f87f76;
+    display: block;
+    margin: 0 auto;
+    color: white;
+    font-size: 2.2rem;
+    font-weight: bold;
+    border: none;
+    width: 30rem;
+    padding: 1rem 1.5rem;
+    border-radius: 1rem;
+    cursor: pointer;
+    text-shadow: 0.125rem 0.125rem 0.25rem rgba(0, 0, 0, 0.6);
+    box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.5);
+    transition: all 0.2s ease;
+}
+
+.button:hover {
+    background-color: #c66059;
+    box-shadow: 0 0.375rem 0.625rem rgba(0, 0, 0, 0.4);
+    transform: translateY(-0.2rem);
+}
+
+.button:active {
+    background-color: #c15550;
+    transform: scale(0.97);
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.7);
+}
+

@@ -6,33 +6,15 @@ body {
   color: #2c3e50; /* Темный текст для хорошей читаемости */
 }
 
-/* Заголовок страницы */
-h1 {
-  text-align: center;
-  margin-top: 20px;
-  font-size: 2.5em;
-  color: #EB6B3B; /* Основной акцентный цвет для заголовка */
-}
-
-
-/* Стили для меток */
-label {
-  font-size: 1.2em;
-  font-weight: bold;
-  margin-bottom: 10px;
-  display: block;
-  color: #2c3e50;
-}
-
 /* Стили для полей ввода, выпадающих списков и textarea */
 select, input[type="text"], textarea {
   width: 100%;
   padding: 12px;
   margin: 10px 0 20px;
-  border: 1px solid #79C8CB; /* Цвет рамки — бирюзовый */
+  /*border: 1px solid grey; !* Цвет рамки — бирюзовый *!*/
   border-radius: 8px;
   font-size: 1em;
-  color: #2c3e50;
+  color: #333;
   background-color: #f9f9f9; /* Нежный фон */
   transition: box-shadow 0.3s, border 0.3s;
 }
@@ -42,36 +24,4 @@ select:focus, input[type="text"]:focus, textarea:focus {
   outline: none;
   border: 1px solid #EB6B3B; /* Оранжевый акцент */
   box-shadow: 0 0 5px rgba(235, 107, 59, 0.5);
-}
-
-/* Стили кнопки */
-button {
-  background-color: #79C8CB; /* Бирюзовый фон кнопки */
-  color: white;
-  font-size: 1.2em;
-  padding: 12px 20px;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: background-color 0.3s, transform 0.2s;
-  display: block;
-  width: 100%;
-}
-
-/* Выделения */
-.highlight {
-  color: #79C8CB; /* Бирюзовый для выделения ключевых слов */
-}
-
-.budget-range {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.budget-range label {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  font-size: 1em;
 }
