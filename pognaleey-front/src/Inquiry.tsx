@@ -171,8 +171,6 @@ const Inquiry: React.FC = () => {
     return (
         <MainContainer>
             <Header/>
-            {/*<LocationInput></LocationInput>*/}
-            {/*<form onSubmit={handleSubmit}>*/}
             <div className="form-heading">
                 Ответьте на вопросы, чтобы мы могли подобрать идеальное путешествие!
             </div>

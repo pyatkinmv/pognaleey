@@ -1,41 +1,18 @@
-/* Общие стили контейнера */
-.recommendations-container {
-    font-family: 'Arial', sans-serif;
-    background-color: #E8DFC2;
-    color: #333;
-    padding: 20px;
-}
-
-/* Заголовок */
-.title {
-    color: #EB6B3B;
-    text-align: center;
-    margin-bottom: 20px;
-}
-
 /* Индикатор загрузки */
 .loading-indicator {
     text-align: center;
-    color: #79C8CB;
-    font-size: 18px;
-    margin-bottom: 20px;
+    color: #f87f76; /* Основной акцентный цвет */
+    font-size: 1.125rem; /* 18px */
+    margin-bottom: 1.25rem; /* 20px */
 }
 
 /* Список рекомендаций */
 .recommendations-list {
     display: flex;
     flex-direction: column;
-    gap: 20px;
-}
-
-/* Изображение */
-.recommendation-image {
-    width: 512px;
-    height: 512px;
-    object-fit: cover;
-    border-radius: 10px;
-    margin-right: 20px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    gap: 1.25rem; /* 20px */
+    /*max-width: 80%;*/
+    margin: 0 auto;
 }
 
 /* Контент рекомендации */
@@ -45,45 +22,46 @@
 
 /* Заголовок рекомендации */
 .recommendation-title {
-    color: #EB6B3B;
-    font-size: 24px;
-    margin-bottom: 10px;
+    color: #2c3e50; /* Основной текстовый цвет */
+    font-size: 1.5rem; /* 24px */
+    margin-bottom: 0.625rem; /* 10px */
 }
 
 /* Описание рекомендации */
 .recommendation-description {
-    color: #666;
-    margin-bottom: 15px;
-    font-size: 16px;
-    line-height: 1.6;
+    color: #333; /* Тёмный текст для описания */
+    margin-bottom: 0.9375rem; /* 15px */
+    font-size: 1rem; /* 16px */
+    line-height: 1.5;
 }
 
 /* Стили для списков */
 ul {
     list-style: disc;
-    padding-left: 20px;
-    margin: 10px 0;
+    padding-left: 1.25rem; /* 20px */
+    margin: 0.625rem 0; /* 10px */
 }
 
 li {
-    margin-bottom: 5px;
+    margin-bottom: 0.3125rem; /* 5px */
+    color: #2c3e50;
 }
 
 /* Дополнительные стили для текста */
 strong {
-    color: #79C8CB;
+    color: #f87f76;
     font-weight: bold;
 }
 
 /* CSS для вращающегося прогресс-бара */
 .loader {
-    border: 4px solid #f3f3f3; /* Light grey */
-    border-top: 4px solid #79C8CB; /* Blue color */
+    border: 0.25rem solid #f3f3f3; /* Светло-серый */
+    border-top: 0.25rem solid #f87f76; /* Основной цвет */
     border-radius: 50%;
-    width: 40px;
-    height: 40px;
+    width: 2.5rem; /* 40px */
+    height: 2.5rem; /* 40px */
     animation: spin 1s linear infinite;
-    margin: auto; /* Центрирование внутри элемента */
+    margin: auto;
 }
 
 @keyframes spin {
@@ -95,50 +73,42 @@ strong {
     }
 }
 
+/* Карточка рекомендации */
 .recommendation-card {
     display: flex;
     align-items: center;
-    background-color: #ffffff;
-    border-radius: 10px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    background-color: #f1e7dd;
+    border-radius: 0.625rem; /* 10px */
+    box-shadow: 0 0.25rem 0.625rem rgba(0, 0, 0, 0.2);
     overflow: hidden;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
-/* Обёртка для изображения */
+.recommendation-card:hover {
+    /*transform: translateY(-0.1rem);*/
+    box-shadow: 0 0.375rem 0.75rem rgba(0, 0, 0, 0.3);
+}
+
+/* Изображение */
 .recommendation-image-wrapper {
     display: flex;
     justify-content: center;
     align-items: center;
-    width: 500px;
-    height: 500px;
-    background-color: #f0f0f0;
-    border-radius: 10px;
-    margin-right: 20px;
+    width: 15rem;
+    height: 15rem;
+    background-color: #d0c9c7;
+    border-radius: 0.625rem; /* 10px */
+    margin-right: 1rem; /* 20px */
+    overflow: hidden;
+    margin-left: 1rem;
 }
 
-/* Картинка */
 .recommendation-image {
-    max-width: 100%;
-    max-height: 100%;
-    border-radius: 10px;
+    min-width: 100%;
+    min-height: 100%;
+    border-radius: 0.625rem; /* 10px */
     object-fit: cover;
-}
-
-/* Контейнер с текстом */
-.recommendation-content {
-    flex: 1;
-}
-
-/* Заголовок */
-.recommendation-content h2 {
-    color: #79C8CB;
-}
-
-/* Описание */
-.recommendation-content p {
-    margin-top: 10px;
-    font-size: 16px;
-    color: #333;
+    transition: transform 0.3s ease;
 }
 
 .recommendation-image:hover {
@@ -147,17 +117,45 @@ strong {
 
 /* Детали рекомендации */
 .recommendation-details {
-    margin-top: 10px;
+    margin-top: 0.625rem; /* 10px */
 }
 
-/* Стили для модального окна */
+/* Кнопка для генерации гайда */
+.generate-guide-button {
+    background-color: #f87f76;
+    color: white;
+    font-size: 1.125rem; /* 18px */
+    font-weight: bold;
+    padding: 0.625rem 1rem; /* 10px 16px */
+    border: none;
+    border-radius: 0.5rem; /* 8px */
+    cursor: pointer;
+    text-shadow: 0.0625rem 0.0625rem 0.125rem rgba(0, 0, 0, 0.6);
+    box-shadow: 0 0.1875rem 0.375rem rgba(0, 0, 0, 0.2);
+    transition: all 0.3s ease;
+    margin-bottom: 0.5rem;
+}
+
+.generate-guide-button:hover {
+    background-color: #c66059;
+    box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.3);
+    transform: translateY(-0.125rem);
+}
+
+.generate-guide-button:active {
+    background-color: #c15550;
+    transform: scale(0.98);
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.5);
+}
+
+/* Модальное окно */
 .modal-overlay {
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0, 0, 0, 0.8); /* Затемнение фона */
+    background: rgba(0, 0, 0, 0.8);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -167,7 +165,7 @@ strong {
 .modal-content {
     position: relative;
     background: transparent;
-    border-radius: 10px;
+    border-radius: 0.625rem; /* 10px */
     max-width: 90%;
     max-height: 90%;
     display: flex;
@@ -179,47 +177,26 @@ strong {
 .modal-image {
     max-width: 100%;
     max-height: 100%;
-    border-radius: 10px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    border-radius: 0.625rem; /* 10px */
+    box-shadow: 0 0.25rem 0.625rem rgba(0, 0, 0, 0.3);
 }
 
-/* Кнопка закрытия в виде крестика */
 .modal-close {
     position: absolute;
-    top: 10px;
-    right: 10px;
-    color: #fff; /* Белый цвет крестика */
-    font-size: 24px; /* Увеличенный размер */
+    top: 1rem; /* 10px */
+    right: 1.625rem; /* 10px */
+    color: #fff;
+    font-size: 2.5rem; /* 24px */
     font-weight: bold;
-    background: none; /* Убираем фон */
-    border: none; /* Убираем границы */
+    background: none;
+    border: none;
     cursor: pointer;
-    padding: 0; /* Убираем внутренние отступы */
-    line-height: 1;
-    z-index: 1001; /* Чтобы кнопка была поверх картинки */
+    padding: 0;
+    z-index: 1001;
     transition: transform 0.3s ease;
 }
 
 .modal-close:hover {
-    transform: scale(1.2); /* Увеличение при наведении */
-    color: #eb6b3b; /* Цвет крестика при наведении */
-}
-
-.modal-close:hover {
-    background: #c74d27;
-}
-
-/* Логотип */
-.recommendations-container .logo {
-    width: 7rem; /* Ширина логотипа */
-    height: 7rem; /* Высота логотипа */
-    object-fit: contain; /* Сохраняем пропорции логотипа */
-    margin-right: 1.5rem; /* Отступ справа от логотипа до текста */
-}
-
-/* Заголовок */
-.recommendations-title {
-    font-size: 2.5rem; /* Размер текста */
-    color: #eb6b3b; /* Цвет заголовка */
-    margin: 0; /* Убираем лишние отступы */
+    transform: scale(1.2);
+    color: #f87f76;
 }

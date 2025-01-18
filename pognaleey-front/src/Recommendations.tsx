@@ -2,7 +2,8 @@ import React, {useEffect, useState} from "react";
 import {useLocation, useNavigate, useParams} from "react-router-dom";
 import "./Recommendations.css";
 import apiClient from "./apiClient";
-import Header from "./Header"; // Подключаем стили
+import Header from "./Header";
+import MainContainer from "./MainContainer"; // Подключаем стили
 
 interface QuickRecommendation {
     id: number;
@@ -102,7 +103,7 @@ const Recommendations: React.FC = () => {
     }, [params.inquiryId]);
 
     return (
-        <div className="recommendations-container">
+        <MainContainer>
             <Header/>
             <div className="recommendations-list">
                 {recommendations.map((recommendation) => (
@@ -171,7 +172,7 @@ const Recommendations: React.FC = () => {
                 )}
             </div>
 
-        </div>
+        </MainContainer>
     );
 };
 

@@ -23,7 +23,7 @@ public final class AuthenticatedUserProvider {
         var principal = authentication.getPrincipal();
 
         if (!(principal instanceof User)) {
-            log.warn("Wrong user type {}", principal.getClass().getName());
+            log.info("Non-authenticated user type: {}", principal.getClass().getName());
             return Optional.empty();
         }
 
