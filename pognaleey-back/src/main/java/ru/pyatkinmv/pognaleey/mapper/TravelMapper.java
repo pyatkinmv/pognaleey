@@ -24,8 +24,7 @@ public class TravelMapper {
                 .quickRecommendations(recommendations.stream()
                         .map(it -> new TravelQuickRecommendationDto(
                                 it.getId(),
-                                it.getTitle(),
-                                it.getShortDescription())
+                                it.getTitle())
                         ).toList())
                 .build();
     }
@@ -49,13 +48,9 @@ public class TravelMapper {
 
         return new TravelRecommendationDto(
                 travelRecommendation.getId(),
-                details.title(),
-                details.budget(),
+                travelRecommendation.getTitle(),
                 details.reasoning(),
-                details.creativeDescription(),
-                details.tips(),
-                details.whereToGo(),
-                details.additionalConsideration(),
+                details.description(),
                 travelRecommendation.getImageUrl(),
                 guideId
         );

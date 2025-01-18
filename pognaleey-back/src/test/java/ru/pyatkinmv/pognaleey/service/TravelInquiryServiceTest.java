@@ -29,13 +29,14 @@ class TravelInquiryServiceTest extends DatabaseCleaningTest {
         assertThat(inquiry.getQuickRecommendations())
                 .usingRecursiveFieldByFieldElementComparatorIgnoringFields("id")
                 .containsExactly(
-                        new TravelQuickRecommendationDto(-1L, "Грузия, Тбилиси и винные регионы", "Грузия весна пейзаж"),
-                        new TravelQuickRecommendationDto(-1L, "Париж, Франция: Город любви", "Париж Эйфелева башня закат"),
-                        new TravelQuickRecommendationDto(-1L, "Красная Поляна, Сочи: Горнолыжный отдых", "Красная Поляна лыжи снег")
+                        new TravelQuickRecommendationDto(-1L, "Грузия, Тбилиси и винные регионы"),
+                        new TravelQuickRecommendationDto(-1L, "Париж, Франция: Город любви"),
+                        new TravelQuickRecommendationDto(-1L, "Красная Поляна, Сочи: Горнолыжный отдых")
                 );
 
     }
 
+    // TODO: FIX TESTS
     @Test
     void getInquiryRecommendations() {
         var inquiry = travelInquiryService.createInquiry(Map.of("preferences", "festivals", "to", "europe"));
@@ -44,12 +45,8 @@ class TravelInquiryServiceTest extends DatabaseCleaningTest {
         assertThat(inquiryRecommendations.recommendations()).allMatch(
                 it -> it.title() != null
                         && it.imageUrl().equals("imageUrl")
-                        && it.budget() != null
-                        && it.additionalConsideration() != null
-                        && it.creativeDescription() != null
+                        && it.description() != null
                         && it.reasoning() != null
-                        && it.tips() != null
-                        && !it.whereToGo().isEmpty()
         );
     }
 }

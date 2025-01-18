@@ -3,23 +3,20 @@ import {useLocation, useNavigate, useParams} from "react-router-dom";
 import "./Recommendations.css";
 import apiClient from "./apiClient";
 import Header from "./Header";
-import MainContainer from "./MainContainer"; // Подключаем стили
+import MainContainer from "./MainContainer";
 
 interface QuickRecommendation {
     id: number;
     title: string;
-    description: string;
-    imageUrl?: string; // Добавляем поле для URL картинки
 }
 
-interface DetailedRecommendation extends QuickRecommendation {
-    budget: string;
+interface DetailedRecommendation {
+    id: number;
+    title: string;
     reasoning: string;
-    creativeDescription: string;
-    tips: string;
-    whereToGo: string[];
-    additionalConsideration: string;
-    guideId?: number
+    description: string;
+    imageUrl?: string;
+    guideId?: number;
 }
 
 const Recommendations: React.FC = () => {
@@ -27,31 +24,27 @@ const Recommendations: React.FC = () => {
     const navigate = useNavigate();
     const params = useParams<{ inquiryId: string }>();
 
-    // Получаем quickRecommendations из состояния предыдущей страницы
     const {quickRecommendations} = location.state || {quickRecommendations: []};
 
-    // Состояния для рекомендаций и загрузки
-    const [recommendations, setRecommendations] = useState<QuickRecommendation[] | DetailedRecommendation[]>(quickRecommendations || []);
-    const [isLoading, setIsLoading] = useState<boolean>(true); // Изначально показываем индикатор загрузки
+    const [recommendations, setRecommendations] = useState<(QuickRecommendation | DetailedRecommendation)[]>(quickRecommendations || []);
+    const [isLoading, setIsLoading] = useState<boolean>(true);
+    const [detailedLoading, setDetailedLoading] = useState<boolean>(false);
 
-    // Для модального окна
     const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
     const handleImageClick = (imageUrl: string) => {
-        setSelectedImage(imageUrl); // Открыть модальное окно
+        setSelectedImage(imageUrl);
     };
 
     const closeModal = () => {
-        setSelectedImage(null); // Закрыть модальное окно
+        setSelectedImage(null);
     };
 
     const handleGenerateGuide = async (recommendationId: number) => {
         try {
             const response = await apiClient(
                 `${process.env.REACT_APP_API_URL}/travel-guides?recommendationId=${recommendationId}`,
-                {
-                    method: "POST",
-                }
+                {method: "POST"}
             );
 
             if (!response.ok) {
@@ -67,39 +60,39 @@ const Recommendations: React.FC = () => {
     };
 
     useEffect(() => {
-        // Проверяем, что inquiryId существует
         if (!params.inquiryId) {
             console.error("Missing inquiryId in URL");
             return;
         }
 
-        // Асинхронная функция для загрузки рекомендаций
-        const fetchRecommendations = async () => {
-            console.log("Fetching detailed recommendations...");
-            setIsLoading(true); // Устанавливаем индикатор загрузки
+        const fetchDetailedRecommendations = async () => {
+            setDetailedLoading(true);
 
             try {
-                const response = await apiClient(`${process.env.REACT_APP_API_URL}/travel-inquiries/${params.inquiryId}/recommendations`);
+                const response = await apiClient(
+                    `${process.env.REACT_APP_API_URL}/travel-inquiries/${params.inquiryId}/recommendations`
+                );
 
                 if (!response.ok) {
                     throw new Error(`Failed to fetch recommendations: ${response.status}`);
                 }
 
                 const data = await response.json();
-                const recommendations: DetailedRecommendation[] = data.recommendations;
-                console.log("Detailed recommendations received:", recommendations);
+                const detailedRecommendations: DetailedRecommendation[] = data.recommendations;
 
-                // Обновляем рекомендации с детализированными данными
-                setRecommendations(recommendations);
+                setRecommendations((prevRecommendations) =>
+                    prevRecommendations.map((rec) =>
+                        detailedRecommendations.find((detRec) => detRec.id === rec.id) || rec
+                    )
+                );
             } catch (error) {
                 console.error("Error fetching detailed recommendations:", error);
             } finally {
-                setIsLoading(false); // Выключаем индикатор загрузки
+                setDetailedLoading(false);
             }
         };
 
-        // Запускаем загрузку рекомендаций
-        fetchRecommendations();
+        fetchDetailedRecommendations();
     }, [params.inquiryId]);
 
     return (
@@ -108,46 +101,31 @@ const Recommendations: React.FC = () => {
             <div className="recommendations-list">
                 {recommendations.map((recommendation) => (
                     <div className="recommendation-card" key={recommendation.id}>
-                        {/* Вращающийся индикатор или изображение */}
                         <div className="recommendation-image-wrapper">
-                            {isLoading ? (
-                                <div className="loader"/> // Прогресс-бар
-                            ) : (
+                            {"imageUrl" in recommendation && recommendation.imageUrl ? (
                                 <img
                                     className="recommendation-image"
                                     src={recommendation.imageUrl}
                                     alt={recommendation.title}
-                                    onClick={() => handleImageClick(recommendation.imageUrl || "/logo512.png")}
+                                    onClick={() => handleImageClick(recommendation.imageUrl || "/logo-circle512.png")}
                                 />
+                            ) : (
+                                <div className="loader"/>
                             )}
                         </div>
-                        {/* Контент */}
                         <div className="recommendation-content">
                             <h2 className="recommendation-title">{recommendation.title}</h2>
-                            <p className="recommendation-description">{recommendation.description}</p>
 
-                            {/* Если это детализированная рекомендация, покажем дополнительные данные */}
-                            {"budget" in recommendation && (
+                            {"reasoning" in recommendation && (
                                 <>
-                                    <p><strong>Необходимый бюджет:</strong> {recommendation.budget || "Не указано"}</p>
                                     <p><strong>Почему подходит:</strong> {recommendation.reasoning}</p>
-                                    <p><strong>Описание:</strong> {recommendation.creativeDescription}</p>
-                                    <p><strong>Советы:</strong> {recommendation.tips}</p>
-                                    <p><strong>Места для посещения:</strong></p>
-                                    <ul>
-                                        {recommendation.whereToGo.map((place, index) => (
-                                            <li key={index}>{place}</li>
-                                        ))}
-                                    </ul>
-                                    <p><strong>Дополнительно:</strong> {recommendation.additionalConsideration}</p>
+                                    <p><strong>Описание:</strong> {recommendation.description}</p>
                                     <button
                                         className="generate-guide-button"
                                         onClick={() => {
                                             if ("guideId" in recommendation && recommendation.guideId) {
-                                                // Если guideId существует, перенаправляем на гайд
                                                 navigate(`/travel-guides/${recommendation.guideId}`);
                                             } else {
-                                                // Если guideId отсутствует, генерируем новый гайд
                                                 handleGenerateGuide(recommendation.id);
                                             }
                                         }}
@@ -156,7 +134,6 @@ const Recommendations: React.FC = () => {
                                     </button>
                                 </>
                             )}
-
                         </div>
                     </div>
                 ))}
@@ -171,7 +148,6 @@ const Recommendations: React.FC = () => {
                     </div>
                 )}
             </div>
-
         </MainContainer>
     );
 };

@@ -64,11 +64,16 @@ public class ImagesSearchHttpClient {
         log.info("found imageUrls {}", imageUrls);
 
         if (imageUrls.isEmpty()) {
-            log.warn("no imageUrls found");
-            log.info(responseXml);
+            log.error("no imageUrls found; possibly bad response");
         }
 
-        String resultUrl = imageUrls.stream().filter(this::isUrlValid).findFirst().orElseThrow();
+        // TODO: Fix
+        var resultUrl = imageUrls.stream().filter(this::isUrlValid).findFirst().orElseGet(() -> {
+            log.error("no valid imageUrl found; response {}", responseXml);
+
+            return "/logo-circle512.png";
+        });
+
         log.info("searchImageUrl resultUrl {}", resultUrl);
 
         return resultUrl;

@@ -1,8 +1,4 @@
 package ru.pyatkinmv.pognaleey.dto;
 
-import java.util.List;
-
-public record GptResponseRecommendationDetailsDto(String title, String budget, String reasoning,
-                                                  String creativeDescription, String tips, List<String> whereToGo,
-                                                  String additionalConsideration) {
+public record GptResponseRecommendationDetailsDto(String reasoning, String description) {
 }

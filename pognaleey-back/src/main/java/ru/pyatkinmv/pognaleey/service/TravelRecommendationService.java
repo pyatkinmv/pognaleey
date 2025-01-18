@@ -24,7 +24,7 @@ import static ru.pyatkinmv.pognaleey.service.GptAnswerResolveHelper.resolveInCas
 @Service
 @RequiredArgsConstructor
 public class TravelRecommendationService {
-    public static final int RECOMMENDATIONS_NUMBER = 3;
+    public static final int RECOMMENDATIONS_NUMBER = 5;
 
     private final GptHttpClient gptHttpClient;
     private final ImagesSearchHttpClient imagesSearchHttpClient;
@@ -38,7 +38,7 @@ public class TravelRecommendationService {
                 .map(it -> TravelRecommendation.builder()
                         .inquiryId(inquiryId)
                         .title(it.title().trim())
-                        .shortDescription(it.imageSearchPhrase().trim())
+                        .imageSearchPhrase(it.imageSearchPhrase().trim())
                         .createdAt(Instant.now())
                         .build())
                 .toList();
@@ -46,7 +46,7 @@ public class TravelRecommendationService {
 
     @SneakyThrows
     static GptResponseRecommendationDetailsDto parseDetailed(String gptRecommendationsAnswerRaw) {
-        var regex = "\\{[\\s\\S]*\"title\":[\\s\\S]*\\}";
+        var regex = "\\{[\\s\\S]*\"description\":[\\s\\S]*\\}";
         var pattern = Pattern.compile(regex);
         var matcher = pattern.matcher(gptRecommendationsAnswerRaw);
 
@@ -99,7 +99,7 @@ public class TravelRecommendationService {
 
     @SneakyThrows
     private void searchAndSave(TravelRecommendation recommendation) {
-        var searchText = recommendation.getShortDescription();
+        var searchText = recommendation.getImageSearchPhrase();
         var imageUrl = imagesSearchHttpClient.searchImageUrlWithRateLimiting(searchText);
         log.info("Update imageUrl {} for recommendation {}", imageUrl, recommendation.getId());
         recommendationRepository.updateImageUrl(recommendation.getId(), imageUrl);

@@ -4,33 +4,25 @@ import ru.pyatkinmv.pognaleey.dto.GptResponseRecommendationDetailsDto;
 import ru.pyatkinmv.pognaleey.model.TravelRecommendation;
 import ru.pyatkinmv.pognaleey.util.Utils;
 
-import java.util.List;
-
 public class PromptService {
 
-    static final GptResponseRecommendationDetailsDto DETAILED_PROMPT_OBJ = new GptResponseRecommendationDetailsDto(
-            "НАЗВАНИЕ МЕСТА",
-            "НЕОБХОДИМЫЙ БЮДЖЕТ (НАПРИМЕР, 1000$)",
-            "ПОЧЕМУ ЭТОТ ВАРИАНТ ПОДХОДИТ",
-            "КРЕАТИВНОЕ ХУДОЖЕСТВЕННОЕ ОПИСАНИЕ ВАРИАНТА",
-            "ОБЩИЕ РЕКОМЕНДАЦИИ (СТРОКА)",
-            List.of("ДОСТОПРИМЕЧАТЕЛЬНОСТИ/КОНКРЕТНЫЕ МЕСТА РЕКОМЕНДУЕМЫЕ ДЛЯ ПОСЕЩЕНИЯ"),
-            "ЧТО НУЖНО ДОПОЛНИТЕЛЬНО УЧЕСТЬ"
-    );
-
     public static final String QUICK_PROMPT_FORMAT = """
-            Придумай мне ровно %d варианта путешествий исходя из входных условий: %s.К этим вариантам добавь короткие
+            Придумай мне ровно %d вариантов путешествий исходя из входных условий: %s.К этим вариантам добавь короткие
              поисковые запросы, по которым я могу найти красивые картинки в соответствии с основными условиями.
              Ответ выдай в формате:{заглавие1}(поисковой запрос1)|{заглавие2}(поисковой запрос2)|...
              Например: {Грузия, Тбилиси и винные регионы}(Грузия весна пейзаж)
             |{Париж, Франция: Город любви}(Париж Эйфелева башня закат)
             |{Красная Поляна, Сочи: Горнолыжный отдых}(Красная Поляна лыжи снег).
-            В ответе не пиши ничего кроме самой статьи
+            В ответе не пиши ничего кроме вариантов
             """;
     public static final String DETAILED_PROMPT_FORMAT = """
             У меня есть идея для путешествия:%s.Мои пожелания следующие: %s.
-            Дай мне исходя из этих предпочтений подробное описание в формате JSON
-            (не надо никаких дополнительных нумераций и слов, в ответе только JSON). Формат: %s""";
+            Дай мне исходя из этих пожеланий подробное описание в формате JSON
+            (не надо никаких дополнительных нумераций и слов, в ответе только JSON указанного формата). Формат: %s""";
+    static final GptResponseRecommendationDetailsDto DETAILED_PROMPT_OBJ = new GptResponseRecommendationDetailsDto(
+            "ПОЧЕМУ ЭТОТ ВАРИАНТ ПОДХОДИТ",
+            "ОПИСАНИЕ ВАРИАНТА"
+    );
     public static final String GUIDE_IMAGES_PROMPT_FORMAT = """
             Пишу путеводитель-статью по теме: %s. Условия: %s.
             Хочу добавить красивые картинки в статью. Предложи мне список 5 поисковых запросов,
@@ -69,7 +61,7 @@ public class PromptService {
     }
 
     private static String toPromtString(TravelRecommendation recommendation) {
-        return recommendation.getTitle() + "—" + recommendation.getShortDescription().trim();
+        return recommendation.getTitle();
     }
 
     public static String generateGuideImagesPrompt(String guideTitle, String inquiryParams) {

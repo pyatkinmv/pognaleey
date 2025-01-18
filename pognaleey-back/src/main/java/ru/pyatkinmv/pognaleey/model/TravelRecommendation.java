@@ -25,8 +25,7 @@ public class TravelRecommendation {
 
     private String title;
 
-    // TODO: it's not description any longer; it's imageSearchPhrase
-    private String shortDescription;
+    private String imageSearchPhrase;
 
     /**
      * {@link GptResponseRecommendationDetailsDto} stored here
