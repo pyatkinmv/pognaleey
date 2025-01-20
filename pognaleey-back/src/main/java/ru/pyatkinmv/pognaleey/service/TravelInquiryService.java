@@ -5,8 +5,9 @@ import org.springframework.stereotype.Service;
 import ru.pyatkinmv.pognaleey.dto.TravelInquiryDto;
 import ru.pyatkinmv.pognaleey.mapper.TravelMapper;
 import ru.pyatkinmv.pognaleey.model.TravelInquiry;
-import ru.pyatkinmv.pognaleey.repository.TravelGuideRepository;
+import ru.pyatkinmv.pognaleey.model.User;
 import ru.pyatkinmv.pognaleey.repository.TravelInquiryRepository;
+import ru.pyatkinmv.pognaleey.security.AuthenticatedUserProvider;
 
 import java.time.Instant;
 import java.util.Collection;
@@ -18,7 +19,6 @@ import java.util.stream.Collectors;
 public class TravelInquiryService {
     private final TravelInquiryRepository inquiryRepository;
     private final TravelRecommendationService recommendationService;
-    private final TravelGuideRepository travelGuideRepository;
 
     private static String toStringFilteringNonEmpty(Map<String, Object> params) {
         var filteredMap = params.entrySet()
@@ -49,12 +49,15 @@ public class TravelInquiryService {
 
     public TravelInquiryDto createInquiry(Map<String, Object> inquiryParams) {
         var inquiryPayload = toStringFilteringNonEmpty(inquiryParams);
+        var userId = AuthenticatedUserProvider.getCurrentUser().map(User::getId).orElse(null);
         var inquiry = TravelInquiry.builder()
                 .params(inquiryPayload)
                 .createdAt(Instant.now())
+                .userId(userId)
                 .build();
         inquiry = inquiryRepository.save(inquiry);
-        recommendationService.createRecommendationsAsync(inquiry.getId(), inquiryPayload);
+        var recommendations = recommendationService.createBlueprintRecommendations(inquiry.getId());
+        recommendationService.enrichRecommendationsAsync(recommendations, inquiryPayload);
 
         return TravelMapper.toInquiryDto(inquiry);
     }

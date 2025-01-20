@@ -13,7 +13,7 @@ import java.time.Instant;
 @Builder
 public class TravelInquiryDto {
     private Long id;
-    private String payload;
+    private String params;
     private Instant createdAt;
 }
 

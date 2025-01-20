@@ -38,5 +38,6 @@ public class TravelRecommendation {
     @Nullable
     private String imageUrl;
 
+    // TODO: Подумать насчет статуса Inquiry вместо этого
     private TravelRecommendationStatus status;
 }

@@ -12,3 +12,9 @@ set status = CASE
 
 ALTER TABLE travel_recommendations
     ALTER COLUMN status SET NOT NULL;
+
+ALTER TABLE travel_recommendations
+    ALTER COLUMN title DROP NOT NULL;
+
+ALTER TABLE travel_recommendations
+    ALTER COLUMN image_search_phrase DROP NOT NULL;

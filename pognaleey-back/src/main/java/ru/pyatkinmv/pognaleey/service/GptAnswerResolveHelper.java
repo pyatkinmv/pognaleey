@@ -1,7 +1,6 @@
 package ru.pyatkinmv.pognaleey.service;
 
 import lombok.extern.slf4j.Slf4j;
-import ru.pyatkinmv.pognaleey.model.TravelRecommendation;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,8 +12,8 @@ import static ru.pyatkinmv.pognaleey.service.TravelRecommendationService.RECOMME
 
 @Slf4j
 public class GptAnswerResolveHelper {
-    public static List<TravelRecommendation> resolveInCaseGeneratedMoreOrLessThanExpected(
-            List<TravelRecommendation> recommendations) {
+    public static <T> List<T> resolveInCaseGeneratedMoreOrLessThanExpected(
+            List<T> recommendations) {
         if (recommendations.size() != RECOMMENDATIONS_NUMBER) {
             log.warn("Number of recommendations {} is not equal to the number of expected {}",
                     recommendations.size(), RECOMMENDATIONS_NUMBER);

@@ -14,7 +14,11 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Instant;
+import java.util.Collection;
+import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 @Slf4j
@@ -77,6 +81,18 @@ public final class Utils {
         } catch (IOException | RuntimeException e) {
             System.err.println("Ошибка при записи файла: " + e.getMessage());
         }
+    }
+
+    public static <T> Optional<T> get(Collection<T> collection, int i) {
+        if (i < collection.size()) {
+            return Optional.of(collection.stream().toList().get(i));
+        } else {
+            return Optional.empty();
+        }
+    }
+
+    public static <T, R> List<R> extracting(Collection<T> collection, Function<T, R> function) {
+        return collection.stream().map(function).toList();
     }
 
     public static <T> T peek(Runnable runnable, T obj) {

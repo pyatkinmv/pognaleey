@@ -18,7 +18,7 @@ public class TravelMapper {
     public static TravelInquiryDto toInquiryDto(TravelInquiry inquiry) {
         return TravelInquiryDto.builder()
                 .id(inquiry.getId())
-                .payload(inquiry.getParams())
+                .params(inquiry.getParams())
                 .createdAt(inquiry.getCreatedAt())
                 .build();
     }

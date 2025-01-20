@@ -42,6 +42,14 @@ public interface TravelRecommendationRepository extends CrudRepository<TravelRec
     @Modifying
     @Query("""
                 UPDATE travel_recommendations
+                SET status = 'FAILED'
+                WHERE id IN (:ids);
+            """)
+    void setFailed(List<Long> ids);
+
+    @Modifying
+    @Query("""
+                UPDATE travel_recommendations
                 SET status = :status
                 WHERE id = :id;
             """)

@@ -6,6 +6,12 @@ import MainContainer from "./MainContainer";
 import useRecommendations from "./useRecommendation";
 import apiClient from "./apiClient";
 
+// TODO: 1) /travel-recommendations - обрабатывать
+//  2) Если всё FAILED
+//  3) Шрифты
+//  4) Лоадеры
+//  5) Сгенерировать гайд
+//  6) Прыгающий размер
 const Recommendations: React.FC = () => {
     const navigate = useNavigate();
     const location = useLocation();

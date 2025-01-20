@@ -9,6 +9,7 @@ import ru.pyatkinmv.pognaleey.model.TravelInquiry;
 import ru.pyatkinmv.pognaleey.model.TravelRecommendation;
 import ru.pyatkinmv.pognaleey.model.TravelRecommendationStatus;
 import ru.pyatkinmv.pognaleey.repository.TravelInquiryRepository;
+import ru.pyatkinmv.pognaleey.repository.TravelRecommendationRepository;
 import ru.pyatkinmv.pognaleey.util.Utils;
 
 import java.time.Instant;
@@ -21,47 +22,54 @@ class TravelRecommendationServiceTest extends DatabaseCleaningTest {
     @Autowired
     private TravelRecommendationService recommendationService;
     @Autowired
+    private TravelRecommendationRepository recommendationRepository;
+    @Autowired
     private TravelInquiryRepository travelInquiryRepository;
 
     @Test
-    void createQuickRecommendations() {
-        var inquiry = createTravelInquiry();
+    void enrichWithShortInfo() {
+        var inquiry = createTravelInquiryAndBlueprintRecommendations();
+        var blueprintRecommendations = recommendationRepository.findByInquiryId(inquiry.getId());
         var recommendations =
-                recommendationService.createQuickRecommendations(inquiry.getId(), inquiry.getParams());
+                recommendationService.enrichWithShortInfo(blueprintRecommendations, inquiry.getParams());
         assertThat(recommendations)
                 .usingRecursiveFieldByFieldElementComparatorIgnoringFields("id", "createdAt")
                 .containsExactly(
                         new TravelRecommendation(null, null, inquiry.getId(), "Грузия, Тбилиси и винные регионы", "Грузия весна пейзаж", null, null, TravelRecommendationStatus.IN_PROGRESS),
                         new TravelRecommendation(null, null, inquiry.getId(), "Париж, Франция: Город любви", "Париж Эйфелева башня закат", null, null, TravelRecommendationStatus.IN_PROGRESS),
-                        new TravelRecommendation(null, null, inquiry.getId(), "Красная Поляна, Сочи: Горнолыжный отдых", "Красная Поляна лыжи снег", null, null, TravelRecommendationStatus.IN_PROGRESS)
+                        new TravelRecommendation(null, null, inquiry.getId(), "Красная Поляна, Сочи: Горнолыжный отдых", "Красная Поляна лыжи снег", null, null, TravelRecommendationStatus.IN_PROGRESS),
+                        new TravelRecommendation(null, null, inquiry.getId(), "Индонезия, Бали: Пляжный отдых", "Бали пляжи закат", null, null, TravelRecommendationStatus.IN_PROGRESS),
+                        new TravelRecommendation(null, null, inquiry.getId(), "Исландия: Природные чудеса", "Исландия водопады ледники", null, null, TravelRecommendationStatus.IN_PROGRESS)
                 );
     }
 
     @Test
     void enrichWithDetailsAsync() {
-        var inquiry = createTravelInquiry();
+        var inquiry = createTravelInquiryAndBlueprintRecommendations();
+        var blueprintRecommendations = recommendationRepository.findByInquiryId(inquiry.getId());
         var recommendations =
-                recommendationService.createQuickRecommendations(inquiry.getId(), inquiry.getParams());
+                recommendationService.enrichWithShortInfo(blueprintRecommendations, inquiry.getParams());
         assertThat(recommendations).allMatch(it -> it.getDetails() == null);
         recommendationService.enrichWithDetailsAsyncEach(recommendations, inquiry.getParams());
 
         var recommendationIds = recommendations.stream().map(TravelRecommendation::getId).toList();
         var updated = recommendationService.getRecommendations(recommendationIds);
-        assertThat(updated.recommendations()).hasSize(3);
+        assertThat(updated.recommendations()).hasSize(5);
         assertThat(updated.recommendations()).allMatch(it -> it.details() != null);
     }
 
     @Test
     void enrichWithImagesAsync() {
-        var inquiry = createTravelInquiry();
+        var inquiry = createTravelInquiryAndBlueprintRecommendations();
+        var blueprintRecommendations = recommendationRepository.findByInquiryId(inquiry.getId());
         var recommendations =
-                recommendationService.createQuickRecommendations(inquiry.getId(), inquiry.getParams());
+                recommendationService.enrichWithShortInfo(blueprintRecommendations, inquiry.getParams());
         assertThat(recommendations).allMatch(it -> it.getImageUrl() == null);
         recommendationService.enrichWithImagesAsyncAll(recommendations);
 
         var recommendationIds = recommendations.stream().map(TravelRecommendation::getId).toList();
         var updated = recommendationService.getRecommendations(recommendationIds);
-        assertThat(updated.recommendations()).hasSize(3);
+        assertThat(updated.recommendations()).hasSize(5);
         assertThat(updated.recommendations()).allMatch(it -> it.image() != null);
     }
 
@@ -74,8 +82,9 @@ class TravelRecommendationServiceTest extends DatabaseCleaningTest {
 
     @Test
     void getRecommendationsWithoutEnrichment() {
-        var inquiry = createTravelInquiry();
-        recommendationService.createQuickRecommendations(inquiry.getId(), inquiry.getParams());
+        var inquiry = createTravelInquiryAndBlueprintRecommendations();
+        var blueprintRecommendations = recommendationRepository.findByInquiryId(inquiry.getId());
+        recommendationService.enrichWithShortInfo(blueprintRecommendations, inquiry.getParams());
         var recommendations = recommendationService.getRecommendations(inquiry.getId());
         assertThat(recommendations.recommendations()).allMatch(
                 it -> it.id() != 0
@@ -90,11 +99,12 @@ class TravelRecommendationServiceTest extends DatabaseCleaningTest {
         assertThat(recommendations).isEqualTo(recommendationsByIds);
     }
 
-    private TravelInquiry createTravelInquiry() {
+    private TravelInquiry createTravelInquiryAndBlueprintRecommendations() {
         var inquiryParams = "duration=8-14 days;from=Moscow;to=Asia;budget={from=2100, to=3800}";
         var inquiry = travelInquiryRepository.save(new TravelInquiry(null, inquiryParams, Instant.now(), null));
         assertThat(inquiry.getParams()).isEqualTo(inquiryParams);
         assertThat(inquiry.getId()).isNotNull();
+        recommendationService.createBlueprintRecommendations(inquiry.getId());
 
         return inquiry;
     }
