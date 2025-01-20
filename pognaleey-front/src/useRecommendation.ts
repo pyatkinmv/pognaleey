@@ -19,6 +19,7 @@ interface Recommendation {
 const useRecommendations = (inquiryId: string | null, timeout: number = 20000) => {
     const [recommendations, setRecommendations] = useState<Recommendation[]>([]);
     const [isLoading, setIsLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
 
     const mergeRecommendations = (
         prevRecommendations: Recommendation[],
@@ -34,8 +35,8 @@ const useRecommendations = (inquiryId: string | null, timeout: number = 20000) =
     const fetchRecommendations = async (inquiryId: string) => {
         console.log("Fetching recommendations...");
         setIsLoading(true);
+        setError(null); // Reset error state
         const startTime = Date.now();
-        const timeout = 20000;
 
         while (Date.now() - startTime < timeout) {
             try {
@@ -49,12 +50,19 @@ const useRecommendations = (inquiryId: string | null, timeout: number = 20000) =
 
                 const data: { recommendations: Recommendation[] } = await response.json();
 
+                if (data.recommendations.length === 0) {
+                    throw new Error(`Рекомендации не найдены.`);
+                }
+
+                if (data.recommendations.every((rec) => rec.status === "FAILED")) {
+                    throw new Error(`Failed to fetch recommendations`);
+                }
+
                 setRecommendations((prevRecommendations) =>
                     mergeRecommendations(prevRecommendations, data.recommendations)
                 );
 
                 if (
-                    data.recommendations.length !== 0 &&
                     data.recommendations.every(
                         (rec) => rec.status === "READY" || rec.status === "FAILED"
                     )
@@ -63,11 +71,17 @@ const useRecommendations = (inquiryId: string | null, timeout: number = 20000) =
                 }
             } catch (error) {
                 console.error("Error fetching recommendations:", error);
+                setError("Ошибка при загрузке рекомендаций.");
                 break;
             }
 
             await new Promise((resolve) => setTimeout(resolve, 500));
         }
+
+        // Перед завершением загрузки оставляем только READY рекомендации
+        setRecommendations((prevRecommendations) =>
+            prevRecommendations.filter((rec) => rec.status === "READY")
+        );
 
         setIsLoading(false);
     };
@@ -75,14 +89,15 @@ const useRecommendations = (inquiryId: string | null, timeout: number = 20000) =
     useEffect(() => {
         if (!inquiryId) {
             console.error("Missing inquiryId in URL");
+            setError("Идентификатор запроса отсутствует.");
+            setIsLoading(false);
             return;
         }
 
         fetchRecommendations(inquiryId);
     }, [inquiryId]);
 
-
-    return {recommendations, isLoading};
+    return {recommendations, isLoading, error};
 };
 
 export default useRecommendations;

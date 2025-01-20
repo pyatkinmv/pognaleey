@@ -27,11 +27,11 @@ class TravelRecommendationServiceTest extends DatabaseCleaningTest {
     private TravelInquiryRepository travelInquiryRepository;
 
     @Test
-    void enrichWithShortInfo() {
+    void enrichWithShortInfoOrSetFailed() {
         var inquiry = createTravelInquiryAndBlueprintRecommendations();
         var blueprintRecommendations = recommendationRepository.findByInquiryId(inquiry.getId());
         var recommendations =
-                recommendationService.enrichWithShortInfo(blueprintRecommendations, inquiry.getParams());
+                recommendationService.enrichWithShortInfoOrSetFailed(blueprintRecommendations, inquiry.getParams());
         assertThat(recommendations)
                 .usingRecursiveFieldByFieldElementComparatorIgnoringFields("id", "createdAt")
                 .containsExactly(
@@ -48,7 +48,7 @@ class TravelRecommendationServiceTest extends DatabaseCleaningTest {
         var inquiry = createTravelInquiryAndBlueprintRecommendations();
         var blueprintRecommendations = recommendationRepository.findByInquiryId(inquiry.getId());
         var recommendations =
-                recommendationService.enrichWithShortInfo(blueprintRecommendations, inquiry.getParams());
+                recommendationService.enrichWithShortInfoOrSetFailed(blueprintRecommendations, inquiry.getParams());
         assertThat(recommendations).allMatch(it -> it.getDetails() == null);
         recommendationService.enrichWithDetailsAsyncEach(recommendations, inquiry.getParams());
 
@@ -63,7 +63,7 @@ class TravelRecommendationServiceTest extends DatabaseCleaningTest {
         var inquiry = createTravelInquiryAndBlueprintRecommendations();
         var blueprintRecommendations = recommendationRepository.findByInquiryId(inquiry.getId());
         var recommendations =
-                recommendationService.enrichWithShortInfo(blueprintRecommendations, inquiry.getParams());
+                recommendationService.enrichWithShortInfoOrSetFailed(blueprintRecommendations, inquiry.getParams());
         assertThat(recommendations).allMatch(it -> it.getImageUrl() == null);
         recommendationService.enrichWithImagesAsyncAll(recommendations);
 
@@ -84,7 +84,7 @@ class TravelRecommendationServiceTest extends DatabaseCleaningTest {
     void getRecommendationsWithoutEnrichment() {
         var inquiry = createTravelInquiryAndBlueprintRecommendations();
         var blueprintRecommendations = recommendationRepository.findByInquiryId(inquiry.getId());
-        recommendationService.enrichWithShortInfo(blueprintRecommendations, inquiry.getParams());
+        recommendationService.enrichWithShortInfoOrSetFailed(blueprintRecommendations, inquiry.getParams());
         var recommendations = recommendationService.getRecommendations(inquiry.getId());
         assertThat(recommendations.recommendations()).allMatch(
                 it -> it.id() != 0

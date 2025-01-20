@@ -88,7 +88,7 @@ public class TravelRecommendationService {
         List<TravelRecommendation> recommendationsWithShortInfo;
 
         try {
-            recommendationsWithShortInfo = enrichWithShortInfo(recommendations, inquiryParams);
+            recommendationsWithShortInfo = enrichWithShortInfoOrSetFailed(recommendations, inquiryParams);
         } catch (Exception e) {
             var recommendationIds = Utils.extracting(recommendations, TravelRecommendation::getId);
             log.error("enrichRecommendationsAsync error: {}, set failed for: {}", e, recommendationIds);
@@ -97,12 +97,16 @@ public class TravelRecommendationService {
             return;
         }
 
-        enrichWithDetailsAsyncEach(recommendationsWithShortInfo, inquiryParams);
-        enrichWithImagesAsyncAll(recommendationsWithShortInfo);
+        var withShortInfo = recommendationsWithShortInfo.stream()
+                .filter(it -> it.getTitle() != null && it.getImageSearchPhrase() != null)
+                .toList();
+
+        enrichWithDetailsAsyncEach(withShortInfo, inquiryParams);
+        enrichWithImagesAsyncAll(withShortInfo);
     }
 
-    List<TravelRecommendation> enrichWithShortInfo(List<TravelRecommendation> blueprintRecommendations,
-                                                   String inquiryParams) {
+    List<TravelRecommendation> enrichWithShortInfoOrSetFailed(List<TravelRecommendation> blueprintRecommendations,
+                                                              String inquiryParams) {
         var prompt = PromptService.generateQuickPrompt(RECOMMENDATIONS_NUMBER, inquiryParams);
         var answer = gptHttpClient.ask(prompt);
         var titleAndImageSearchPhrasesParsed = parseQuick(answer);

@@ -6,11 +6,11 @@ import MainContainer from "./MainContainer";
 import useRecommendations from "./useRecommendation";
 import apiClient from "./apiClient";
 
-// TODO: 1) /travel-recommendations - обрабатывать
-//  2) Если всё FAILED
+// TODO: 1) /travel-recommendations - обрабатывать DONE
+//  2) Если всё FAILED DONE
 //  3) Шрифты
-//  4) Лоадеры
-//  5) Сгенерировать гайд
+//  4) Лоадеры DONE
+//  5) Сгенерировать гайд DONE
 //  6) Прыгающий размер
 const Recommendations: React.FC = () => {
     const navigate = useNavigate();
@@ -19,7 +19,7 @@ const Recommendations: React.FC = () => {
     const searchParams = new URLSearchParams(location.search);
     const inquiryId = searchParams.get("inquiryId");
 
-    const {recommendations, isLoading} = useRecommendations(inquiryId);
+    const {recommendations, isLoading, error} = useRecommendations(inquiryId);
 
     const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
@@ -50,11 +50,12 @@ const Recommendations: React.FC = () => {
         }
     };
 
-
     return (
         <MainContainer>
             <Header/>
-            {isLoading && <div className="loader"/>}
+            {!isLoading && error && (
+                <div className="error-message">{error}</div>
+            )}
             <div className="recommendations-list">
                 {recommendations.map((recommendation) => (
                     <div className="recommendation-card" key={recommendation.id}>
@@ -64,7 +65,9 @@ const Recommendations: React.FC = () => {
                                     className="recommendation-image"
                                     src={recommendation.image.thumbnailUrl}
                                     alt={recommendation.title}
-                                    onClick={() => handleImageClick(recommendation.image?.imageUrl || "")}
+                                    onClick={() =>
+                                        handleImageClick(recommendation.image?.imageUrl || "")
+                                    }
                                 />
                             ) : (
                                 <div className="loader"/>
@@ -75,16 +78,18 @@ const Recommendations: React.FC = () => {
                             {recommendation.details ? (
                                 <>
                                     <p>
-                                        <strong>Почему подходит:</strong> {recommendation.details.reasoning}
+                                        <strong>Почему подходит:</strong>{" "}
+                                        {recommendation.details.reasoning}
                                     </p>
                                     <p>
-                                        <strong>Описание:</strong> {recommendation.details.description}
+                                        <strong>Описание:</strong>{" "}
+                                        {recommendation.details.description}
                                     </p>
                                 </>
                             ) : (
                                 <div className="loader"/>
                             )}
-                            <button
+                            {recommendation.status === "READY" && (<button
                                 className="generate-guide-button"
                                 onClick={() =>
                                     recommendation.guideId
@@ -92,8 +97,10 @@ const Recommendations: React.FC = () => {
                                         : handleGenerateGuide(recommendation.id)
                                 }
                             >
-                                {recommendation.guideId ? "Перейти на гайд" : "Сгенерировать гайд"}
-                            </button>
+                                {recommendation.guideId
+                                    ? "Перейти на гайд"
+                                    : "Сгенерировать гайд"}
+                            </button>)}
                         </div>
                     </div>
                 ))}

@@ -43,6 +43,12 @@ public class ImagesSearchHttpClient {
 
     private Optional<String> searchImageUrl(String text) {
         log.info("searchImageUrl for text {}", text);
+
+        if (text.isEmpty()) {
+            log.info("text is empty");
+            return Optional.empty();
+        }
+
         var uri = buildUri(text);
         log.info("searchImageUrl uri {}", withoutSecret(uri));
         var responseXml = Objects.requireNonNull(restTemplate.getForObject(uri, String.class));
@@ -72,7 +78,7 @@ public class ImagesSearchHttpClient {
         var resultUrl = imageUrls.stream().filter(this::isUrlValid).findFirst().orElseGet(() -> {
             log.error("no valid imageUrl found; response {}", responseXml);
 
-            return null;
+            return "/logo-circle192.png";
         });
 
         log.info("searchImageUrl resultUrl {}", resultUrl);
