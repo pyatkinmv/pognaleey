@@ -1,4 +1,3 @@
-// Main.tsx (Refactored)
 import React, {useEffect, useRef, useState} from "react";
 import "./Main.css";
 import {useNavigate} from "react-router-dom";
@@ -8,6 +7,7 @@ import TileGrid from "./TileGrid";
 import LoginPopup from "./LoginPopup";
 import apiClient from "./apiClient";
 import MainContainer from "./MainContainer";
+import {useLikeHandler} from "./useLikeHandler";
 
 const Main: React.FC = () => {
     const navigate = useNavigate();
@@ -21,6 +21,8 @@ const Main: React.FC = () => {
 
     const observer = useRef<IntersectionObserver | null>(null);
     const lastTileRef = useRef<HTMLDivElement | null>(null);
+
+    const {handleLike} = useLikeHandler(() => setShowLoginPopup(true));
 
     const handleFilterChange = (value: string) => {
         if ((value === "liked" || value === "my") && !localStorage.getItem("jwtToken")) {
@@ -66,36 +68,12 @@ const Main: React.FC = () => {
         }
     };
 
-    const handleLike = async (id: number, isCurrentlyLiked: boolean) => {
-        try {
-            const token = localStorage.getItem("jwtToken");
-            if (!token) {
-                setShowLoginPopup(true);
-                return;
-            }
-
-            const endpoint = isCurrentlyLiked
-                ? `${process.env.REACT_APP_API_URL}/travel-guides/${id}/unlike`
-                : `${process.env.REACT_APP_API_URL}/travel-guides/${id}/like`;
-
-            const response = await apiClient(endpoint, {
-                method: isCurrentlyLiked ? "DELETE" : "PUT",
-            });
-
-            if (!response.ok) {
-                throw new Error("Ошибка при обработке лайка");
-            }
-
-            const {guideId, isLiked, totalLikes} = await response.json();
-
-            setTiles((prevTiles) =>
-                prevTiles.map((tile) =>
-                    tile.id === guideId ? {...tile, isLiked, totalLikes} : tile
-                )
-            );
-        } catch (error) {
-            console.error("Ошибка обработки лайка:", error);
-        }
+    const updateTileLikes = (guideId: number, isLiked: boolean, totalLikes: number) => {
+        setTiles((prevTiles) =>
+            prevTiles.map((tile) =>
+                tile.id === guideId ? {...tile, isLiked, totalLikes} : tile
+            )
+        );
     };
 
     useEffect(() => {
@@ -132,7 +110,13 @@ const Main: React.FC = () => {
 
             <FilterButtons selectedFilter={selectedFilter} onFilterChange={handleFilterChange}/>
 
-            <TileGrid tiles={tiles} onLike={handleLike} lastTileRef={lastTileRef} isLoading={isLoading} error={error}/>
+            <TileGrid
+                tiles={tiles}
+                onLike={(id, isLiked) => handleLike(id, isLiked, updateTileLikes)}
+                lastTileRef={lastTileRef}
+                isLoading={isLoading}
+                error={error}
+            />
 
             {showLoginPopup && (
                 <LoginPopup onClose={() => setShowLoginPopup(false)} onLogin={() => navigate("/login")}/>

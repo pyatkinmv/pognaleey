@@ -54,13 +54,16 @@ public class TravelMapper {
         );
     }
 
-    public static TravelGuideFullDto toGuideDto(TravelGuide guide, @Nullable User user, int totalLikes) {
+    public static TravelGuideFullDto toGuideDto(TravelGuide guide, @Nullable User user, int totalLikes,
+                                                boolean isCurrentUserLiked) {
         return new TravelGuideFullDto(
                 guide.getId(),
                 guide.getTitle(),
                 guide.getImageUrl(),
                 guide.getDetails(),
                 totalLikes,
+                isCurrentUserLiked,
+                guide.getCreatedAt().toEpochMilli(),
                 Optional.ofNullable(user).map(TravelMapper::toUserDto).orElse(null)
         );
     }

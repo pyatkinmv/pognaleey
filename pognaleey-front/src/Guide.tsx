@@ -1,11 +1,13 @@
 import React, {useEffect, useState} from "react";
-import {useParams} from "react-router-dom";
+import {useNavigate, useParams} from "react-router-dom";
 import ReactMarkdown from "react-markdown";
 import rehypeRaw from "rehype-raw";
 import apiClient from "./apiClient";
 import "./Guide.css";
 import Header from "./Header";
 import MainContainer from "./MainContainer";
+import {useLikeHandler} from "./useLikeHandler";
+import LoginPopup from "./LoginPopup";
 
 interface UserDto {
     id: number;
@@ -18,7 +20,20 @@ interface TravelGuideFullDto {
     imageUrl: string;
     details: string;
     totalLikes: number;
+    isLiked: boolean;
     owner?: UserDto;
+    createdAt: number; // Дата создания
+}
+
+function formatDate(timestamp: number): string {
+    const date = new Date(timestamp); // Создаем объект Date из миллисекунд
+    return date.toLocaleString('ru-RU', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+    }).replace(',', ''); // Убираем запятую между датой и временем
 }
 
 const Guide: React.FC = () => {
@@ -26,11 +41,15 @@ const Guide: React.FC = () => {
     const [guide, setGuide] = useState<TravelGuideFullDto | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const [showLoginPopup, setShowLoginPopup] = useState<boolean>(false);
+    const navigate = useNavigate();
+
+    const {handleLike} = useLikeHandler(() => setShowLoginPopup(true));
 
     useEffect(() => {
         const fetchGuide = async () => {
             try {
-                setLoading(true); // Устанавливаем состояние загрузки
+                setLoading(true);
                 const response = await apiClient(`${process.env.REACT_APP_API_URL}/travel-guides/${guideId}`);
 
                 if (response.ok) {
@@ -42,12 +61,20 @@ const Guide: React.FC = () => {
             } catch (err) {
                 setError((err as Error).message);
             } finally {
-                setLoading(false); // Снимаем состояние загрузки
+                setLoading(false);
             }
         };
 
         fetchGuide();
     }, [guideId]);
+
+    const handleLikeUpdate = (guideId: number, isLiked: boolean, totalLikes: number) => {
+        setGuide((prevGuide) =>
+            prevGuide?.id === guideId
+                ? {...prevGuide, isLiked, totalLikes}
+                : prevGuide
+        );
+    };
 
     if (loading) {
         return (
@@ -65,19 +92,40 @@ const Guide: React.FC = () => {
         return <div className="not-found">Гид не найден.</div>;
     }
 
+    const handlePdfDownload = (id: any) => {
+
+    };
+
     return (
         <MainContainer>
-            <Header></Header>
+            <Header/>
             <div className="guide-header">
-                <p>Лайков: {guide.totalLikes}</p>
-                {guide.owner && <p>Владелец: {guide.owner.username}</p>}
+                <div className="guide-actions">
+                    <div className="tile-likes">
+                    <span
+                        className={`like-button ${guide.isLiked ? "liked" : ""}`}
+                        onClick={() => handleLike(guide.id, guide.isLiked, handleLikeUpdate)}
+                    >
+                        ❤
+                    </span>
+                        {guide.totalLikes}
+                    </div>
+                    <button className="download-pdf-button" onClick={() => handlePdfDownload(guide.id)}>
+                        Скачать PDF 💾
+                    </button>
+                    <p className="owner">Владелец: {guide.owner?.username || "Неизвестно"}</p>
+                    <p className="created-at">Дата создания: {formatDate(guide.createdAt)}</p>
+                </div>
             </div>
             <div className="guide-details">
                 <ReactMarkdown rehypePlugins={[rehypeRaw]}>{guide.details}</ReactMarkdown>
             </div>
+            {showLoginPopup && (
+                <LoginPopup onClose={() => setShowLoginPopup(false)} onLogin={() => navigate("/login")}/>
+            )}
         </MainContainer>
-
     );
+
 };
 
 export default Guide;

@@ -1,7 +1,58 @@
-/* Заголовок гида */
+.content-container {
+    /*background-color: #fff;*/
+}
+
+/* Нижняя часть страницы (footer) */
 .guide-header {
-    text-align: center;
-    margin-bottom: 20px;
+    /*border: 1px solid;*/
+    margin: 0.5rem 0 0.25rem 4rem;
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #333;
+}
+
+.guide-actions .like-button {
+    font-size: 2.5rem; /* Пример переопределения */
+}
+
+.guide-header p {
+    /*border: 1px solid;*/
+    margin: 0.3rem 0;
+}
+
+/* Действия в строку */
+.guide-actions {
+    display: flex;
+    justify-content: left; /* Центрируем по горизонтали */
+    align-items: center; /* Выравниваем по вертикали */
+    gap: 2rem; /* Расстояние между элементами */
+}
+
+.download-pdf-button {
+    background-color: #f87f76;
+    width: 10rem;
+    color: white;
+    font-size: 1rem; /* 18px */
+    font-weight: bold;
+    padding: 0.5rem 1rem; /* 10px 16px */
+    border: none;
+    border-radius: 0.75rem; /* 8px */
+    cursor: pointer;
+    text-shadow: 0.0625rem 0.0625rem 0.125rem rgba(0, 0, 0, 0.6);
+    box-shadow: 0 0.1875rem 0.375rem rgba(0, 0, 0, 0.2);
+    transition: all 0.3s ease;
+}
+
+.download-pdf-button:hover {
+    background-color: #c66059;
+    box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.3);
+    transform: translateY(-0.125rem);
+}
+
+.download-pdf-button:active {
+    background-color: #c15550;
+    transform: scale(0.98);
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.5);
 }
 
 .guide-header h1 {
@@ -55,18 +106,6 @@
 
 .guide-details a:hover {
     text-decoration: underline;
-}
-
-/* Нижняя часть страницы (footer) */
-.guide-header {
-    margin: 1rem;
-    font-size: 1rem;
-    color: #666;
-    text-align: right;
-}
-
-.guide-header p {
-    margin: 5px 0;
 }
 
 /* Стили для состояния загрузки и ошибок */

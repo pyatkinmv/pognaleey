@@ -85,8 +85,12 @@ public class TravelGuideService {
         var owner = Optional.ofNullable(guide.getUserId())
                 .flatMap(userService::findUserById)
                 .orElse(null);
+        var isCurrentUserLiked = getCurrentUser()
+                .map(it -> likeService.findGuidesIdsByUserId(it.getId(), Integer.MAX_VALUE, 0))
+                .map(it -> it.contains(guideId))
+                .orElse(false);
 
-        return TravelMapper.toGuideDto(guide, owner, totalLikes);
+        return TravelMapper.toGuideDto(guide, owner, totalLikes, isCurrentUserLiked);
     }
 
     private Optional<TravelGuide> findTravelGuideWithContent(long guideId) {
