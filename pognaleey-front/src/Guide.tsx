@@ -5,6 +5,7 @@ import rehypeRaw from "rehype-raw";
 import apiClient from "./apiClient";
 import "./Guide.css";
 import Header from "./Header";
+import MainContainer from "./MainContainer";
 
 interface UserDto {
     id: number;
@@ -52,7 +53,6 @@ const Guide: React.FC = () => {
         return (
             <div className="loading-container">
                 <div className="loader"></div>
-                <p>Уже готовим ваш путеводитель! Чуть-чуть подождите 😊</p>
             </div>
         );
     }
@@ -66,17 +66,17 @@ const Guide: React.FC = () => {
     }
 
     return (
-        <div className="guide-container">
-            <Header/>
+        <MainContainer>
+            <Header></Header>
+            <div className="guide-header">
+                <p>Лайков: {guide.totalLikes}</p>
+                {guide.owner && <p>Владелец: {guide.owner.username}</p>}
+            </div>
             <div className="guide-details">
                 <ReactMarkdown rehypePlugins={[rehypeRaw]}>{guide.details}</ReactMarkdown>
             </div>
+        </MainContainer>
 
-            <div className="guide-footer">
-                <p>Лайков: {guide.totalLikes}</p>
-                {guide.owner && <p>Автор: {guide.owner.username}</p>}
-            </div>
-        </div>
     );
 };
 
