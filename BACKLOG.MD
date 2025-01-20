@@ -28,19 +28,23 @@
 | Monitoring (Prometheus + Grafana) | 1        | 5      | Add monitoring                                                                                                               |
 | Kubernetes                        | 1        | 6      | Use                                                                                                                          |
 | New features?                     | 1        | 20?    | Guide content management?                                                                                                    |
+| Contact page                      | 1        | 2      | Page with contacts (telegram, email, linkedin)                                                                               |
+| Fetch user's location             | 3        | 3      |                                                                                                                              |
 
 # PLAN
 
-| Task                                | Weight | Task Description                                                                                                             |
-|-------------------------------------|--------|------------------------------------------------------------------------------------------------------------------------------|
-| Guide page 1                        | 5/8    | New component, Markdown processing, JUST show content                                                                        |
-| Recommendations page 1              | 2/5    | Guide generation button, navigate to the Guide page                                                                          |
-| VPN on the host                     | 3/3    | Requests to ChatGPT from the host                                                                                            |
-| Login/Registration window & logic 1 | 1/3    | Remove mandatory login, refine the window itself, validations                                                                |
-| Main page 1                         | 7/14   | Background, content overlay, image, generate button                                                                          |
-| Main page 2                         | 7/14   | Feed, likes/dislikes                                                                                                         |
-| Header                              | 4/4    | Add a header to all pages (Main, Login/Logout/Registration)                                                                  |
-| Questionnaire                       | 3/3    | Fix content (e.g., budget and source), align with the main page, direct navigation to recommendations page, preference field |
-| Recommendations page 2              | 3/5    | Align with the main page, fix content, single upload, scroll to top                                                          |
-| Guide page 2                        | 3/8    | Owner, likes/dislikes (display and functionality), align with the main page                                                  |
-| Login/Registration window & logic 2 | 2/3    | Refine the window itself, validations                                                                                        |
+| Task                                    | Weight | Task Description                                                                                                             |
+|-----------------------------------------|--------|------------------------------------------------------------------------------------------------------------------------------|
+| ~~Guide page 1~~                        | 5/8    | New component, Markdown processing, JUST show content                                                                        |
+| ~~Recommendations page 1~~              | 2/5    | Guide generation button, navigate to the Guide page                                                                          |
+| ~~VPN on the host~~                     | 3/3    | Requests to ChatGPT from the host                                                                                            |
+| ~~Login/Registration window & logic 1~~ | 1/3    | Remove mandatory login, refine the window itself, validations                                                                |
+| ~~Main page 1~~                         | 7/14   | Background, content overlay, image, generate button                                                                          |
+| ~~Main page 2~~                         | 7/14   | Feed, likes/dislikes                                                                                                         |
+| ~~Logo~~                                | 2/2    | Generate, format and use logo for header                                                                                     |
+| ~~Header 1~~                            | 4/6    | Implement login/logout/user                                                                                                  |
+| ~~Header 2~~                            | 2/6    | Implement lang & contact; add a header to all pages (Main, Login/Logout/Registration)                                        |
+| Questionnaire                           | 3/3    | Fix content (e.g., budget and source), align with the main page, direct navigation to recommendations page, preference field |
+| Recommendations page 2                  | 3/5    | Align with the main page, fix content, single upload, scroll to top                                                          |
+| Guide page 2                            | 3/8    | Owner, likes/dislikes (display and functionality), align with the main page                                                  |
+| Login/Registration window & logic 2     | 2/3    | Refine the window itself, validations                                                                                        |

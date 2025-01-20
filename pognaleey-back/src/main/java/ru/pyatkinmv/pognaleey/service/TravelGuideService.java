@@ -220,8 +220,14 @@ public class TravelGuideService {
         for (var title : titleToImageUrlMap.keySet()) {
             var target = String.format("{%s}", title);
             var titleStr = GptAnswerResolveHelper.replaceQuotes(title);
-            var replacement = String.format(MARKDOWN_IMAGE_FORMAT + "\n", titleToImageUrlMap.get(title), titleStr);
-            result = result.replace(target, replacement);
+            String imageUrl = titleToImageUrlMap.get(title);
+
+            if (imageUrl != null) {
+                var replacement = String.format(MARKDOWN_IMAGE_FORMAT + "\n", imageUrl, titleStr);
+                result = result.replace(target, replacement);
+            } else {
+                log.warn("Not found image for title {}", title);
+            }
         }
 
         return result;
@@ -282,7 +288,8 @@ public class TravelGuideService {
         return titlesWithImageSearchPhrases.stream()
                 .collect(Collectors.toMap(
                         GptAnswerResolveHelper.SearchableItem::title,
-                        it -> imagesSearchHttpClient.searchImageUrlWithRateLimiting(it.imageSearchPhrase()),
+                        // TODO: fix
+                        it -> imagesSearchHttpClient.searchImageUrlWithRateLimiting(it.imageSearchPhrase()).orElse(null),
                         (a, b) -> b,
                         () -> new TreeMap<>(String.CASE_INSENSITIVE_ORDER)
                 ));

@@ -1,11 +1,9 @@
 package ru.pyatkinmv.pognaleey.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Table;
+import org.springframework.lang.Nullable;
 import ru.pyatkinmv.pognaleey.dto.GptResponseRecommendationDetailsDto;
 
 import java.time.Instant;
@@ -15,14 +13,18 @@ import java.time.Instant;
 @AllArgsConstructor
 @Builder
 @Table("travel_recommendations")
+@ToString(onlyExplicitlyIncluded = true)
 public class TravelRecommendation {
+    @ToString.Include
     @Id
     private Long id;
 
     private Instant createdAt;
 
+    @ToString.Include
     private Long inquiryId;
 
+    @ToString.Include
     private String title;
 
     private String imageSearchPhrase;
@@ -30,7 +32,11 @@ public class TravelRecommendation {
     /**
      * {@link GptResponseRecommendationDetailsDto} stored here
      */
+    @Nullable
     private String details;
 
+    @Nullable
     private String imageUrl;
+
+    private TravelRecommendationStatus status;
 }

@@ -16,18 +16,36 @@ public interface TravelRecommendationRepository extends CrudRepository<TravelRec
     @Modifying
     @Query("""
                 UPDATE travel_recommendations
-                SET DETAILS = :details
-                WHERE id = :id
+                SET
+                    details = :details,
+                    status = CASE
+                                WHEN image_url IS NOT NULL THEN 'READY'
+                                ELSE status
+                             END
+                WHERE id = :id;
             """)
-    void updateDetails(Long id, String details);
+    void updateDetailsAndStatus(Long id, String details);
 
     @Modifying
     @Query("""
                 UPDATE travel_recommendations
-                SET IMAGE_URL = :imageUrl
-                WHERE id = :id
+                SET
+                    image_url = :imageUrl,
+                    status = CASE
+                                WHEN details IS NOT NULL THEN 'READY'
+                                ELSE status
+                             END
+                WHERE id = :id;
             """)
-    void updateImageUrl(Long id, String imageUrl);
+    void updateImageUrlAndStatus(Long id, String imageUrl);
+
+    @Modifying
+    @Query("""
+                UPDATE travel_recommendations
+                SET status = :status
+                WHERE id = :id;
+            """)
+    void setStatus(Long id, String status);
 
     default List<TravelRecommendation> saveAllFromIterable(Iterable<TravelRecommendation> travelRecommendations) {
         return StreamSupport.stream(saveAll(travelRecommendations).spliterator(), false).toList();

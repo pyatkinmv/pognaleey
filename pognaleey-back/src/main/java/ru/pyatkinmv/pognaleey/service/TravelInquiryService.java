@@ -3,19 +3,14 @@ package ru.pyatkinmv.pognaleey.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.pyatkinmv.pognaleey.dto.TravelInquiryDto;
-import ru.pyatkinmv.pognaleey.dto.TravelRecommendationListDto;
 import ru.pyatkinmv.pognaleey.mapper.TravelMapper;
 import ru.pyatkinmv.pognaleey.model.TravelInquiry;
-import ru.pyatkinmv.pognaleey.model.TravelRecommendation;
 import ru.pyatkinmv.pognaleey.repository.TravelGuideRepository;
 import ru.pyatkinmv.pognaleey.repository.TravelInquiryRepository;
-import ru.pyatkinmv.pognaleey.util.LongPolling;
 
 import java.time.Instant;
 import java.util.Collection;
-import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -59,48 +54,9 @@ public class TravelInquiryService {
                 .createdAt(Instant.now())
                 .build();
         inquiry = inquiryRepository.save(inquiry);
-        List<TravelRecommendation> recommendations;
+        recommendationService.createRecommendationsAsync(inquiry.getId(), inquiryPayload);
 
-        try {
-            recommendations = recommendationService.createQuickRecommendations(inquiry.getId(), inquiryPayload);
-            recommendationService.enrichWithDetailsAsync(recommendations, inquiryPayload);
-            recommendationService.enrichWithImagesAsync(recommendations);
-
-            return TravelMapper.toInquiryDto(inquiry, recommendations);
-        } catch (Exception e) {
-            throw new RuntimeException("Failed to process inquiry", e);
-        }
-    }
-
-    public TravelRecommendationListDto getInquiryRecommendations(Long inquiryId, long timeoutMillis) {
-        var inquiry = inquiryRepository.findById(inquiryId);
-
-        if (inquiry.isEmpty()) {
-            throw new RuntimeException("Inquiry with id " + inquiryId + " does not exist");
-        }
-
-        var longPoll = new LongPolling<List<TravelRecommendation>>();
-        var recommendations = longPoll.execute(
-                () -> findRecommendationsFilteringDetailsAndImages(inquiryId),
-                timeoutMillis,
-                300
-        );
-        var recommendationsIds = recommendations.stream().map(TravelRecommendation::getId).toList();
-        var recommendationIdToGuideIdMap = travelGuideRepository.getRecommendationToGuideMap(recommendationsIds);
-
-        return TravelMapper.toRecommendationListDto(recommendations, recommendationIdToGuideIdMap);
-    }
-
-    private Optional<List<TravelRecommendation>> findRecommendationsFilteringDetailsAndImages(Long inquiryId) {
-        var recommendations = recommendationService.findByInquiryId(inquiryId);
-
-        if (!recommendations.isEmpty()
-                && recommendations.stream().allMatch(
-                it -> it.getDetails() != null && it.getImageUrl() != null)) {
-            return Optional.of(recommendations);
-        } else {
-            return Optional.empty();
-        }
+        return TravelMapper.toInquiryDto(inquiry);
     }
 
     public TravelInquiry findById(Long inquiryId) {

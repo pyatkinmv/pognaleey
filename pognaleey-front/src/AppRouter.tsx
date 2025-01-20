@@ -33,7 +33,7 @@ const AppRouter: React.FC = () => {
                 }
             />
             <Route
-                path="/travel-inquiries/:inquiryId/recommendations"
+                path="/travel-recommendations"
                 element={
                     <PrivateRoute>
                         <Recommendations/>

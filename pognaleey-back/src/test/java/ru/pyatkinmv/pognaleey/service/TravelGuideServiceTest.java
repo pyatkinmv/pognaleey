@@ -11,6 +11,7 @@ import ru.pyatkinmv.pognaleey.dto.TravelGuideLikeDto;
 import ru.pyatkinmv.pognaleey.model.TravelGuide;
 import ru.pyatkinmv.pognaleey.model.TravelInquiry;
 import ru.pyatkinmv.pognaleey.model.TravelRecommendation;
+import ru.pyatkinmv.pognaleey.model.TravelRecommendationStatus;
 import ru.pyatkinmv.pognaleey.repository.TravelGuideRepository;
 import ru.pyatkinmv.pognaleey.repository.TravelInquiryRepository;
 import ru.pyatkinmv.pognaleey.repository.TravelRecommendationRepository;
@@ -198,13 +199,12 @@ class TravelGuideServiceTest extends DatabaseCleaningTest {
     }
 
     private TravelRecommendation createRecommendation() {
-        // TODO: fix budget (подешевле, комфортно, роскошно)
-        var inquiryParams = "duration=1-3 days;to=Russia;budget={from=100, to=800}";
+        var inquiryParams = "duration=1-3 days;to=Russia;budget=standard";
         var inquiry = travelInquiryRepository.save(new TravelInquiry(null, inquiryParams, Instant.now(), null));
         assertThat(inquiry.getParams()).isEqualTo(inquiryParams);
         assertThat(inquiry.getId()).isNotNull();
         var recommendation = travelRecommendationRepository.save(
-                new TravelRecommendation(null, Instant.now(), inquiry.getId(), "Москва", "белокаменная", "details", "imageUrl")
+                new TravelRecommendation(null, Instant.now(), inquiry.getId(), "Москва", "белокаменная", "details", "imageUrl", TravelRecommendationStatus.IN_PROGRESS)
         );
         assertThat(recommendation.getId()).isNotNull();
 

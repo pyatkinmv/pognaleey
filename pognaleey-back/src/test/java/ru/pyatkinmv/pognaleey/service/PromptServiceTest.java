@@ -2,6 +2,7 @@ package ru.pyatkinmv.pognaleey.service;
 
 import org.junit.jupiter.api.Test;
 import ru.pyatkinmv.pognaleey.model.TravelRecommendation;
+import ru.pyatkinmv.pognaleey.model.TravelRecommendationStatus;
 
 import java.time.Instant;
 
@@ -11,16 +12,16 @@ class PromptServiceTest {
 
     @Test
     void generateQuickPrompt() {
-        var actual = PromptService.generateQuickPrompt(3,
+        var actual = PromptService.generateQuickPrompt(5,
                 "from=Moscow;to=Asia"
         );
-        var expected = "Придумай мне ровно 3 варианта путешествий исходя из входных условий: from=Moscow;to=Asia.К этим вариантам добавь короткие" +
+        var expected = "Придумай мне ровно 5 вариантов путешествий исходя из входных условий: from=Moscow;to=Asia.К этим вариантам добавь короткие" +
                 " поисковые запросы, по которым я могу найти красивые картинки в соответствии с основными условиями." +
                 " Ответ выдай в формате:{заглавие1}(поисковой запрос1)|{заглавие2}(поисковой запрос2)|..." +
                 " Например: {Грузия, Тбилиси и винные регионы}(Грузия весна пейзаж)" +
                 "|{Париж, Франция: Город любви}(Париж Эйфелева башня закат)" +
                 "|{Красная Поляна, Сочи: Горнолыжный отдых}(Красная Поляна лыжи снег)." +
-                "В ответе не пиши ничего кроме самой статьи";
+                "В ответе не пиши ничего кроме вариантов";
         assertThat(actual).isEqualTo(expected);
     }
 
@@ -28,19 +29,14 @@ class PromptServiceTest {
     void generateDetailedPrompt() {
         var now = Instant.now();
         var recommendation =
-                new TravelRecommendation(1L, now, 1L, "t1", "d1", "dt1", "i1");
+                new TravelRecommendation(1L, now, 1L, "t1", "d1", "dt1", "i1", TravelRecommendationStatus.IN_PROGRESS);
 
         var actual = PromptService.generateDetailedPrompt(recommendation, "budget=500&purpose=romantic");
-        var expected = "У меня есть идея для путешествия:t1—d1." +
+        var expected = "У меня есть идея для путешествия:t1." +
                 "Мои пожелания следующие: budget=500&purpose=romantic." +
-                "Дай мне исходя из этих предпочтений подробное описание в формате JSON" +
-                "(не надо никаких дополнительных нумераций и слов, в ответе только JSON). " +
-                "Формат: {\"title\":\"НАЗВАНИЕ МЕСТА\",\"budget\":\"НЕОБХОДИМЫЙ БЮДЖЕТ (НАПРИМЕР, 1000$)\"," +
-                "\"reasoning\":\"ПОЧЕМУ ЭТОТ ВАРИАНТ ПОДХОДИТ\"," +
-                "\"description\":\"КРЕАТИВНОЕ ХУДОЖЕСТВЕННОЕ ОПИСАНИЕ ВАРИАНТА\"," +
-                "\"tips\":\"ОБЩИЕ РЕКОМЕНДАЦИИ (СТРОКА)\"," +
-                "\"whereToGo\":[\"ДОСТОПРИМЕЧАТЕЛЬНОСТИ/КОНКРЕТНЫЕ МЕСТА РЕКОМЕНДУЕМЫЕ ДЛЯ ПОСЕЩЕНИЯ\"]," +
-                "\"additionalConsideration\":\"ЧТО НУЖНО ДОПОЛНИТЕЛЬНО УЧЕСТЬ\"}";
+                "Дай мне исходя из этих пожеланий подробное описание в формате JSON" +
+                "(не надо никаких дополнительных нумераций и слов, в ответе только JSON указанного формата). " +
+                "Формат: {\"reasoning\":\"ПОЧЕМУ ЭТОТ ВАРИАНТ ПОДХОДИТ\",\"description\":\"ОПИСАНИЕ ВАРИАНТА\"}";
         assertThat(actual).isEqualTo(expected);
     }
 

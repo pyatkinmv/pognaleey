@@ -31,15 +31,9 @@ const Inquiry: React.FC = () => {
                 (e.target as HTMLSelectElement).selectedOptions,
                 (option) => option.value
             );
-            setFormData({
-                ...formData,
-                [name]: options,
-            });
+            setFormData({...formData, [name]: options});
         } else {
-            setFormData({
-                ...formData,
-                [name]: value,
-            });
+            setFormData({...formData, [name]: value});
         }
     };
 
@@ -53,12 +47,7 @@ const Inquiry: React.FC = () => {
 
             if (response.ok) {
                 const data = await response.json();
-                const inquiryId = data.id;
-
-                // Редирект на страницу рекомендаций
-                navigate(`/travel-inquiries/${inquiryId}/recommendations`, {
-                    state: {quickRecommendations: data.quickRecommendations},
-                });
+                navigate(`/travel-recommendations?inquiryId=${data.id}`);
             } else {
                 alert("Ошибка отправки формы.");
             }
@@ -330,8 +319,9 @@ const Inquiry: React.FC = () => {
             </QuestionContainer>
 
             {/* Кнопка отправки */}
-            <button className="button" type="submit" onClick={handleSubmit}>Отправить</button>
-            {/*</form>*/}
+            <button className="button" type="submit" onClick={handleSubmit}>
+                Отправить
+            </button>
         </MainContainer>
     );
 };

@@ -2,9 +2,11 @@ package ru.pyatkinmv.pognaleey.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 import ru.pyatkinmv.pognaleey.dto.TravelInquiryDto;
-import ru.pyatkinmv.pognaleey.dto.TravelRecommendationListDto;
 import ru.pyatkinmv.pognaleey.service.TravelInquiryService;
 import ru.pyatkinmv.pognaleey.util.Utils;
 
@@ -22,8 +24,4 @@ public class TravelInquiryController {
         return Utils.measuringTime(() -> inquiryService.createInquiry(inquiryParams));
     }
 
-    @GetMapping("/{inquiryId}/recommendations")
-    public TravelRecommendationListDto getInquiryRecommendations(@PathVariable Long inquiryId) {
-        return Utils.measuringTime(() -> inquiryService.getInquiryRecommendations(inquiryId, 30_000L));
-    }
 }

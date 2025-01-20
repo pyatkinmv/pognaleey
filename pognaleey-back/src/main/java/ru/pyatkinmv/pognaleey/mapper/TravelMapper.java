@@ -15,17 +15,11 @@ import java.util.stream.Collectors;
 
 @Component
 public class TravelMapper {
-
-    public static TravelInquiryDto toInquiryDto(TravelInquiry inquiry, Collection<TravelRecommendation> recommendations) {
+    public static TravelInquiryDto toInquiryDto(TravelInquiry inquiry) {
         return TravelInquiryDto.builder()
                 .id(inquiry.getId())
                 .payload(inquiry.getParams())
                 .createdAt(inquiry.getCreatedAt())
-                .quickRecommendations(recommendations.stream()
-                        .map(it -> new TravelQuickRecommendationDto(
-                                it.getId(),
-                                it.getTitle())
-                        ).toList())
                 .build();
     }
 
@@ -34,24 +28,28 @@ public class TravelMapper {
         return new TravelRecommendationListDto(
                 recommendations.stream()
                         .map(it -> toRecommendationDto(it, recommendationIdToGuideIdMap.get(it.getId())))
+                        .sorted(Comparator.comparing(TravelRecommendationDto::id))
                         .toList()
         );
     }
 
     @SneakyThrows
-    public static TravelRecommendationDto toRecommendationDto(TravelRecommendation travelRecommendation,
+    public static TravelRecommendationDto toRecommendationDto(TravelRecommendation recommendation,
                                                               @Nullable Long guideId) {
-        var details = Utils.toObject(
-                travelRecommendation.getDetails(),
-                GptResponseRecommendationDetailsDto.class
-        );
+        var details = Optional.ofNullable(recommendation.getDetails())
+                .map(it -> Utils.toObject(it, GptResponseRecommendationDetailsDto.class))
+                .map(it -> new TravelRecommendationDto.DetailsDto(it.description(), it.reasoning()))
+                .orElse(null);
+        var image = Optional.ofNullable(recommendation.getImageUrl())
+                .map(it -> new TravelRecommendationDto.ImageDto(it, it))
+                .orElse(null);
 
         return new TravelRecommendationDto(
-                travelRecommendation.getId(),
-                travelRecommendation.getTitle(),
-                details.reasoning(),
-                details.description(),
-                travelRecommendation.getImageUrl(),
+                recommendation.getId(),
+                recommendation.getTitle(),
+                recommendation.getStatus().name(),
+                details,
+                image,
                 guideId
         );
     }

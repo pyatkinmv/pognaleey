@@ -5,9 +5,16 @@ import org.springframework.lang.Nullable;
 public record TravelRecommendationDto(
         long id,
         String title,
-        String reasoning,
-        String description,
-        String imageUrl,
+        String status,
+        @Nullable DetailsDto details,
+        @Nullable ImageDto image,
         @Nullable Long guideId
 ) {
+    public record DetailsDto(String description, String reasoning) {
+
+    }
+
+    public record ImageDto(String thumbnailUrl, String imageUrl) {
+
+    }
 }

@@ -14,6 +14,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.regex.Pattern;
 
 @SuppressWarnings("UnstableApiUsage")
@@ -34,13 +35,13 @@ public class ImagesSearchHttpClient {
     @Value("${image-search-client.base-url}")
     private String imageSearchBaseUrl;
 
-    public String searchImageUrlWithRateLimiting(String text) {
+    public Optional<String> searchImageUrlWithRateLimiting(String text) {
         rateLimiter.acquire();
 
         return searchImageUrl(text);
     }
 
-    private String searchImageUrl(String text) {
+    private Optional<String> searchImageUrl(String text) {
         log.info("searchImageUrl for text {}", text);
         var uri = buildUri(text);
         log.info("searchImageUrl uri {}", withoutSecret(uri));
@@ -71,12 +72,12 @@ public class ImagesSearchHttpClient {
         var resultUrl = imageUrls.stream().filter(this::isUrlValid).findFirst().orElseGet(() -> {
             log.error("no valid imageUrl found; response {}", responseXml);
 
-            return "/logo-circle512.png";
+            return null;
         });
 
         log.info("searchImageUrl resultUrl {}", resultUrl);
 
-        return resultUrl;
+        return Optional.ofNullable(resultUrl);
     }
 
     private URI buildUri(String text) {

@@ -6,7 +6,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.Instant;
-import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -16,6 +15,5 @@ public class TravelInquiryDto {
     private Long id;
     private String payload;
     private Instant createdAt;
-    private List<TravelQuickRecommendationDto> quickRecommendations;
 }
 
