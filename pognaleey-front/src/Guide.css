@@ -108,16 +108,6 @@
     position: relative; /* Убедимся, что элементы позиционируются относительно контейнера */
 }
 
-.loader {
-    width: 50px;
-    height: 50px;
-    border: 5px solid #f3f3f3;
-    border-top: 5px solid #4caf50; /* Цвет активной линии */
-    border-radius: 50%;
-    animation: spin 1s linear infinite; /* Классический вращающийся спиннер */
-    margin-bottom: 15px; /* Отступ между спиннером и текстом */
-}
-
 .loading-container p {
     font-size: 18px;
     color: #555;

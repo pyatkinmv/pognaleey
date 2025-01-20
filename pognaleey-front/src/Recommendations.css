@@ -35,42 +35,11 @@
     line-height: 1.5;
 }
 
-/* Стили для списков */
-ul {
-    list-style: disc;
-    padding-left: 1.25rem; /* 20px */
-    margin: 0.625rem 0; /* 10px */
-}
-
-li {
-    margin-bottom: 0.3125rem; /* 5px */
-    color: #2c3e50;
-}
 
 /* Дополнительные стили для текста */
 strong {
     color: #f87f76;
     font-weight: bold;
-}
-
-/* CSS для вращающегося прогресс-бара */
-.loader {
-    border: 0.25rem solid #f3f3f3; /* Светло-серый */
-    border-top: 0.25rem solid #f87f76; /* Основной цвет */
-    border-radius: 50%;
-    width: 2.5rem; /* 40px */
-    height: 2.5rem; /* 40px */
-    animation: spin 1s linear infinite;
-    margin: auto;
-}
-
-@keyframes spin {
-    0% {
-        transform: rotate(0deg);
-    }
-    100% {
-        transform: rotate(360deg);
-    }
 }
 
 /* Карточка рекомендации */
@@ -85,8 +54,8 @@ strong {
 }
 
 .recommendation-card:hover {
-    /*transform: translateY(-0.1rem);*/
-    box-shadow: 0 0.375rem 0.75rem rgba(0, 0, 0, 0.3);
+    transform: translateY(-0.1rem);
+    box-shadow: 0 0.375rem 1rem rgba(0, 0, 0, 0.4);
 }
 
 /* Изображение */
