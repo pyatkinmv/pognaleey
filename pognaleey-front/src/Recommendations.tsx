@@ -37,8 +37,11 @@ const Recommendations: React.FC = () => {
                 throw new Error(`Failed to generate guide: ${response.status}`);
             }
 
+            // Получаем данные о гайде (без details)
             const guide = await response.json();
-            navigate(`/travel-guides/${guide.id}`);
+
+            // Передаем данные в navigate через state
+            navigate(`/travel-guides/${guide.id}`, {state: {guideInfo: guide}});
         } catch (error) {
             console.error("Error generating guide:", error);
             alert("Не удалось сгенерировать гайд.");

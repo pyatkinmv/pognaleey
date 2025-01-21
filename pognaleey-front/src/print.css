@@ -6,13 +6,15 @@
         visibility: hidden;
     }
 
+    /*TODO: добавить лого*/
+
     /* Показать только элемент guide-details и его содержимое */
     .guide-details, .guide-details * {
         visibility: visible;
     }
 
     .guide-details {
-        max-width: 80%; /* Подгоните ширину под размер страницы */
+        max-width: 75%; /* Подгоните ширину под размер страницы */
         margin: 0 auto;
     }
 }

@@ -5,9 +5,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
-import ru.pyatkinmv.pognaleey.dto.TravelGuideFullDto;
+import ru.pyatkinmv.pognaleey.dto.TravelGuideContentDto;
+import ru.pyatkinmv.pognaleey.dto.TravelGuideInfoDto;
 import ru.pyatkinmv.pognaleey.dto.TravelGuideLikeDto;
-import ru.pyatkinmv.pognaleey.dto.TravelGuideShortDto;
 import ru.pyatkinmv.pognaleey.service.TravelGuideService;
 
 @RestController
@@ -18,7 +18,7 @@ public class TravelGuideController {
     private final TravelGuideService travelGuideService;
 
     @PostMapping
-    public TravelGuideShortDto createGuide(@RequestParam("recommendationId") long recommendationId) {
+    public TravelGuideInfoDto createGuide(@RequestParam("recommendationId") long recommendationId) {
         return travelGuideService.createGuide(recommendationId);
     }
 
@@ -33,22 +33,27 @@ public class TravelGuideController {
     }
 
     @GetMapping("/{guideId}")
-    public TravelGuideFullDto getGuide(@PathVariable("guideId") long guideId) {
-        return travelGuideService.getFullGuide(guideId, 30_000L);
+    public TravelGuideInfoDto getGuide(@PathVariable("guideId") long guideId) {
+        return travelGuideService.getGuideInfo(guideId);
+    }
+
+    @GetMapping("/{guideId}/content")
+    public TravelGuideContentDto getGuideContent(@PathVariable("guideId") long guideId) {
+        return travelGuideService.getGuideContent(guideId);
     }
 
     @GetMapping("/liked")
-    public Page<TravelGuideShortDto> getLikedGuides(Pageable pageable) {
+    public Page<TravelGuideInfoDto> getLikedGuides(Pageable pageable) {
         return travelGuideService.getLikedGuides(pageable);
     }
 
     @GetMapping("/my")
-    public Page<TravelGuideShortDto> getMyGuides(Pageable pageable) {
+    public Page<TravelGuideInfoDto> getMyGuides(Pageable pageable) {
         return travelGuideService.getMyGuides(pageable);
     }
 
     @GetMapping("/feed")
-    public Page<TravelGuideShortDto> getFeedGuides(Pageable pageable) {
+    public Page<TravelGuideInfoDto> getFeedGuides(Pageable pageable) {
         return travelGuideService.getFeedGuides(pageable);
     }
 

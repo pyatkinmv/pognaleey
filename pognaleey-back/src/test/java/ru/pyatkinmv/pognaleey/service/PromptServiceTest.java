@@ -1,8 +1,8 @@
 package ru.pyatkinmv.pognaleey.service;
 
 import org.junit.jupiter.api.Test;
+import ru.pyatkinmv.pognaleey.model.ProcessingStatus;
 import ru.pyatkinmv.pognaleey.model.TravelRecommendation;
-import ru.pyatkinmv.pognaleey.model.TravelRecommendationStatus;
 
 import java.time.Instant;
 
@@ -29,7 +29,7 @@ class PromptServiceTest {
     void generateDetailedPrompt() {
         var now = Instant.now();
         var recommendation =
-                new TravelRecommendation(1L, now, 1L, "t1", "d1", "dt1", "i1", TravelRecommendationStatus.IN_PROGRESS);
+                new TravelRecommendation(1L, now, 1L, "t1", "d1", "dt1", "i1", ProcessingStatus.IN_PROGRESS);
 
         var actual = PromptService.generateDetailedPrompt(recommendation, "budget=500&purpose=romantic");
         var expected = "У меня есть идея для путешествия:t1." +

@@ -15,15 +15,26 @@ interface UserDto {
     username: string;
 }
 
-interface TravelGuideFullDto {
+interface TravelGuideInfoDto {
     id: number;
     title: string;
     imageUrl: string;
-    details: string;
     totalLikes: number;
     isLiked: boolean;
     owner?: UserDto;
-    createdAt: number; // Дата создания
+    createdAt: number;
+}
+
+interface TravelGuideContentDto {
+    contentItems: TravelGuideContentItemDto[];
+}
+
+interface TravelGuideContentItemDto {
+    id: number;
+    guideId: number;
+    ordinal: number;
+    content?: string;
+    status: string;
 }
 
 function formatDate(timestamp: number): string {
@@ -39,22 +50,25 @@ function formatDate(timestamp: number): string {
 
 const Guide: React.FC = () => {
     const {guideId} = useParams<{ guideId: string }>();
-    const [guide, setGuide] = useState<TravelGuideFullDto | null>(null);
+    const [guide, setGuide] = useState<TravelGuideInfoDto | null>(null);
+    const [contentItems, setContentItems] = useState<TravelGuideContentItemDto[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
-    const [showLoginPopup, setShowLoginPopup] = useState<boolean>(false);
+    const [showLoginPopup, setShowLoginPopup] = useState(false);
     const navigate = useNavigate();
 
     const {handleLike} = useLikeHandler(() => setShowLoginPopup(true));
 
     useEffect(() => {
         const fetchGuide = async () => {
+            if (!guideId) return;
+
             try {
                 setLoading(true);
                 const response = await apiClient(`${process.env.REACT_APP_API_URL}/travel-guides/${guideId}`);
 
                 if (response.ok) {
-                    const data: TravelGuideFullDto = await response.json();
+                    const data: TravelGuideInfoDto = await response.json();
                     setGuide(data);
                 } else {
                     throw new Error("Failed to fetch travel guide.");
@@ -68,6 +82,36 @@ const Guide: React.FC = () => {
 
         fetchGuide();
     }, [guideId]);
+
+    useEffect(() => {
+        if (!guideId) return;
+
+        const fetchContent = async () => {
+            try {
+                setLoading(true);
+                const response = await apiClient(
+                    `${process.env.REACT_APP_API_URL}/travel-guides/${guideId}/content`
+                );
+
+                if (!response.ok) {
+                    throw new Error("Failed to fetch guide content.");
+                }
+
+                const data: TravelGuideContentDto = await response.json();
+                setContentItems(data.contentItems);
+            } catch (err) {
+                setError((err as Error).message);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        // Загружаем контент только если еще не был передан
+        if (!contentItems.length) {
+            fetchContent();
+        }
+    }, [guideId, contentItems.length]);
+
 
     const handleLikeUpdate = (guideId: number, isLiked: boolean, totalLikes: number) => {
         setGuide((prevGuide) =>
@@ -119,7 +163,18 @@ const Guide: React.FC = () => {
                 </div>
             </div>
             <div className="guide-details">
-                <ReactMarkdown rehypePlugins={[rehypeRaw]}>{guide.details}</ReactMarkdown>
+                {contentItems.length > 0 ? (
+                    contentItems.map((item) => (
+                        <div key={item.id} className="content-item">
+                            <ReactMarkdown rehypePlugins={[rehypeRaw]}>
+                                {item.content}
+                            </ReactMarkdown>
+                            {item.status === "IN_PROGRESS" && <div className="loader"/>}
+                        </div>
+                    ))
+                ) : (
+                    <div className="loader"/>
+                )}
             </div>
             {showLoginPopup && (
                 <LoginPopup onClose={() => setShowLoginPopup(false)} onLogin={() => navigate("/login")}/>

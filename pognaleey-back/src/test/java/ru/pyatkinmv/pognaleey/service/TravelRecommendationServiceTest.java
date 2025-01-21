@@ -5,9 +5,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import ru.pyatkinmv.pognaleey.DatabaseCleaningTest;
 import ru.pyatkinmv.pognaleey.dto.TravelRecommendationDto;
+import ru.pyatkinmv.pognaleey.model.ProcessingStatus;
 import ru.pyatkinmv.pognaleey.model.TravelInquiry;
 import ru.pyatkinmv.pognaleey.model.TravelRecommendation;
-import ru.pyatkinmv.pognaleey.model.TravelRecommendationStatus;
 import ru.pyatkinmv.pognaleey.repository.TravelInquiryRepository;
 import ru.pyatkinmv.pognaleey.repository.TravelRecommendationRepository;
 import ru.pyatkinmv.pognaleey.util.Utils;
@@ -35,11 +35,11 @@ class TravelRecommendationServiceTest extends DatabaseCleaningTest {
         assertThat(recommendations)
                 .usingRecursiveFieldByFieldElementComparatorIgnoringFields("id", "createdAt")
                 .containsExactly(
-                        new TravelRecommendation(null, null, inquiry.getId(), "Грузия, Тбилиси и винные регионы", "Грузия весна пейзаж", null, null, TravelRecommendationStatus.IN_PROGRESS),
-                        new TravelRecommendation(null, null, inquiry.getId(), "Париж, Франция: Город любви", "Париж Эйфелева башня закат", null, null, TravelRecommendationStatus.IN_PROGRESS),
-                        new TravelRecommendation(null, null, inquiry.getId(), "Красная Поляна, Сочи: Горнолыжный отдых", "Красная Поляна лыжи снег", null, null, TravelRecommendationStatus.IN_PROGRESS),
-                        new TravelRecommendation(null, null, inquiry.getId(), "Индонезия, Бали: Пляжный отдых", "Бали пляжи закат", null, null, TravelRecommendationStatus.IN_PROGRESS),
-                        new TravelRecommendation(null, null, inquiry.getId(), "Исландия: Природные чудеса", "Исландия водопады ледники", null, null, TravelRecommendationStatus.IN_PROGRESS)
+                        new TravelRecommendation(null, null, inquiry.getId(), "Грузия, Тбилиси и винные регионы", "Грузия весна пейзаж", null, null, ProcessingStatus.IN_PROGRESS),
+                        new TravelRecommendation(null, null, inquiry.getId(), "Париж, Франция: Город любви", "Париж Эйфелева башня закат", null, null, ProcessingStatus.IN_PROGRESS),
+                        new TravelRecommendation(null, null, inquiry.getId(), "Красная Поляна, Сочи: Горнолыжный отдых", "Красная Поляна лыжи снег", null, null, ProcessingStatus.IN_PROGRESS),
+                        new TravelRecommendation(null, null, inquiry.getId(), "Индонезия, Бали: Пляжный отдых", "Бали пляжи закат", null, null, ProcessingStatus.IN_PROGRESS),
+                        new TravelRecommendation(null, null, inquiry.getId(), "Исландия: Природные чудеса", "Исландия водопады ледники", null, null, ProcessingStatus.IN_PROGRESS)
                 );
     }
 

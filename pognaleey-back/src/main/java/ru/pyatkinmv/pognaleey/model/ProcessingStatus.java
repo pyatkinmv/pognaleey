@@ -1,6 +1,6 @@
 package ru.pyatkinmv.pognaleey.model;
 
-public enum TravelRecommendationStatus {
+public enum ProcessingStatus {
     IN_PROGRESS,
     READY,
     FAILED

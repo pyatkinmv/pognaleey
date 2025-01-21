@@ -4,10 +4,7 @@ import lombok.SneakyThrows;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
 import ru.pyatkinmv.pognaleey.dto.*;
-import ru.pyatkinmv.pognaleey.model.TravelGuide;
-import ru.pyatkinmv.pognaleey.model.TravelInquiry;
-import ru.pyatkinmv.pognaleey.model.TravelRecommendation;
-import ru.pyatkinmv.pognaleey.model.User;
+import ru.pyatkinmv.pognaleey.model.*;
 import ru.pyatkinmv.pognaleey.util.Utils;
 
 import java.util.*;
@@ -54,46 +51,33 @@ public class TravelMapper {
         );
     }
 
-    public static TravelGuideFullDto toGuideDto(TravelGuide guide, @Nullable User user, int totalLikes,
-                                                boolean isCurrentUserLiked) {
-        return new TravelGuideFullDto(
-                guide.getId(),
-                guide.getTitle(),
-                guide.getImageUrl(),
-                guide.getDetails(),
-                totalLikes,
-                isCurrentUserLiked,
-                guide.getCreatedAt().toEpochMilli(),
-                Optional.ofNullable(user).map(TravelMapper::toUserDto).orElse(null)
-        );
-    }
-
-    public static List<TravelGuideShortDto> toShortGuideListDto(List<TravelGuide> userGuides,
-                                                                List<User> users,
-                                                                Map<Long, Integer> guideIdToLikesCountMap,
-                                                                Set<Long> currentUserLikedGuidesIds) {
+    public static List<TravelGuideInfoDto> toShortGuideListDto(List<TravelGuide> userGuides,
+                                                               List<User> users,
+                                                               Map<Long, Integer> guideIdToLikesCountMap,
+                                                               Set<Long> currentUserLikedGuidesIds) {
         var userIdToUser = users.stream().collect(Collectors.toMap(User::getId, it -> it));
 
         return userGuides.stream()
-                .map(guide -> toShortGuideDto(
+                .map(guide -> toGuideInfoDto(
                                 guide,
                                 userIdToUser.get(guide.getUserId()),
                         guideIdToLikesCountMap.get(guide.getId()),
                         currentUserLikedGuidesIds.contains(guide.getId())
                         )
                 )
-                .sorted(Comparator.comparingInt(TravelGuideShortDto::totalLikes).reversed())
+                .sorted(Comparator.comparingInt(TravelGuideInfoDto::totalLikes).reversed())
                 .toList();
     }
 
-    public static TravelGuideShortDto toShortGuideDto(TravelGuide it, @Nullable User user, int totalLikes,
-                                                      boolean currentUserLiked) {
-        return new TravelGuideShortDto(
+    public static TravelGuideInfoDto toGuideInfoDto(TravelGuide it, @Nullable User user, int totalLikes,
+                                                    boolean currentUserLiked) {
+        return new TravelGuideInfoDto(
                 it.getId(),
                 it.getTitle(),
                 it.getImageUrl(),
                 totalLikes,
                 currentUserLiked,
+                it.getCreatedAt().toEpochMilli(),
                 Optional.ofNullable(user)
                         .map(TravelMapper::toUserDto)
                         .orElse(null)
@@ -102,5 +86,16 @@ public class TravelMapper {
 
     public static UserDto toUserDto(User user) {
         return new UserDto(user.getId(), user.getUsername());
+    }
+
+    public static TravelGuideContentDto toGuideContentDto(List<TravelGuideContentItem> items) {
+        return new TravelGuideContentDto(
+                items.stream()
+                        .map(it -> new TravelGuideContentDto.TravelGuideContentItemDto(
+                                it.getId(), it.getGuideId(), it.getOrdinal(), it.getContent(), it.getStatus().name()
+                        ))
+                        .sorted(Comparator.comparing(TravelGuideContentDto.TravelGuideContentItemDto::ordinal))
+                        .toList()
+        );
     }
 }

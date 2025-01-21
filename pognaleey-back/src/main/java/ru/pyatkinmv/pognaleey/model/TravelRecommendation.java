@@ -39,5 +39,5 @@ public class TravelRecommendation {
     private String imageUrl;
 
     // TODO: Подумать насчет статуса Inquiry вместо этого
-    private TravelRecommendationStatus status;
+    private ProcessingStatus status;
 }

@@ -10,8 +10,8 @@ import ru.pyatkinmv.pognaleey.client.ImagesSearchHttpClient;
 import ru.pyatkinmv.pognaleey.dto.GptResponseRecommendationDetailsDto;
 import ru.pyatkinmv.pognaleey.dto.TravelRecommendationListDto;
 import ru.pyatkinmv.pognaleey.mapper.TravelMapper;
+import ru.pyatkinmv.pognaleey.model.ProcessingStatus;
 import ru.pyatkinmv.pognaleey.model.TravelRecommendation;
-import ru.pyatkinmv.pognaleey.model.TravelRecommendationStatus;
 import ru.pyatkinmv.pognaleey.repository.TravelGuideRepository;
 import ru.pyatkinmv.pognaleey.repository.TravelInquiryRepository;
 import ru.pyatkinmv.pognaleey.repository.TravelRecommendationRepository;
@@ -72,9 +72,9 @@ public class TravelRecommendationService {
         if (shortInfo.isPresent()) {
             recommendation.setTitle(shortInfo.get().title());
             recommendation.setImageSearchPhrase(shortInfo.get().imageSearchPhrase());
-            recommendation.setStatus(TravelRecommendationStatus.IN_PROGRESS);
+            recommendation.setStatus(ProcessingStatus.IN_PROGRESS);
         } else {
-            recommendation.setStatus(TravelRecommendationStatus.FAILED);
+            recommendation.setStatus(ProcessingStatus.FAILED);
         }
 
         return recommendation;
@@ -145,7 +145,7 @@ public class TravelRecommendationService {
         } catch (Exception e) {
             log.error("Can not enrichWithDetails for recommendation {}, set failed status; reason: ",
                     recommendation.getId(), e);
-            recommendationRepository.setStatus(recommendation.getId(), TravelRecommendationStatus.FAILED.name());
+            recommendationRepository.setStatus(recommendation.getId(), ProcessingStatus.FAILED.name());
         }
 
         log.info("end enrichWithDetails for recommendation: {}", recommendation.getId());
@@ -170,7 +170,7 @@ public class TravelRecommendationService {
             recommendationRepository.updateImageUrlAndStatus(recommendation.getId(), imageUrl.get());
         } else {
             log.error("Not found image url for recommendation {}, set failed status", recommendation.getId());
-            recommendationRepository.setStatus(recommendation.getId(), TravelRecommendationStatus.FAILED.name());
+            recommendationRepository.setStatus(recommendation.getId(), ProcessingStatus.FAILED.name());
         }
     }
 
@@ -218,7 +218,7 @@ public class TravelRecommendationService {
                 .mapToObj(i -> TravelRecommendation.builder()
                         .inquiryId(inquiryId)
                         .createdAt(Instant.now())
-                        .status(TravelRecommendationStatus.IN_PROGRESS)
+                        .status(ProcessingStatus.IN_PROGRESS)
                         .build())
                 .toList();
 

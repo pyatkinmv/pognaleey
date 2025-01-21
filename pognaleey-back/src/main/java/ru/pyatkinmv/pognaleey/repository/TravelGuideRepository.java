@@ -1,6 +1,7 @@
 package ru.pyatkinmv.pognaleey.repository;
 
 import org.springframework.dao.DataAccessException;
+import org.springframework.data.jdbc.repository.query.Modifying;
 import org.springframework.data.jdbc.repository.query.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
@@ -39,6 +40,14 @@ public interface TravelGuideRepository extends CrudRepository<TravelGuide, Long>
             GROUP BY g.id
             """, resultSetExtractorClass = GuideLikesExtractor.class)
     Map<Long, Integer> countLikesByGuideId(@Param("guideIds") Collection<Long> guideIds);
+
+    @Modifying
+    @Query("""
+            UPDATE travel_guides
+            SET title = :title
+            WHERE id = :guideId
+            """)
+    void updateTitle(long guideId, String title);
 
     int countAllByUserId(Long userId);
 

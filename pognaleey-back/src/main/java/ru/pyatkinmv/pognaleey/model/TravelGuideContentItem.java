@@ -8,26 +8,21 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Table;
 import org.springframework.lang.Nullable;
 
-import java.time.Instant;
-
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@Table("travel_guides")
-public class TravelGuide {
+@Table("travel_guide_content_items")
+public class TravelGuideContentItem {
     @Id
     private Long id;
 
-    private Long recommendationId;
+    private Long guideId;
 
     @Nullable
-    private Long userId;
+    private String content;
 
-    private Instant createdAt;
+    private Integer ordinal;
 
-    @Nullable
-    private String title;
-
-    private String imageUrl;
+    private ProcessingStatus status;
 }
