@@ -16,7 +16,7 @@ interface Recommendation {
     guideId?: number | null;
 }
 
-const useRecommendations = (inquiryId: string | null, timeout: number = 20000) => {
+const useRecommendations = (inquiryId: string | null, timeout: number = 30000) => {
     const [recommendations, setRecommendations] = useState<Recommendation[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);

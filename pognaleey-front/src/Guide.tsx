@@ -4,6 +4,7 @@ import ReactMarkdown from "react-markdown";
 import rehypeRaw from "rehype-raw";
 import apiClient from "./apiClient";
 import "./Guide.css";
+import "./print.css"
 import Header from "./Header";
 import MainContainer from "./MainContainer";
 import {useLikeHandler} from "./useLikeHandler";
@@ -92,8 +93,8 @@ const Guide: React.FC = () => {
         return <div className="not-found">Гид не найден.</div>;
     }
 
-    const handlePdfDownload = (id: any) => {
-
+    const handlePdfDownload = async () => {
+        window.print();
     };
 
     return (
@@ -110,7 +111,7 @@ const Guide: React.FC = () => {
                     </span>
                         {guide.totalLikes}
                     </div>
-                    <button className="download-pdf-button" onClick={() => handlePdfDownload(guide.id)}>
+                    <button className="download-pdf-button" onClick={() => handlePdfDownload()}>
                         Скачать PDF 💾
                     </button>
                     <p className="owner">Владелец: {guide.owner?.username || "Неизвестно"}</p>

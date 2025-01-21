@@ -1,10 +1,4 @@
-.content-container {
-    /*background-color: #fff;*/
-}
-
-/* Нижняя часть страницы (footer) */
 .guide-header {
-    /*border: 1px solid;*/
     margin: 0.5rem 0 0.25rem 4rem;
     font-size: 1.2rem;
     font-weight: bold;
@@ -16,7 +10,6 @@
 }
 
 .guide-header p {
-    /*border: 1px solid;*/
     margin: 0.3rem 0;
 }
 
@@ -56,47 +49,47 @@
 }
 
 .guide-header h1 {
-    font-size: 28px;
+    font-size: 1.8rem;
     color: #333;
-    margin-bottom: 10px;
+    margin-bottom: 0.75rem;
 }
 
 .guide-image {
     max-width: 100%;
     height: auto;
-    border-radius: 8px;
-    margin-top: 10px;
+    border-radius: 0.5rem;
+    margin-top: 0.75rem;
 }
 
 /* Контейнер для контента гида */
 .guide-details {
-    font-size: 16px;
+    font-size: 1rem;
     line-height: 1.6;
     color: #333;
     background-color: #fff;
     padding: 1rem 3rem 1rem 4rem;
-    border-radius: 8px;
+    border-radius: 0.5rem;
     /*box-shadow: inset 0px 1px 3px rgba(0, 0, 0, 0.1);*/
 }
 
 .guide-details h2, .guide-details h3, .guide-details h4 {
     color: #333;
-    margin-top: 20px;
-    margin-bottom: 10px;
+    margin-top: 1.25rem;
+    margin-bottom: 0.7rem;
 }
 
 .guide-details p {
-    margin-bottom: 15px;
+    margin-bottom: 1rem;
 }
 
 .guide-details ul {
-    padding-left: 20px;
-    margin-bottom: 15px;
+    padding-left: 1.25rem;
+    margin-bottom: 1rem;
 }
 
 .guide-details ul li {
     list-style-type: disc;
-    margin-bottom: 5px;
+    margin-bottom: 0.3rem;
 }
 
 .guide-details a {
@@ -111,9 +104,9 @@
 /* Стили для состояния загрузки и ошибок */
 .loading, .error, .not-found {
     text-align: center;
-    font-size: 18px;
+    font-size: 1.125rem;
     color: #333;
-    margin-top: 20px;
+    margin-top: 1.25rem;
 }
 
 .error {

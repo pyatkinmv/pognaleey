@@ -40,3 +40,13 @@ select:focus, input[type="text"]:focus, textarea:focus {
   animation: spin 1s linear infinite; /* Классический вращающийся спиннер */
   margin: auto;
 }
+
+/* Анимация вращения */
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
