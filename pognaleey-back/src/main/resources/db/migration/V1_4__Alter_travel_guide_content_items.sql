@@ -1,0 +1,2 @@
+ALTER TABLE travel_guide_content_items
+    DROP CONSTRAINT travel_guide_content_items_guide_id_key;

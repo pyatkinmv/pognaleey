@@ -35,10 +35,9 @@ public class AppConfig {
     @Profile("!test")
     @Bean
     public ExecutorService executorService() {
-        int nThreads = Runtime.getRuntime().availableProcessors();
-        log.info("nThreads={}", nThreads);
+        log.info("using cachedThreadPoolExecutor");
 
-        return Executors.newFixedThreadPool(nThreads);
+        return Executors.newCachedThreadPool();
     }
 
     @Bean

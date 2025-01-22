@@ -23,6 +23,8 @@ public class PromptService {
             "ПОЧЕМУ ЭТОТ ВАРИАНТ ПОДХОДИТ",
             "ОПИСАНИЕ ВАРИАНТА"
     );
+
+
     public static final String GUIDE_IMAGES_PROMPT_FORMAT = """
             Пишу путеводитель-статью по теме: %s. Условия: %s.
             Хочу добавить красивые картинки в статью. Предложи мне список 5 поисковых запросов,
@@ -46,6 +48,69 @@ public class PromptService {
             Также выдели фигурными скобками {} само заглавие статьи в самом начале.
             Не используй повелительное наклонение. В ответе не пиши ничего кроме самой статьи.Формат статьи — Markdown
             """;
+
+
+    public static final String GUIDE_INTRO_PROMPT_FORMAT = """
+            Пишу путеводитель-статью по теме:%s.Условия путешествия:%s.
+            Напиши введение для этой статьи в формате Markdown.
+            Цель:заинтересовать читателя, представить место, дать краткое описание и вызвать желание узнать больше.
+            Содержание:Краткое описание места,почему это место стоит посетить (основные особенности, уникальность).
+            В ответе не пиши ничего кроме текста введения.
+            Пример: \\"## Введение: волшебство Токио в весенний период...\\n текст введения \\"
+            """;
+    // Пишу путеводитель-статью по теме: Токио. Условия: duration=8-14 дней;preferences=[мегаполис, прогулки];purpose=[отдых];companions=с партнёром;locationTo=asia;season=весна;transport=[any];budget=standard;locationFrom=Москва.Сгенерируй 5 заголовков, готовые к использованию в тексте статьи. Эти заголовки должны относится к практической части статьи (информация по подготовке, как добраться,детализированный бюджет,где расположиться, приложения/сайты для путешественников; и если релевантно:виза,валюта,риски,безопасность,полезные советы,необходимые вещи,что нужно знать и тд. Не включай сюда информацию по достопримечательностям,местам для посещения,маршрутам,введению и заключению. В ответе не пиши ничего кроме ответа указанного формата:Заголовок1|Заголовок2|Заголовок3|...
+    public static final String GUIDE_PRACTICAL_TITLES_PROMPT_FORMAT = """
+            Пишу путеводитель-статью по теме:%s.Условия путешествия:%s.
+            Сгенерируй %d заголовков, готовые к использованию в тексте статьи.
+            Эти заголовки должны относится к практической части статьи:информация по подготовке,как добраться,
+            детализированный бюджет,где расположиться,приложения/сайты для путешественников;и если релевантно:
+            виза,валюта,риски,безопасность,полезные советы,необходимые вещи,что нужно знать и тд.
+            Не включай сюда информацию по достопримечательностям,местам для посещения,маршрутам,введению и заключению.
+            В ответе не пиши ничего кроме ответа указанного формата:Заголовок1|Заголовок2|Заголовок3|...
+            """;
+    public static final int GUIDE_PRACTICAL_TITLES_COUNT = 5;
+    public static final String GUIDE_PRACTICAL_TITLE_PROMPT_FORMAT = """
+            Пишу путеводитель-статью по теме:%s.Условия путешествия:%s.
+            У меня есть следующие темы:%s.Сгенерируй мне текст по одной из тем:%s.
+            Но не включай информацию по другим темам из списка.
+            Если в теме описывается бюджет и цены,немного преувеличивай.Формат Markdown.
+            В ответе не пиши ничего кроме текста ответа указанного формата:### %s\\n текст
+            """;
+    public static final String GUIDE_VISUAL_PROMPT_FORMAT = """
+            Пишу путеводитель-статью по теме:%s.Условия путешествия:%s.
+            Напиши часть статьи, которая относится к рекомендованным маршрутам,достопримечательностям,развлечениям,активностям.
+            В формате Markdown.Также включи следующие %d тем:%s.
+            Добавь для этих тем заголовки, между заголовком и текстом добавь её саму в фигурных скобках.
+            Формат: \\"## общий заголовок\\n### тема из списка {тема из списка буква в букву}\\n описание\\".
+            В ответе не пиши ничего кроме текста статьи.Заголовок самой статьи добавлять не нужно
+            """;
+    public static final String GUIDE_CONCLUSION_PROMPT_FORMAT = """
+            Пишу путеводитель-статью по теме:%s.Условия путешествия:%s.
+            Напиши введение для этой статьи в формате Markdown.
+            Цель:подвести итог, дать финальные рекомендации и вдохновить читателя на путешествие.
+            Содержание:Краткое резюме о месте и его ключевых особенностях,подвести итог,оставить читателя с вдохновляющим настроем.
+            В ответе не пиши ничего кроме текста заключения. Пример: \\"## Заключение\\n текст заключения \\"
+            """;
+
+    public static String generateGuideIntroPrompt(String guideTitle, String inquiryParams) {
+        return String.format(GUIDE_INTRO_PROMPT_FORMAT, guideTitle, inquiryParams);
+    }
+
+    public static String generateGuidePracticalTitlesPrompt(String guideTitle, String inquiryParams) {
+        return String.format(GUIDE_PRACTICAL_TITLES_PROMPT_FORMAT, guideTitle, inquiryParams, GUIDE_PRACTICAL_TITLES_COUNT);
+    }
+
+    public static String generateGuidePracticalTitlePrompt(String guideTitle, String inquiryParams, String allTitles, String practicalTitle) {
+        return String.format(GUIDE_PRACTICAL_TITLE_PROMPT_FORMAT, guideTitle, inquiryParams, allTitles, practicalTitle, practicalTitle);
+    }
+
+    public static String generateGuideVisualPrompt(String guideTitle, String inquiryParams, String guideVisualTopics) {
+        return String.format(GUIDE_VISUAL_PROMPT_FORMAT, guideTitle, inquiryParams, GUIDE_PRACTICAL_TITLES_COUNT, guideVisualTopics);
+    }
+
+    public static String generateGuideConclusionPrompt(String guideTitle, String inquiryParams) {
+        return String.format(GUIDE_CONCLUSION_PROMPT_FORMAT, guideTitle, inquiryParams);
+    }
 
     public static String generateQuickPrompt(int optionsNumber, String inquiryParams) {
         return String.format(QUICK_PROMPT_FORMAT, optionsNumber, inquiryParams)

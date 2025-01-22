@@ -1,6 +1,5 @@
 package ru.pyatkinmv.pognaleey;
 
-import org.flywaydb.core.Flyway;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.scheduling.annotation.EnableAsync;
@@ -9,8 +8,8 @@ import org.springframework.scheduling.annotation.EnableAsync;
 @SpringBootApplication
 public class PognaleeyApp {
 
-	public static void main(String[] args) {
-		SpringApplication.run(PognaleeyApp.class, args);
-	}
+    public static void main(String[] args) {
+        SpringApplication.run(PognaleeyApp.class, args);
+    }
 
 }

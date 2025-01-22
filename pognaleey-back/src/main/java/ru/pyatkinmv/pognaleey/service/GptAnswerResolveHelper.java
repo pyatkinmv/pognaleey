@@ -75,6 +75,23 @@ public class GptAnswerResolveHelper {
         return result;
     }
 
+    static List<String> splitWithPipe(String input) {
+        var regex = "([^|]+)";
+        var pattern = Pattern.compile(regex);
+        var matcher = pattern.matcher(input);
+        var result = new ArrayList<String>();
+
+        while (matcher.find()) {
+            var item = matcher.group().trim().replaceAll("\\.", "");
+
+            if (!item.isEmpty()) {
+                result.add(item);
+            }
+        }
+
+        return result;
+    }
+
     static Optional<SearchableItem> parseSearchableItem(String searchableItemRaw) {
         // {title}(searchPhrase)
         //noinspection RegExpRedundantEscape

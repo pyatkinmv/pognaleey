@@ -38,7 +38,7 @@ public class TravelGuideService {
     private final TravelRecommendationService recommendationService;
     private final UserService userService;
     private final ExecutorService executorService;
-    private final TravelGuideContentProvider guideContentProvider;
+    private final TravelGuideContentProviderV2 guideContentProvider;
     private final TravelGuideContentItemRepository guideContentItemRepository;
 
     public TravelGuideLikeDto likeGuide(long guideId) {
@@ -160,14 +160,14 @@ public class TravelGuideService {
                         .build()
         );
 
-        var guideContentItems = guideContentProvider.createBlueprintContentItemsV1(
+        var guideContentItems = guideContentProvider.createBlueprintContentItems(
                 guide.getId(),
                 recommendation.getTitle(),
                 recommendation.getImageUrl()
         );
 
         executorService.execute(
-                () -> guideContentProvider.enrichGuideWithContentV1(
+                () -> guideContentProvider.enrichGuideWithContent(
                         guide,
                         guideContentItems,
                         recommendation.getInquiryId(),
