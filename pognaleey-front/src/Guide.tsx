@@ -11,6 +11,7 @@ import {useLikeHandler} from "./useLikeHandler";
 import useGuideContent from "./useGuideContent"; // Импортируем наш кастомный хук
 import LoginPopup from "./LoginPopup";
 import PencilLoader from "./PencilLoader";
+import CircleLoader from "./CircleLoader";
 
 interface UserDto {
     id: number;
@@ -81,11 +82,7 @@ const Guide: React.FC = () => {
     };
 
     if (loadingGuide) {
-        return (
-            // <div className="loading-container">
-            <div className="circle-loader"></div>
-            // </div>
-        );
+        return <CircleLoader/>;
     }
 
     if (errorGuide) {

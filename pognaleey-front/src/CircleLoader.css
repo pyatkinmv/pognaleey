@@ -1,0 +1,27 @@
+.circle-loader-container {
+    border: 1px solid;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%; /* Можно адаптировать для нужного контейнера */
+    width: 100%;
+    position: relative; /* Если нужно адаптировать внутри родительского блока */
+}
+
+.circle-loader {
+    width: 3rem;
+    height: 3rem;
+    border: 0.35rem solid #f3f3f3;
+    border-top: 0.35rem solid #f87f76; /* Цвет активной линии */
+    border-radius: 50%;
+    animation: spin 1s linear infinite; /* Вращающийся спиннер */
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}

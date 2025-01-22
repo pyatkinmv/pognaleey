@@ -2,6 +2,7 @@
 import React from "react";
 import "./TileGrid.css";
 import {useNavigate} from "react-router-dom";
+import CircleLoader from "./CircleLoader";
 
 interface Tile {
     id: number;
@@ -50,7 +51,7 @@ const TileGrid: React.FC<TileGridProps> = ({tiles, onLike, lastTileRef, isLoadin
                     </div>
                 </div>
             ))}
-            {isLoading && <div className="circle-loader"/>}
+            {isLoading && <CircleLoader/>}
         </div>
     );
 };

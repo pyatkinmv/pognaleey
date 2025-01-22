@@ -1,11 +1,9 @@
 .pencil-loader {
-    border: 1px solid;
     display: flex;
     justify-content: center; /* Центрирование по горизонтали */
     align-items: center; /* Центрирование по вертикали */
     text-align: center; /* Центрирование текста */
     margin: auto;
-    height: 100%;
     width: 100%;
 }
 

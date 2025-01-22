@@ -31,22 +31,3 @@ select:focus, input[type="text"]:focus, textarea:focus {
   box-shadow: 0 0 5px rgba(235, 107, 59, 0.5);
 }
 
-.circle-loader {
-  width: 3rem;
-  height: 3rem;
-  border: 0.35rem solid #f3f3f3;
-  border-top: 0.35rem solid #f87f76; /* Цвет активной линии */
-  border-radius: 50%;
-  animation: spin 1s linear infinite; /* Классический вращающийся спиннер */
-  margin: auto;
-}
-
-/* Анимация вращения */
-@keyframes spin {
-  0% {
-    transform: rotate(0deg);
-  }
-  100% {
-    transform: rotate(360deg);
-  }
-}
