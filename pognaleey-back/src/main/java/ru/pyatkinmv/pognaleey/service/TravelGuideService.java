@@ -180,7 +180,6 @@ public class TravelGuideService {
 
     @SneakyThrows
     public TravelGuideContentDto getGuideContent(long guideId) {
-//        Thread.sleep(3000);
         return TravelMapper.toGuideContentDto(guideContentItemRepository.findByGuideId(guideId));
     }
 }

@@ -1,0 +1,50 @@
+.pencil-loader {
+    border: 1px solid;
+    display: flex;
+    justify-content: center; /* Центрирование по горизонтали */
+    align-items: center; /* Центрирование по вертикали */
+    text-align: center; /* Центрирование текста */
+    margin: auto;
+    height: 100%;
+    width: 100%;
+}
+
+.pencil {
+    font-size: 2rem;
+    animation: wiggle 0.5s infinite alternate;
+}
+
+.writing span {
+    display: inline-block;
+    font-size: 2rem;
+    animation: blink 1.5s infinite;
+}
+
+.writing span:nth-child(1) {
+    animation-delay: 0s;
+}
+.writing span:nth-child(2) {
+    animation-delay: 0.3s;
+}
+.writing span:nth-child(3) {
+    animation-delay: 0.6s;
+}
+
+@keyframes wiggle {
+    0% {
+        transform: rotate(-5deg);
+    }
+    100% {
+        transform: rotate(10deg);
+    }
+}
+
+@keyframes blink {
+    0%,
+    100% {
+        opacity: 0;
+    }
+    50% {
+        opacity: 1;
+    }
+}

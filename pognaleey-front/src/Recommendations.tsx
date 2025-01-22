@@ -5,6 +5,7 @@ import Header from "./Header";
 import MainContainer from "./MainContainer";
 import useRecommendations from "./useRecommendation";
 import apiClient from "./apiClient";
+import PencilLoader from "./PencilLoader";
 
 // TODO: Исправить прыгающий размер и элементы
 const Recommendations: React.FC = () => {
@@ -68,7 +69,7 @@ const Recommendations: React.FC = () => {
                                     }
                                 />
                             ) : (
-                                <div className="loader"/>
+                                <div className="circle-loader"/>
                             )}
                         </div>
                         <div className="recommendation-content">
@@ -84,9 +85,7 @@ const Recommendations: React.FC = () => {
                                         {recommendation.details.description}
                                     </p>
                                 </>
-                            ) : (
-                                <div className="loader"/>
-                            )}
+                            ) : <PencilLoader/>}
                             {recommendation.status === "READY" && (<button
                                 className="generate-guide-button"
                                 onClick={() =>

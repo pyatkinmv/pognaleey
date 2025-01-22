@@ -10,6 +10,7 @@ import MainContainer from "./MainContainer";
 import {useLikeHandler} from "./useLikeHandler";
 import useGuideContent from "./useGuideContent"; // Импортируем наш кастомный хук
 import LoginPopup from "./LoginPopup";
+import PencilLoader from "./PencilLoader";
 
 interface UserDto {
     id: number;
@@ -81,9 +82,9 @@ const Guide: React.FC = () => {
 
     if (loadingGuide) {
         return (
-            <div className="loading-container">
-                <div className="loader"></div>
-            </div>
+            // <div className="loading-container">
+            <div className="circle-loader"></div>
+            // </div>
         );
     }
 
@@ -130,7 +131,9 @@ const Guide: React.FC = () => {
                         <ReactMarkdown rehypePlugins={[rehypeRaw]}>
                             {item.content || ""}
                         </ReactMarkdown>
-                        {item.status === "IN_PROGRESS" && <div className="loader"/>}
+                        {item.status === "IN_PROGRESS" &&
+                            <PencilLoader/>
+                        }
                     </div>
                 ))}
             </div>
