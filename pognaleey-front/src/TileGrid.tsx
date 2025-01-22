@@ -50,7 +50,7 @@ const TileGrid: React.FC<TileGridProps> = ({tiles, onLike, lastTileRef, isLoadin
                     </div>
                 </div>
             ))}
-            {isLoading && <div className="loading">Загрузка...</div>}
+            {isLoading && <div className="loader"/>}
         </div>
     );
 };

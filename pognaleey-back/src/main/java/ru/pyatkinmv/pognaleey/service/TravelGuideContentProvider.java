@@ -115,40 +115,46 @@ public class TravelGuideContentProvider {
         return GptAnswerResolveHelper.replaceQuotes(titleWithoutBraces);
     }
 
-    // TODO: Extract all parsing & specific logic outside
     @SneakyThrows
     void enrichGuideWithContentV1(TravelGuide guide, List<TravelGuideContentItem> guideContentItems, long inquiryId,
                                   String recommendationTitle) {
         log.info("Begin enrichGuideWithContentV1 for guide {}", guide.getId());
-        var inquiry = inquiryService.findById(inquiryId);
-        var guideImagesPrompt = PromptService.generateGuideImagesPrompt(recommendationTitle, inquiry.getParams());
-        var imagesGuideResponseRaw = gptHttpClient.ask(guideImagesPrompt);
-        var searchableGuideItems = parseSearchableItems(imagesGuideResponseRaw);
 
-        var result = executorService.submit(() -> searchImagesWithSleepAndBuildTitleToImageMap(searchableGuideItems));
+        try {
+            var inquiry = inquiryService.findById(inquiryId);
+            var guideImagesPrompt = PromptService.generateGuideImagesPrompt(recommendationTitle, inquiry.getParams());
+            var imagesGuideResponseRaw = gptHttpClient.ask(guideImagesPrompt);
+            var searchableGuideItems = parseSearchableItems(imagesGuideResponseRaw);
 
-        var createGuidePrompt = generateGuidePrompt(recommendationTitle, inquiry.getParams(), searchableGuideItems);
-        var guideContentRaw = gptHttpClient.ask(createGuidePrompt);
-        var guideContentTitle = resolveGuideTitle(guideContentRaw);
+            var result = executorService.submit(() -> searchImagesWithSleepAndBuildTitleToImageMap(searchableGuideItems));
 
-        var titleToImageUrlMap = result.get();
+            var createGuidePrompt = generateGuidePrompt(recommendationTitle, inquiry.getParams(), searchableGuideItems);
+            var guideContentRaw = gptHttpClient.ask(createGuidePrompt);
+            var guideContentTitle = resolveGuideTitle(guideContentRaw);
 
-        var guideContent = Optional.of(guideContentRaw)
-                .map(it -> enrichGuideWithContentImages(guideContentRaw, titleToImageUrlMap))
-                .map(it -> enrichGuideWithTitleImage(it, guideContentTitle, guide.getImageUrl()))
-                .map(GptAnswerResolveHelper::stripCurlyBraces)
+            var titleToImageUrlMap = result.get();
+
+            var guideContent = Optional.of(guideContentRaw)
+                    .map(it -> enrichGuideWithContentImages(guideContentRaw, titleToImageUrlMap))
+                    .map(it -> enrichGuideWithTitleImage(it, guideContentTitle, guide.getImageUrl()))
+                    .map(GptAnswerResolveHelper::stripCurlyBraces)
 //                .map(it -> Utils.peek(() -> Utils.writeFile(it, guide.getId()), it))
-                .orElseThrow();
+                    .orElseThrow();
 
-        var guideTitle = Optional.ofNullable(guideContentTitle).orElse(recommendationTitle);
-        var guideContentItem = guideContentItems.getFirst();
-        guideContentItem.setContent(guideContent);
-        guideContentItem.setStatus(ProcessingStatus.READY);
+            var guideTitle = Optional.ofNullable(guideContentTitle).orElse(recommendationTitle);
+            var guideContentItem = guideContentItems.getFirst();
+            guideContentItem.setContent(guideContent);
+            guideContentItem.setStatus(ProcessingStatus.READY);
 
-        transactionTemplate.executeWithoutResult(it -> {
-            guideRepository.updateTitle(guide.getId(), guideTitle);
-            contentItemRepository.save(guideContentItem);
-        });
+            transactionTemplate.executeWithoutResult(it -> {
+                guideRepository.updateTitle(guide.getId(), guideTitle);
+                contentItemRepository.save(guideContentItem);
+            });
+        } catch (Exception e) {
+            log.error("Error enrichGuideWithContentV1", e);
+            guideContentItems.forEach(it -> it.setStatus(ProcessingStatus.FAILED));
+            contentItemRepository.saveAll(guideContentItems);
+        }
 
         log.info("end enrichGuideWithContentV1 for guide: {}", guide.getId());
     }

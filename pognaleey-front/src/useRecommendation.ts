@@ -27,11 +27,22 @@ const useRecommendations = (inquiryId: string | null, timeout: number = 30000) =
         });
     };
 
+    const validateRecommendations = (
+        recommendations: Recommendation[]
+    ): void => {
+        if (recommendations.length === 0) {
+            throw new Error(`Рекомендации не найдены.`);
+        }
+
+        if (recommendations.every((rec) => rec.status === "FAILED")) {
+            throw new Error(`Failed to fetch recommendations`);
+        }
+    }
+
     const {data, isLoading, error} = usePolling<Recommendation>({
         url: `${process.env.REACT_APP_API_URL}/travel-recommendations?inquiryId=${inquiryId}`,
         timeout,
-        processData: (recommendations) =>
-            recommendations.filter((rec) => rec.status !== "FAILED"),
+        validate: validateRecommendations,
         mergeData: mergeRecommendations, // Используем функцию мержинга
         stopCondition: (recommendations) =>
             recommendations.every(

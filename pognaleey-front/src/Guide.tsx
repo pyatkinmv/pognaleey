@@ -124,7 +124,6 @@ const Guide: React.FC = () => {
             </div>
 
             <div className="guide-details">
-                {loadingContent && <div className="loader"/>}
                 {errorContent && <div className="error">Ошибка: {errorContent}</div>}
                 {contentItems.map((item) => (
                     <div key={item.id} className="content-item">

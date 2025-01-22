@@ -13,17 +13,29 @@ const useGuideContent = (guideId: string | null, timeout: number = 30000) => {
         prevContentItems: ContentItem[],
         newContentItems: ContentItem[]
     ): ContentItem[] => {
-        return newContentItems.map((item) => {
-            const existing = prevContentItems.find((prevItem) => prevItem.id === item.id);
+        const filtered = newContentItems.filter((item) => item.status !== "FAILED");
+        return filtered.map((item) => {
+            const existing = prevContentItems.find((prevRec) => prevRec.id === item.id);
             return existing ? {...existing, ...item} : item;
         });
     };
 
+    const validateItems = (
+        newContentItems: ContentItem[]
+    ): void => {
+        if (newContentItems.length === 0) {
+            throw new Error(`Рекомендации не найдены.`);
+        }
+
+        if (newContentItems.every((rec) => rec.status === "FAILED")) {
+            throw new Error(`Failed to fetch recommendations`);
+        }
+    }
+
     const {data, isLoading, error} = usePolling<ContentItem>({
         url: `${process.env.REACT_APP_API_URL}/travel-guides/${guideId}/content`,
         timeout,
-        processData: (contentItems) =>
-            contentItems.filter((item) => item.status !== "FAILED"),
+        validate: validateItems,
         mergeData: mergeContentItems, // Используем функцию мержинга
         stopCondition: (contentItems) =>
             contentItems.every((item) => item.status === "READY" || item.status === "FAILED"),

@@ -4,12 +4,14 @@ interface PollingOptions<T> {
     url: string;
     timeout?: number;
     interval?: number;
-    processData?: (data: T[]) => T[];
+    validate?: (data: T[]) => void;
     mergeData?: (prevData: T[], newData: T[]) => T[];
     stopCondition?: (data: T[]) => boolean;
     dataPath?: string; // Путь к данным в ответе API
 }
 
+// TODO: Replace with WebSockets!!!
+// TODO: Add status specific logic (too much methods here)
 const usePolling = <T>(
     options: PollingOptions<T>
 ): { data: T[]; isLoading: boolean; error: string | null } => {
@@ -19,7 +21,7 @@ const usePolling = <T>(
 
     const fetchData = async () => {
         const startTime = Date.now();
-        const {url, timeout = 30000, interval = 500, processData, mergeData, stopCondition, dataPath} = options;
+        const {url, timeout = 30000, interval = 500, validate, mergeData, stopCondition, dataPath} = options;
 
         while (Date.now() - startTime < timeout) {
             try {
@@ -35,13 +37,13 @@ const usePolling = <T>(
                     throw new Error(`Expected an array but got: ${typeof rawData}`);
                 }
 
-                const processedData = processData ? processData(rawData) : rawData;
+                validate && validate(rawData);
 
                 setData((prevData) =>
-                    mergeData ? mergeData(prevData, processedData) : processedData
+                    mergeData ? mergeData(prevData, rawData) : rawData
                 );
 
-                if (stopCondition && stopCondition(processedData)) {
+                if (stopCondition && stopCondition(rawData)) {
                     break;
                 }
             } catch (err) {
@@ -52,6 +54,8 @@ const usePolling = <T>(
 
             await new Promise((resolve) => setTimeout(resolve, interval));
         }
+
+        setData((prevData) => prevData.filter((item: any) => item.status === "READY"));
 
         setIsLoading(false);
     };
