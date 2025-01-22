@@ -44,10 +44,13 @@ public abstract class TravelGuideContentProvider {
 
     Map<String, String> searchImagesWithSleepAndBuildTitleToImageMap(List<GptAnswerResolveHelper.SearchableItem> titlesWithImageSearchPhrases) {
         return titlesWithImageSearchPhrases.stream()
+                .map(it -> Map.entry(
+                        it.title(),
+                        imagesSearchHttpClient.searchImageUrlWithRateLimiting(it.imageSearchPhrase()))
+                ).filter(it -> it.getValue().isPresent())
                 .collect(Collectors.toMap(
-                        GptAnswerResolveHelper.SearchableItem::title,
-                        // TODO: fix
-                        it -> imagesSearchHttpClient.searchImageUrlWithRateLimiting(it.imageSearchPhrase()).orElse(null),
+                        Map.Entry::getKey,
+                        it -> it.getValue().get(),
                         (a, b) -> b,
                         () -> new TreeMap<>(String.CASE_INSENSITIVE_ORDER)
                 ));

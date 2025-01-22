@@ -143,6 +143,7 @@ public class TravelGuideContentProviderV2 extends TravelGuideContentProvider {
 
                     var sightseeingContent = Optional.of(sightseeingContentResponseRaw)
                             .map(it1 -> enrichWithContentImages(sightseeingContentResponseRaw, titleToImageUrlMap))
+                            .map(GptAnswerResolveHelper::stripCurlyBraces)
                             .orElseThrow();
                     sightseeing.setContent(sightseeingContent);
                     sightseeing.setStatus(ProcessingStatus.READY);
@@ -233,7 +234,7 @@ public class TravelGuideContentProviderV2 extends TravelGuideContentProvider {
         var titleWithImage = items.stream()
                 .filter(it -> it.getOrdinal().equals(GuideStructureType.TITLE_WITH_IMAGE.itemOrdinal))
                 .findFirst().orElseThrow();
-        titleWithImage.setContent(String.format("# %s\n%s\n\n", initialTitle, img));
+        titleWithImage.setContent(String.format("# %s\n%s\n\n", GptAnswerResolveHelper.replaceQuotes(initialTitle), img));
 
         return contentItemRepository.saveAllFromIterable(items);
     }

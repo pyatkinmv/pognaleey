@@ -74,11 +74,11 @@ public class ImagesSearchHttpClient {
             log.error("no imageUrls found; possibly bad response");
         }
 
-        // TODO: Fix
+        // TODO: Fix. Подумать еще раз: что если картинку не удалось сгенерировать, мб показывать загрушку
         var resultUrl = imageUrls.stream().filter(this::isUrlValid).findFirst().orElseGet(() -> {
             log.error("no valid imageUrl found; response {}", responseXml);
 
-            return "/logo-circle192.png";
+            return null;
         });
 
         log.info("searchImageUrl resultUrl {}", resultUrl);
