@@ -44,6 +44,7 @@ strong {
 
 /* Карточка рекомендации */
 .recommendation-card {
+    min-height: 23rem;
     display: flex;
     align-items: center;
     background-color: #f1e7dd;

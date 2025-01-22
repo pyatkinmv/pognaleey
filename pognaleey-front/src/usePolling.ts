@@ -1,0 +1,66 @@
+import {useEffect, useState} from "react";
+
+interface PollingOptions<T> {
+    url: string;
+    timeout?: number;
+    interval?: number;
+    processData?: (data: T[]) => T[];
+    mergeData?: (prevData: T[], newData: T[]) => T[];
+    stopCondition?: (data: T[]) => boolean;
+    dataPath?: string; // Путь к данным в ответе API
+}
+
+const usePolling = <T>(
+    options: PollingOptions<T>
+): { data: T[]; isLoading: boolean; error: string | null } => {
+    const [data, setData] = useState<T[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
+
+    const fetchData = async () => {
+        const startTime = Date.now();
+        const {url, timeout = 30000, interval = 500, processData, mergeData, stopCondition, dataPath} = options;
+
+        while (Date.now() - startTime < timeout) {
+            try {
+                const response = await fetch(url);
+                if (!response.ok) {
+                    throw new Error(`Failed to fetch data: ${response.status}`);
+                }
+
+                const result = await response.json();
+                const rawData = dataPath ? result[dataPath] : result;
+
+                if (!Array.isArray(rawData)) {
+                    throw new Error(`Expected an array but got: ${typeof rawData}`);
+                }
+
+                const processedData = processData ? processData(rawData) : rawData;
+
+                setData((prevData) =>
+                    mergeData ? mergeData(prevData, processedData) : processedData
+                );
+
+                if (stopCondition && stopCondition(processedData)) {
+                    break;
+                }
+            } catch (err) {
+                console.error("Error during polling:", err);
+                setError((err as Error).message);
+                break;
+            }
+
+            await new Promise((resolve) => setTimeout(resolve, interval));
+        }
+
+        setIsLoading(false);
+    };
+
+    useEffect(() => {
+        fetchData();
+    }, [options.url]);
+
+    return {data, isLoading, error};
+};
+
+export default usePolling;
