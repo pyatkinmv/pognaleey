@@ -7,7 +7,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
-import ru.pyatkinmv.pognaleey.dto.SearchImageDto;
+import ru.pyatkinmv.pognaleey.dto.ImageSearchClientImageDto;
 
 import java.net.URI;
 import java.util.ArrayList;
@@ -32,14 +32,14 @@ public class YandexImageSearchHttpClient extends ImageSearchHttpClient<String> {
     }
 
     @Override
-    public Optional<SearchImageDto> searchImage(String searchQuery) {
+    public Optional<ImageSearchClientImageDto> searchImage(String searchQuery) {
         rateLimiter.acquire();
 
         return super.searchImage(searchQuery);
     }
 
     @Override
-    Optional<SearchImageDto> mapToImage(String responseRaw) {
+    Optional<ImageSearchClientImageDto> mapToImage(String responseRaw, String searchQuery) {
         // Either url or image-link must work
         var regex = "<url>(.*?)</url>|<image-link>(.*?)</image-link>";
         var pattern = Pattern.compile(regex);
@@ -69,7 +69,7 @@ public class YandexImageSearchHttpClient extends ImageSearchHttpClient<String> {
                     return null;
                 });
 
-        return Optional.ofNullable(resultUrl).map(it -> new SearchImageDto(it, it));
+        return Optional.ofNullable(resultUrl).map(it -> new ImageSearchClientImageDto(it, it, searchQuery));
     }
 
 

@@ -65,7 +65,7 @@ const Recommendations: React.FC = () => {
                                     src={recommendation.image.thumbnailUrl}
                                     alt={recommendation.title}
                                     onClick={() =>
-                                        handleImageClick(recommendation.image?.imageUrl || "")
+                                        handleImageClick(recommendation.image?.url || "")
                                     }
                                 />
                             ) : (

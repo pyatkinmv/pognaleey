@@ -18,10 +18,15 @@ interface UserDto {
     username: string;
 }
 
+interface ImageDto {
+    url: string;
+    thumbnailUrl: string;
+}
+
 interface TravelGuideInfoDto {
     id: number;
     title: string;
-    imageUrl: string;
+    image?: ImageDto;
     totalLikes: number;
     isLiked: boolean;
     owner?: UserDto;

@@ -6,19 +6,22 @@ import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.support.TransactionTemplate;
 import ru.pyatkinmv.pognaleey.client.GptHttpClient;
-import ru.pyatkinmv.pognaleey.client.ImageSearchHttpClient;
+import ru.pyatkinmv.pognaleey.dto.ImageDto;
 import ru.pyatkinmv.pognaleey.model.ProcessingStatus;
 import ru.pyatkinmv.pognaleey.model.TravelGuide;
 import ru.pyatkinmv.pognaleey.model.TravelGuideContentItem;
 import ru.pyatkinmv.pognaleey.repository.TravelGuideContentItemRepository;
 import ru.pyatkinmv.pognaleey.repository.TravelGuideRepository;
+import ru.pyatkinmv.pognaleey.util.Utils;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 import java.util.stream.Collectors;
 
 import static ru.pyatkinmv.pognaleey.service.GptAnswerResolveHelper.parseSearchableItems;
+import static ru.pyatkinmv.pognaleey.service.GptAnswerResolveHelper.replaceQuotes;
 
 @Component
 @Slf4j
@@ -31,13 +34,13 @@ public class TravelGuideContentProviderV1 extends TravelGuideContentProvider {
     private final TravelGuideRepository guideRepository;
     private final TransactionTemplate transactionTemplate;
 
-    public TravelGuideContentProviderV1(ImageSearchHttpClient imagesSearchHttpClient,
+    public TravelGuideContentProviderV1(ImageService imageService,
                                         TravelInquiryService inquiryService, ExecutorService executorService,
                                         GptHttpClient gptHttpClient,
                                         TravelGuideContentItemRepository contentItemRepository,
                                         TravelGuideRepository guideRepository,
                                         TransactionTemplate transactionTemplate) {
-        super(imagesSearchHttpClient);
+        super(imageService);
         this.inquiryService = inquiryService;
         this.executorService = executorService;
         this.gptHttpClient = gptHttpClient;
@@ -116,17 +119,20 @@ public class TravelGuideContentProviderV1 extends TravelGuideContentProvider {
             var imagesGuideResponseRaw = gptHttpClient.ask(guideImagesPrompt);
             var searchableGuideItems = parseSearchableItems(imagesGuideResponseRaw);
 
-            var result = executorService.submit(() -> searchImagesWithSleepAndBuildTitleToImageMap(searchableGuideItems));
+            var result = executorService.submit(() -> searchAndSaveImages(searchableGuideItems));
 
             var createGuidePrompt = generateGuidePrompt(recommendationTitle, inquiry.getParams(), searchableGuideItems);
             var guideContentRaw = gptHttpClient.ask(createGuidePrompt);
             var guideContentTitle = resolveGuideTitle(guideContentRaw);
 
-            var titleToImageUrlMap = result.get();
+            var titleToImageMap = Utils.tryOrEmpty(result)
+                    .map(it -> Utils.toCaseInsensitiveTreeMap(it, ImageDto::title))
+                    .orElse(Map.of());
 
+            var image = imageService.findByIdOrThrow(guide.getId());
             var guideContent = Optional.of(guideContentRaw)
-                    .map(it -> enrichWithContentImages(guideContentRaw, titleToImageUrlMap))
-                    .map(it -> enrichGuideWithTitleImage(it, guideContentTitle, guide.getImageUrl()))
+                    .map(it -> enrichWithContentImages(guideContentRaw, titleToImageMap))
+                    .map(it -> enrichGuideWithTitleImage(it, guideContentTitle, image.url()))
                     .map(GptAnswerResolveHelper::stripCurlyBraces)
 //                .map(it -> Utils.peek(() -> Utils.writeFile(it, guide.getId()), it))
                     .orElseThrow();
@@ -149,11 +155,12 @@ public class TravelGuideContentProviderV1 extends TravelGuideContentProvider {
         log.info("end enrichGuideWithContent for guide: {}", guide.getId());
     }
 
-    public List<TravelGuideContentItem> createBlueprintContentItems(long guideId, String initialTitle, String imageUrl) {
-        var img = String.format(MARKDOWN_IMAGE_FORMAT, imageUrl, initialTitle);
+    public List<TravelGuideContentItem> createBlueprintContentItems(long guideId, String initialTitle, Long imageId) {
+        var image = imageService.findByIdOrThrow(imageId);
+        var imageStr = String.format(MARKDOWN_IMAGE_FORMAT, replaceQuotes(image.url()), initialTitle);
         var guideContentItem = TravelGuideContentItem.builder()
                 // NOTE: initial content
-                .content(String.format("# %s\n%s\n\n## Введение\n\n", initialTitle, img))
+                .content(String.format("# %s\n%s\n\n## Введение\n\n", initialTitle, imageStr))
                 .guideId(guideId)
                 .ordinal(1)
                 .status(ProcessingStatus.IN_PROGRESS)

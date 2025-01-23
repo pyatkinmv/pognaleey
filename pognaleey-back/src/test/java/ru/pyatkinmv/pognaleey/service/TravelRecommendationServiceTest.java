@@ -4,15 +4,16 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import ru.pyatkinmv.pognaleey.DatabaseCleaningTest;
+import ru.pyatkinmv.pognaleey.dto.ImageDto;
 import ru.pyatkinmv.pognaleey.dto.TravelRecommendationDto;
 import ru.pyatkinmv.pognaleey.model.ProcessingStatus;
 import ru.pyatkinmv.pognaleey.model.TravelInquiry;
-import ru.pyatkinmv.pognaleey.model.TravelRecommendation;
 import ru.pyatkinmv.pognaleey.repository.TravelInquiryRepository;
 import ru.pyatkinmv.pognaleey.repository.TravelRecommendationRepository;
 import ru.pyatkinmv.pognaleey.util.Utils;
 
 import java.time.Instant;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static ru.pyatkinmv.pognaleey.service.PromptService.DETAILED_PROMPT_OBJ;
@@ -27,50 +28,29 @@ class TravelRecommendationServiceTest extends DatabaseCleaningTest {
     private TravelInquiryRepository travelInquiryRepository;
 
     @Test
-    void enrichWithShortInfoOrSetFailed() {
+    void enrichRecommendationsAsync() {
         var inquiry = createTravelInquiryAndBlueprintRecommendations();
         var blueprintRecommendations = recommendationRepository.findByInquiryId(inquiry.getId());
-        var recommendations =
-                recommendationService.enrichWithShortInfoOrSetFailed(blueprintRecommendations, inquiry.getParams());
+        recommendationService.enrichRecommendationsAsync(blueprintRecommendations, inquiry.getParams());
+        var recommendations = recommendationService.getRecommendations(inquiry.getId()).recommendations();
+        assertThat(recommendations).allMatch(it -> it.details() != null);
         assertThat(recommendations)
-                .usingRecursiveFieldByFieldElementComparatorIgnoringFields("id", "createdAt")
-                .containsExactly(
-                        new TravelRecommendation(null, null, inquiry.getId(), "Грузия, Тбилиси и винные регионы", "Грузия весна пейзаж", null, null, ProcessingStatus.IN_PROGRESS),
-                        new TravelRecommendation(null, null, inquiry.getId(), "Париж, Франция: Город любви", "Париж Эйфелева башня закат", null, null, ProcessingStatus.IN_PROGRESS),
-                        new TravelRecommendation(null, null, inquiry.getId(), "Красная Поляна, Сочи: Горнолыжный отдых", "Красная Поляна лыжи снег", null, null, ProcessingStatus.IN_PROGRESS),
-                        new TravelRecommendation(null, null, inquiry.getId(), "Индонезия, Бали: Пляжный отдых", "Бали пляжи закат", null, null, ProcessingStatus.IN_PROGRESS),
-                        new TravelRecommendation(null, null, inquiry.getId(), "Исландия: Природные чудеса", "Исландия водопады ледники", null, null, ProcessingStatus.IN_PROGRESS)
+                .usingRecursiveComparison()
+                .ignoringFields("id", "createdAt", "details", "image.id")
+                .isEqualTo(
+                        List.of(
+                                new TravelRecommendationDto(-1L, "Грузия, Тбилиси и винные регионы", ProcessingStatus.READY.name(), null,
+                                        new ImageDto(-1L, "Грузия, Тбилиси и винные регионы", "imageUrl", "thumbnailUrl", "Грузия весна пейзаж"), null),
+                                new TravelRecommendationDto(-1L, "Париж, Франция: Город любви", ProcessingStatus.READY.name(), null,
+                                        new ImageDto(-1L, "Париж, Франция: Город любви", "imageUrl", "thumbnailUrl", "Париж Эйфелева башня закат"), null),
+                                new TravelRecommendationDto(-1L, "Красная Поляна, Сочи: Горнолыжный отдых", ProcessingStatus.READY.name(), null,
+                                        new ImageDto(-1L, "Красная Поляна, Сочи: Горнолыжный отдых", "imageUrl", "thumbnailUrl", "Красная Поляна лыжи снег"), null),
+                                new TravelRecommendationDto(-1L, "Индонезия, Бали: Пляжный отдых", ProcessingStatus.READY.name(), null,
+                                        new ImageDto(-1L, "Индонезия, Бали: Пляжный отдых", "imageUrl", "thumbnailUrl", "Бали пляжи закат"), null),
+                                new TravelRecommendationDto(-1L, "Исландия: Природные чудеса", ProcessingStatus.READY.name(), null,
+                                        new ImageDto(-1L, "Исландия: Природные чудеса", "imageUrl", "thumbnailUrl", "Исландия водопады ледники"), null)
+                        )
                 );
-    }
-
-    @Test
-    void enrichWithDetailsAsync() {
-        var inquiry = createTravelInquiryAndBlueprintRecommendations();
-        var blueprintRecommendations = recommendationRepository.findByInquiryId(inquiry.getId());
-        var recommendations =
-                recommendationService.enrichWithShortInfoOrSetFailed(blueprintRecommendations, inquiry.getParams());
-        assertThat(recommendations).allMatch(it -> it.getDetails() == null);
-        recommendationService.enrichWithDetailsAsyncEach(recommendations, inquiry.getParams());
-
-        var recommendationIds = recommendations.stream().map(TravelRecommendation::getId).toList();
-        var updated = recommendationService.getRecommendations(recommendationIds);
-        assertThat(updated.recommendations()).hasSize(5);
-        assertThat(updated.recommendations()).allMatch(it -> it.details() != null);
-    }
-
-    @Test
-    void enrichWithImagesAsync() {
-        var inquiry = createTravelInquiryAndBlueprintRecommendations();
-        var blueprintRecommendations = recommendationRepository.findByInquiryId(inquiry.getId());
-        var recommendations =
-                recommendationService.enrichWithShortInfoOrSetFailed(blueprintRecommendations, inquiry.getParams());
-        assertThat(recommendations).allMatch(it -> it.getImageUrl() == null);
-        recommendationService.enrichWithImagesAsyncAll(recommendations);
-
-        var recommendationIds = recommendations.stream().map(TravelRecommendation::getId).toList();
-        var updated = recommendationService.getRecommendations(recommendationIds);
-        assertThat(updated.recommendations()).hasSize(5);
-        assertThat(updated.recommendations()).allMatch(it -> it.image() != null);
     }
 
     @Test
@@ -83,16 +63,14 @@ class TravelRecommendationServiceTest extends DatabaseCleaningTest {
     @Test
     void getRecommendationsWithoutEnrichment() {
         var inquiry = createTravelInquiryAndBlueprintRecommendations();
-        var blueprintRecommendations = recommendationRepository.findByInquiryId(inquiry.getId());
-        recommendationService.enrichWithShortInfoOrSetFailed(blueprintRecommendations, inquiry.getParams());
         var recommendations = recommendationService.getRecommendations(inquiry.getId());
         assertThat(recommendations.recommendations()).allMatch(
-                it -> it.id() != 0
-                        && it.title() != null
+                it -> it.id() > 0
+                        && it.title() == null
                         && it.details() == null
                         && it.image() == null
                         && it.guideId() == null
-                        && it.status().equals("IN_PROGRESS")
+                        && it.status().equals(ProcessingStatus.IN_PROGRESS.name())
         );
         var recommendationsIds = recommendations.recommendations().stream().map(TravelRecommendationDto::id).toList();
         var recommendationsByIds = recommendationService.getRecommendations(recommendationsIds);

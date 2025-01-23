@@ -62,8 +62,10 @@ public class TravelInquiryService {
         return TravelMapper.toInquiryDto(inquiry);
     }
 
-    public TravelInquiry findById(Long inquiryId) {
-        return inquiryRepository.findById(inquiryId).orElseThrow();
+    public TravelInquiryDto findById(Long inquiryId) {
+        return inquiryRepository.findById(inquiryId)
+                .map(TravelMapper::toInquiryDto)
+                .orElseThrow();
     }
 }
 

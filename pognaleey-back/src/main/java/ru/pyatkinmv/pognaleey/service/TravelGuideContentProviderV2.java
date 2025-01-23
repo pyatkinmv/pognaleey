@@ -6,23 +6,22 @@ import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.support.TransactionTemplate;
 import ru.pyatkinmv.pognaleey.client.GptHttpClient;
-import ru.pyatkinmv.pognaleey.client.ImageSearchHttpClient;
+import ru.pyatkinmv.pognaleey.dto.ImageDto;
 import ru.pyatkinmv.pognaleey.model.ProcessingStatus;
 import ru.pyatkinmv.pognaleey.model.TravelGuide;
 import ru.pyatkinmv.pognaleey.model.TravelGuideContentItem;
 import ru.pyatkinmv.pognaleey.repository.TravelGuideContentItemRepository;
 import ru.pyatkinmv.pognaleey.repository.TravelGuideRepository;
+import ru.pyatkinmv.pognaleey.util.Utils;
 
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static ru.pyatkinmv.pognaleey.service.GptAnswerResolveHelper.parseSearchableItems;
-import static ru.pyatkinmv.pognaleey.service.GptAnswerResolveHelper.splitWithPipe;
+import static ru.pyatkinmv.pognaleey.service.GptAnswerResolveHelper.*;
 import static ru.pyatkinmv.pognaleey.service.PromptService.*;
 
 @Component
@@ -35,29 +34,19 @@ public class TravelGuideContentProviderV2 extends TravelGuideContentProvider {
     private final TravelGuideRepository guideRepository;
     private final TransactionTemplate transactionTemplate;
 
-    public TravelGuideContentProviderV2(ImageSearchHttpClient<?> imageSearchHttpClient,
+    public TravelGuideContentProviderV2(ImageService imageService,
                                         TravelInquiryService inquiryService, ExecutorService executorService,
                                         GptHttpClient gptHttpClient,
                                         TravelGuideContentItemRepository contentItemRepository,
                                         TravelGuideRepository guideRepository,
                                         TransactionTemplate transactionTemplate) {
-        super(imageSearchHttpClient);
+        super(imageService);
         this.inquiryService = inquiryService;
         this.executorService = executorService;
         this.gptHttpClient = gptHttpClient;
         this.contentItemRepository = contentItemRepository;
         this.guideRepository = guideRepository;
         this.transactionTemplate = transactionTemplate;
-    }
-
-    private static <T> Optional<T> getOrEmpty(Future<T> supplier) {
-        try {
-            return Optional.of(supplier.get());
-        } catch (Exception e) {
-            log.error("couldn't get from future");
-
-            return Optional.empty();
-        }
     }
 
     private static String generateSightseeingPrompt(String guideTitle,
@@ -68,15 +57,6 @@ public class TravelGuideContentProviderV2 extends TravelGuideContentProvider {
         var guideVisualTopics = String.join("|", titleToImagePhraseMap.keySet());
 
         return PromptService.generateGuideVisualPrompt(guideTitle, inquiryParams, guideVisualTopics);
-    }
-
-    private static boolean isOverridable(TravelGuideContentItem item) {
-        return getType(item).isOverridable;
-    }
-
-    private static TravelGuideContentItem getByType(List<TravelGuideContentItem> items, GuideStructureType type) {
-        return items.stream().filter(it -> it.getOrdinal().equals(type.itemOrdinal))
-                .findFirst().orElseThrow();
     }
 
     private static GuideStructureType getType(TravelGuideContentItem item) {
@@ -133,16 +113,19 @@ public class TravelGuideContentProviderV2 extends TravelGuideContentProvider {
                     var sightseeingImagesResponseRaw = gptHttpClient.ask(sightseeingImagesPrompt);
                     var searchableGuideItems = parseSearchableItems(sightseeingImagesResponseRaw);
 
-                    var titleToImageUrlMapResult = executorService.submit(
-                            () -> searchImagesWithSleepAndBuildTitleToImageMap(searchableGuideItems));
+                    var imagesFuture = executorService.submit(
+                            () -> searchAndSaveImages(searchableGuideItems)
+                    );
 
                     var sightseeingPrompt = generateSightseeingPrompt(guideTitle, inquiryParams, searchableGuideItems);
                     var sightseeingContentResponseRaw = gptHttpClient.ask(sightseeingPrompt);
 
-                    var titleToImageUrlMap = getOrEmpty(titleToImageUrlMapResult).orElse(Map.of());
+                    var titleToImageMap = Utils.tryOrEmpty(imagesFuture)
+                            .map(it -> Utils.toCaseInsensitiveTreeMap(it, ImageDto::title))
+                            .orElse(Map.of());
 
                     var sightseeingContent = Optional.of(sightseeingContentResponseRaw)
-                            .map(it1 -> enrichWithContentImages(sightseeingContentResponseRaw, titleToImageUrlMap))
+                            .map(it -> enrichWithContentImages(it, titleToImageMap))
                             .map(GptAnswerResolveHelper::stripCurlyBraces)
                             .orElseThrow();
                     sightseeing.setContent(sightseeingContent);
@@ -221,7 +204,7 @@ public class TravelGuideContentProviderV2 extends TravelGuideContentProvider {
     }
 
     @Override
-    public List<TravelGuideContentItem> createBlueprintContentItems(long guideId, String initialTitle, String imageUrl) {
+    public List<TravelGuideContentItem> createBlueprintContentItems(long guideId, String initialTitle, Long imageId) {
         var items = Stream.of(GuideStructureType.values())
                 .map(it -> TravelGuideContentItem.builder()
                         .content(it.initialContent)
@@ -230,11 +213,13 @@ public class TravelGuideContentProviderV2 extends TravelGuideContentProvider {
                         .status(it.initialStatus)
                         .build())
                 .toList();
-        var img = String.format(MARKDOWN_IMAGE_FORMAT, imageUrl, initialTitle);
+        var image = imageService.findByIdOrThrow(imageId);
+        var imageStr = String.format(MARKDOWN_IMAGE_FORMAT, image.url(), replaceQuotes(initialTitle));
         var titleWithImage = items.stream()
                 .filter(it -> it.getOrdinal().equals(GuideStructureType.TITLE_WITH_IMAGE.itemOrdinal))
-                .findFirst().orElseThrow();
-        titleWithImage.setContent(String.format("# %s\n%s\n\n", GptAnswerResolveHelper.replaceQuotes(initialTitle), img));
+                .findFirst()
+                .orElseThrow();
+        titleWithImage.setContent(String.format("# %s\n%s\n\n", initialTitle, imageStr));
 
         return contentItemRepository.saveAllFromIterable(items);
     }

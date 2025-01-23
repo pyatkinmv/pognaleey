@@ -19,7 +19,7 @@ public interface TravelRecommendationRepository extends CrudRepository<TravelRec
                 SET
                     details = :details,
                     status = CASE
-                                WHEN image_url IS NOT NULL THEN 'READY'
+                                WHEN image_id IS NOT NULL THEN 'READY'
                                 ELSE status
                              END
                 WHERE id = :id;
@@ -30,14 +30,14 @@ public interface TravelRecommendationRepository extends CrudRepository<TravelRec
     @Query("""
                 UPDATE travel_recommendations
                 SET
-                    image_url = :imageUrl,
+                    image_id = :imageId,
                     status = CASE
                                 WHEN details IS NOT NULL THEN 'READY'
                                 ELSE status
                              END
                 WHERE id = :id;
             """)
-    void updateImageUrlAndStatus(Long id, String imageUrl);
+    void updateImageIdAndStatus(Long id, Long imageId);
 
     @Modifying
     @Query("""

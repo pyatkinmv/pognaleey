@@ -10,7 +10,7 @@ interface Recommendation {
     };
     image?: {
         thumbnailUrl: string;
-        imageUrl: string;
+        url: string;
     };
     guideId?: number | null;
 }

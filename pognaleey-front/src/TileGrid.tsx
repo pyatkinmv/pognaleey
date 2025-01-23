@@ -7,9 +7,14 @@ import CircleLoader from "./CircleLoader";
 interface Tile {
     id: number;
     title: string;
-    imageUrl: string;
+    image: ImageDto;
     isLiked: boolean;
     totalLikes: number;
+}
+
+interface ImageDto {
+    url: string;
+    thumbnailUrl: string;
 }
 
 interface TileGridProps {
@@ -34,7 +39,7 @@ const TileGrid: React.FC<TileGridProps> = ({tiles, onLike, lastTileRef, isLoadin
                     onClick={() => navigate(`/travel-guides/${tile.id}`)}
                 >
                     <div className="tile-image-wrapper">
-                        <img src={tile.imageUrl} alt={tile.title} className="tile-image"/>
+                        <img src={tile.image.thumbnailUrl} alt={tile.title} className="tile-image"/>
                     </div>
                     <div className="tile-title">{tile.title}</div>
                     <div className="tile-likes">

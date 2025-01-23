@@ -7,6 +7,7 @@ import ru.pyatkinmv.pognaleey.dto.*;
 import ru.pyatkinmv.pognaleey.model.*;
 import ru.pyatkinmv.pognaleey.util.Utils;
 
+import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -21,10 +22,15 @@ public class TravelMapper {
     }
 
     public static TravelRecommendationListDto toRecommendationListDto(Collection<TravelRecommendation> recommendations,
+                                                                      Map<Long, ImageDto> idToImageMap,
                                                                       Map<Long, Long> recommendationIdToGuideIdMap) {
         return new TravelRecommendationListDto(
                 recommendations.stream()
-                        .map(it -> toRecommendationDto(it, recommendationIdToGuideIdMap.get(it.getId())))
+                        .map(it -> toRecommendationDto(
+                                it,
+                                idToImageMap,
+                                recommendationIdToGuideIdMap)
+                        )
                         .sorted(Comparator.comparing(TravelRecommendationDto::id))
                         .toList()
         );
@@ -32,14 +38,16 @@ public class TravelMapper {
 
     @SneakyThrows
     public static TravelRecommendationDto toRecommendationDto(TravelRecommendation recommendation,
-                                                              @Nullable Long guideId) {
+                                                              Map<Long, ImageDto> idToImageMap,
+                                                              Map<Long, Long> recommendationIdToGuideIdMap) {
         var details = Optional.ofNullable(recommendation.getDetails())
                 .map(it -> Utils.toObject(it, GptResponseRecommendationDetailsDto.class))
                 .map(it -> new TravelRecommendationDto.DetailsDto(it.description(), it.reasoning()))
                 .orElse(null);
-        var image = Optional.ofNullable(recommendation.getImageUrl())
-                .map(it -> new TravelRecommendationDto.ImageDto(it, it))
+        var image = Optional.ofNullable(recommendation.getImageId())
+                .map(idToImageMap::get)
                 .orElse(null);
+        var guideId = recommendationIdToGuideIdMap.get(recommendation.getId());
 
         return new TravelRecommendationDto(
                 recommendation.getId(),
@@ -53,6 +61,7 @@ public class TravelMapper {
 
     public static List<TravelGuideInfoDto> toShortGuideListDto(List<TravelGuide> userGuides,
                                                                List<User> users,
+                                                               Map<Long, ImageDto> idToImageMap,
                                                                Map<Long, Integer> guideIdToLikesCountMap,
                                                                Set<Long> currentUserLikedGuidesIds) {
         var userIdToUser = users.stream().collect(Collectors.toMap(User::getId, it -> it));
@@ -60,7 +69,12 @@ public class TravelMapper {
         return userGuides.stream()
                 .map(guide -> toGuideInfoDto(
                                 guide,
-                                userIdToUser.get(guide.getUserId()),
+                        Optional.ofNullable(guide.getUserId())
+                                .map(userIdToUser::get)
+                                .orElse(null),
+                        Optional.ofNullable(guide.getImageId())
+                                .map(idToImageMap::get)
+                                .orElse(null),
                         guideIdToLikesCountMap.get(guide.getId()),
                         currentUserLikedGuidesIds.contains(guide.getId())
                         )
@@ -69,12 +83,12 @@ public class TravelMapper {
                 .toList();
     }
 
-    public static TravelGuideInfoDto toGuideInfoDto(TravelGuide it, @Nullable User user, int totalLikes,
-                                                    boolean currentUserLiked) {
+    public static TravelGuideInfoDto toGuideInfoDto(TravelGuide it, @Nullable User user, @Nullable ImageDto image,
+                                                    int totalLikes, boolean currentUserLiked) {
         return new TravelGuideInfoDto(
                 it.getId(),
                 it.getTitle(),
-                it.getImageUrl(),
+                image,
                 totalLikes,
                 currentUserLiked,
                 it.getCreatedAt().toEpochMilli(),
@@ -97,5 +111,13 @@ public class TravelMapper {
                         .sorted(Comparator.comparing(TravelGuideContentDto.TravelGuideContentItemDto::ordinal))
                         .toList()
         );
+    }
+
+    public static Image toImage(ImageSearchClientImageDto dto, String title) {
+        return new Image(null, Instant.now(), title, dto.url(), dto.thumbnailUrl(), dto.query());
+    }
+
+    public static ImageDto toImageDto(Image image) {
+        return new ImageDto(image.getId(), image.getTitle(), image.getUrl(), image.getThumbnailUrl(), image.getQuery());
     }
 }

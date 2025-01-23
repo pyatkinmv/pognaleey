@@ -2,34 +2,32 @@ package ru.pyatkinmv.pognaleey.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import ru.pyatkinmv.pognaleey.client.ImageSearchHttpClient;
-import ru.pyatkinmv.pognaleey.dto.SearchImageDto;
+import ru.pyatkinmv.pognaleey.dto.ImageDto;
 import ru.pyatkinmv.pognaleey.model.TravelGuide;
 import ru.pyatkinmv.pognaleey.model.TravelGuideContentItem;
 
 import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
-import java.util.stream.Collectors;
+import java.util.Optional;
 
 @Slf4j
 @RequiredArgsConstructor
 public abstract class TravelGuideContentProvider {
-    private final ImageSearchHttpClient<?> imagesSearchHttpClient;
-
-    static final String MARKDOWN_IMAGE_FORMAT = "<img src=\"%s\" alt=\"%s\" style=\"width: 45rem; display: block; margin: 0 auto;\">";
+    static final String MARKDOWN_IMAGE_FORMAT =
+            "<img src=\"%s\" alt=\"%s\" style=\"width: 55rem; display: block; margin: 0 auto;\">";
+    final ImageService imageService;
 
     static String enrichWithContentImages(String guideDetailsWithoutImages,
-                                          Map<String, SearchImageDto> titleToImageUrlMap) {
+                                          Map<String, ImageDto> titleToImageMap) {
         var result = guideDetailsWithoutImages;
 
-        for (var title : titleToImageUrlMap.keySet()) {
+        for (var title : titleToImageMap.keySet()) {
             var target = String.format("{%s}", title);
             var titleStr = GptAnswerResolveHelper.replaceQuotes(title);
-            var image = titleToImageUrlMap.get(title);
+            var image = titleToImageMap.get(title);
 
-            if (image != null && image.largeImageUrl() != null) {
-                var replacement = String.format(MARKDOWN_IMAGE_FORMAT + "\n", image.largeImageUrl(), titleStr);
+            if (image != null && image.url() != null) {
+                var replacement = String.format(MARKDOWN_IMAGE_FORMAT + "\n", image.url(), titleStr);
                 result = result.replace(target, replacement);
             } else {
                 log.warn("Not found image for title {}", title);
@@ -42,19 +40,15 @@ public abstract class TravelGuideContentProvider {
     abstract void enrichGuideWithContent(TravelGuide guide, List<TravelGuideContentItem> guideContentItems, long inquiryId,
                                          String recommendationTitle);
 
-    public abstract List<TravelGuideContentItem> createBlueprintContentItems(long guideId, String initialTitle, String imageUrl);
+    public abstract List<TravelGuideContentItem> createBlueprintContentItems(long guideId,
+                                                                             String initialTitle,
+                                                                             Long imageId);
 
-    Map<String, SearchImageDto> searchImagesWithSleepAndBuildTitleToImageMap(List<GptAnswerResolveHelper.SearchableItem> titlesWithImageSearchPhrases) {
-        return titlesWithImageSearchPhrases.stream()
-                .map(it -> Map.entry(
-                        it.title(),
-                        imagesSearchHttpClient.searchImage(it.imageSearchPhrase()))
-                ).filter(it -> it.getValue().isPresent())
-                .collect(Collectors.toMap(
-                        Map.Entry::getKey,
-                        it -> it.getValue().get(),
-                        (a, b) -> b,
-                        () -> new TreeMap<>(String.CASE_INSENSITIVE_ORDER)
-                ));
+    List<ImageDto> searchAndSaveImages(List<GptAnswerResolveHelper.SearchableItem> searchableItems) {
+        return searchableItems.stream()
+                .map(it -> imageService.searchImageAndSave(it.title(), it.imageSearchPhrase()))
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .toList();
     }
 }

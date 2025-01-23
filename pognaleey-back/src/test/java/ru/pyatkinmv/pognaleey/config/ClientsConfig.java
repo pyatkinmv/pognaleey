@@ -2,11 +2,12 @@ package ru.pyatkinmv.pognaleey.config;
 
 import org.mockito.ArgumentMatchers;
 import org.mockito.Mockito;
+import org.mockito.stubbing.Answer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import ru.pyatkinmv.pognaleey.client.GptHttpClient;
-import ru.pyatkinmv.pognaleey.client.YandexImageSearchHttpClient;
-import ru.pyatkinmv.pognaleey.dto.SearchImageDto;
+import ru.pyatkinmv.pognaleey.client.PixabayImageSearchHttpClient;
+import ru.pyatkinmv.pognaleey.dto.ImageSearchClientImageDto;
 
 import java.util.Optional;
 
@@ -52,11 +53,13 @@ public class ClientsConfig {
     }
 
     @Bean
-    public YandexImageSearchHttpClient imagesSearchHttpClient() {
-        var imageSearchHttpClientMock = Mockito.mock(YandexImageSearchHttpClient.class);
+    public PixabayImageSearchHttpClient imagesSearchHttpClient() {
+        var imageSearchHttpClientMock = Mockito.mock(PixabayImageSearchHttpClient.class);
         when(imageSearchHttpClientMock.searchImage(any()))
-                .thenReturn(Optional.of(new SearchImageDto("imageUrl", "imageUrl")));
-
+                .thenAnswer((Answer<Optional<ImageSearchClientImageDto>>) invocation -> {
+                    var query = invocation.getArgument(0, String.class);
+                    return Optional.of(new ImageSearchClientImageDto("imageUrl", "thumbnailUrl", query));
+                });
         return imageSearchHttpClientMock;
     }
 }

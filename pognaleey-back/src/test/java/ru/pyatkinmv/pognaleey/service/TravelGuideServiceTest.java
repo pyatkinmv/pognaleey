@@ -8,14 +8,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import ru.pyatkinmv.pognaleey.DatabaseCleaningTest;
 import ru.pyatkinmv.pognaleey.dto.AuthRequestDto;
 import ru.pyatkinmv.pognaleey.dto.TravelGuideLikeDto;
-import ru.pyatkinmv.pognaleey.model.ProcessingStatus;
-import ru.pyatkinmv.pognaleey.model.TravelGuide;
-import ru.pyatkinmv.pognaleey.model.TravelInquiry;
-import ru.pyatkinmv.pognaleey.model.TravelRecommendation;
-import ru.pyatkinmv.pognaleey.repository.TravelGuideRepository;
-import ru.pyatkinmv.pognaleey.repository.TravelInquiryRepository;
-import ru.pyatkinmv.pognaleey.repository.TravelRecommendationRepository;
-import ru.pyatkinmv.pognaleey.repository.UserRepository;
+import ru.pyatkinmv.pognaleey.model.*;
+import ru.pyatkinmv.pognaleey.repository.*;
 import ru.pyatkinmv.pognaleey.security.JwtAuthenticationToken;
 
 import java.time.Instant;
@@ -38,14 +32,18 @@ class TravelGuideServiceTest extends DatabaseCleaningTest {
     private TravelInquiryRepository travelInquiryRepository;
     @Autowired
     private TravelRecommendationRepository travelRecommendationRepository;
+    @Autowired
+    private ImageRepository imageRepository;
 
     @Test
     void createGuide() {
         var recommendation = createRecommendation();
         var guide = travelGuideService.createGuide(recommendation.getId());
         assertThat(guide.id()).isGreaterThan(0);
-        assertThat(guide.title()).isNotNull();
+        assertThat(guide.title()).isNull();
         assertThat(guide.owner()).isNull();
+        guide = travelGuideService.getGuideInfo(guide.id());
+        assertThat(guide.title()).isNotNull();
 
         assertThrows(
                 RuntimeException.class,
@@ -59,21 +57,40 @@ class TravelGuideServiceTest extends DatabaseCleaningTest {
         );
         assertThat(userGuide.id()).isNotEqualTo(guide.id());
         assertThat(userGuide.id()).isGreaterThan(0);
-        assertThat(userGuide.title()).isNotNull();
-        assertThat(userGuide.imageUrl()).isNotNull();
+        assertThat(userGuide.title()).isNull();
+        assertThat(userGuide.image()).isNotNull();
         assertThat(userGuide.owner()).isNotNull();
         assertThat(userGuide.totalLikes()).isEqualTo(0);
+        userGuide = travelGuideService.getGuideInfo(userGuide.id());
+        assertThat(userGuide.title()).isNotNull();
     }
 
-    // TODO: fix
     @Test
     void getGuideInfo() {
         var guide = withUser("user-1", this::createTravelGuide);
-//        var fullGuideDto = travelGuideService.getGuideInfo(guide.getId(), 1_000);
-//        assertThat(fullGuideDto.id()).isGreaterThan(0);
-//        assertThat(fullGuideDto.details()).isNotNull();
-//        assertThat(fullGuideDto.owner()).isNotNull();
-//        assertThat(fullGuideDto.owner().username()).isEqualTo("user-1");
+        var guideInfo = travelGuideService.getGuideInfo(guide.getId());
+        assertThat(guideInfo.id()).isGreaterThan(0);
+        assertThat(guideInfo.title()).isNotNull();
+        assertThat(guideInfo.image()).isNotNull();
+        assertThat(guideInfo.totalLikes()).isEqualTo(0);
+        assertThat(guideInfo.isLiked()).isFalse();
+        assertThat(guideInfo.owner()).isNotNull();
+        assertThat(guideInfo.owner().username()).isEqualTo("user-1");
+    }
+
+    @Test
+    void getGuideContent() {
+        var guide = withUser("user-1", this::createTravelGuide);
+        var guideContent = travelGuideService.getGuideContent(guide.getId());
+        assertThat(guideContent).isNotNull();
+        var contentItems = guideContent.contentItems();
+        assertThat(contentItems).allMatch(it ->
+                guide.getId().equals(it.guideId())
+                        && it.content() != null
+                        && it.status().equals(ProcessingStatus.READY.name())
+                        && it.id() > 0
+        );
+        assertThat(contentItems.stream().distinct().count()).isEqualTo(contentItems.size());
     }
 
     @Test
@@ -204,8 +221,11 @@ class TravelGuideServiceTest extends DatabaseCleaningTest {
         var inquiry = travelInquiryRepository.save(new TravelInquiry(null, inquiryParams, Instant.now(), null));
         assertThat(inquiry.getParams()).isEqualTo(inquiryParams);
         assertThat(inquiry.getId()).isNotNull();
+        var image = imageRepository.save(
+                new Image(null, Instant.now(), "image", "url", "thumbnailUrl", "query")
+        );
         var recommendation = travelRecommendationRepository.save(
-                new TravelRecommendation(null, Instant.now(), inquiry.getId(), "Москва", "белокаменная", "details", "imageUrl", ProcessingStatus.IN_PROGRESS)
+                new TravelRecommendation(null, Instant.now(), inquiry.getId(), "Москва", image.getId(), "details", ProcessingStatus.IN_PROGRESS)
         );
         assertThat(recommendation.getId()).isNotNull();
 

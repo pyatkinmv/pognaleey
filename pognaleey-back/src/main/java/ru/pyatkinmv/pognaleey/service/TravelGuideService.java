@@ -7,6 +7,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import ru.pyatkinmv.pognaleey.dto.ImageDto;
 import ru.pyatkinmv.pognaleey.dto.TravelGuideContentDto;
 import ru.pyatkinmv.pognaleey.dto.TravelGuideInfoDto;
 import ru.pyatkinmv.pognaleey.dto.TravelGuideLikeDto;
@@ -18,10 +19,7 @@ import ru.pyatkinmv.pognaleey.repository.TravelGuideContentItemRepository;
 import ru.pyatkinmv.pognaleey.repository.TravelGuideRepository;
 
 import java.time.Instant;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.stream.Collectors;
 
@@ -40,13 +38,14 @@ public class TravelGuideService {
     private final ExecutorService executorService;
     private final TravelGuideContentProviderV2 guideContentProvider;
     private final TravelGuideContentItemRepository guideContentItemRepository;
+    private final ImageService imageService;
 
     public TravelGuideLikeDto likeGuide(long guideId) {
         var guide = guideRepository.findById(guideId)
                 .orElseThrow(() -> new IllegalArgumentException(String.format("Guide %d not found", guideId)));
 
         var user = getCurrentUserOrThrow();
-        var doesntExist = likeService.findByUserIdAndGuideId(user.getId(), guideId).isEmpty();
+        var doesntExist = likeService.findIdByUserIdAndGuideId(user.getId(), guideId).isEmpty();
 
         if (doesntExist) {
             likeService.save(
@@ -63,8 +62,8 @@ public class TravelGuideService {
     }
 
     public TravelGuideLikeDto unlikeGuide(long guideId) {
-        likeService.findByUserIdAndGuideId(getCurrentUserOrThrow().getId(), guideId)
-                .ifPresent(likeService::delete);
+        likeService.findIdByUserIdAndGuideId(getCurrentUserOrThrow().getId(), guideId)
+                .ifPresent(likeService::deleteById);
         int totalLikes = likeService.countByGuideId(guideId);
 
         return new TravelGuideLikeDto(guideId, false, totalLikes);
@@ -80,8 +79,11 @@ public class TravelGuideService {
                 .map(it -> likeService.findGuidesIdsByUserId(it.getId(), Integer.MAX_VALUE, 0))
                 .map(it -> it.contains(guideId))
                 .orElse(false);
+        var image = Optional.ofNullable(guide.getImageId())
+                .map(imageService::findByIdOrThrow)
+                .orElse(null);
 
-        return TravelMapper.toGuideInfoDto(guide, owner, totalLikes, isCurrentUserLiked);
+        return TravelMapper.toGuideInfoDto(guide, owner, image, totalLikes, isCurrentUserLiked);
     }
 
     private TravelGuide findTravelGuide(long guideId) {
@@ -98,8 +100,9 @@ public class TravelGuideService {
         var currentUserLikedGuidesIds = getCurrentUser()
                 .map(it -> likeService.findGuidesIdsByUserId(it.getId(), Integer.MAX_VALUE, 0))
                 .orElseGet(Set::of);
-        var guides = TravelMapper.toShortGuideListDto(userGuides, List.of(user), guideIdToLikesCountMap,
-                currentUserLikedGuidesIds);
+        var idToImageMap = getIdToImageMap(userGuides);
+        var guides = TravelMapper.toShortGuideListDto(userGuides, List.of(user), idToImageMap,
+                guideIdToLikesCountMap, currentUserLikedGuidesIds);
 
         return new PageImpl<>(guides, pageable, totalCount);
     }
@@ -117,7 +120,9 @@ public class TravelGuideService {
         var guideIdToLikesCountMap = guideRepository.countLikesByGuideId(likedGuidesIds);
         var totalCount = likeService.countByUserId(user.getId());
         var users = findUsersByGuides(userGuides);
-        var guides = TravelMapper.toShortGuideListDto(userGuides, users, guideIdToLikesCountMap, likedGuidesIds);
+        var idToImageMap = getIdToImageMap(userGuides);
+        var guides = TravelMapper.toShortGuideListDto(userGuides, users, idToImageMap,
+                guideIdToLikesCountMap, likedGuidesIds);
 
         return new PageImpl<>(guides, pageable, totalCount);
     }
@@ -131,10 +136,20 @@ public class TravelGuideService {
         var currentUserLikedGuidesIds = getCurrentUser()
                 .map(it -> likeService.findGuidesIdsByUserId(it.getId(), Integer.MAX_VALUE, 0))
                 .orElseGet(Set::of);
-        var guides = TravelMapper.toShortGuideListDto(topGuides, users, topGuideIdToLikeCountMap,
-                currentUserLikedGuidesIds);
+        var idToImageMap = getIdToImageMap(topGuides);
+        var guides = TravelMapper.toShortGuideListDto(topGuides, users, idToImageMap,
+                topGuideIdToLikeCountMap, currentUserLikedGuidesIds);
 
         return new PageImpl<>(guides, pageable, totalCount);
+    }
+
+    private Map<Long, ImageDto> getIdToImageMap(List<TravelGuide> guides) {
+        var imageIds = guides.stream()
+                .map(it -> it.getImageId())
+                .filter(Objects::nonNull)
+                .collect(Collectors.toSet());
+
+        return imageService.getIdToImageMap(imageIds);
     }
 
     private List<User> findUsersByGuides(List<TravelGuide> guides) {
@@ -153,7 +168,7 @@ public class TravelGuideService {
         var guide = guideRepository.save(
                 TravelGuide.builder()
                         .title(null)
-                        .imageUrl(recommendation.getImageUrl())
+                        .imageId(recommendation.getImageId())
                         .recommendationId(recommendationId)
                         .userId(Optional.ofNullable(user).map(User::getId).orElse(null))
                         .createdAt(Instant.now())
@@ -163,7 +178,7 @@ public class TravelGuideService {
         var guideContentItems = guideContentProvider.createBlueprintContentItems(
                 guide.getId(),
                 recommendation.getTitle(),
-                recommendation.getImageUrl()
+                recommendation.getImageId()
         );
 
         executorService.execute(
@@ -174,8 +189,11 @@ public class TravelGuideService {
                         recommendation.getTitle()
                 )
         );
+        var image = Optional.ofNullable(guide.getImageId())
+                .map(imageService::findByIdOrThrow)
+                .orElse(null);
 
-        return TravelMapper.toGuideInfoDto(guide, user, 0, false);
+        return TravelMapper.toGuideInfoDto(guide, user, image, 0, false);
     }
 
     @SneakyThrows

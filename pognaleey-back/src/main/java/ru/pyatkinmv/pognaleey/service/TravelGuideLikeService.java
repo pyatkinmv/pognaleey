@@ -24,13 +24,13 @@ public class TravelGuideLikeService {
         return likeRepository.countByGuideId(guideId);
     }
 
-    public Optional<TravelGuideLike> findByUserIdAndGuideId(Long id, long guideId) {
-        return likeRepository.findByUserIdAndGuideId(id, guideId);
+    public Optional<Long> findIdByUserIdAndGuideId(Long id, long guideId) {
+        return likeRepository.findByUserIdAndGuideId(id, guideId).map(TravelGuideLike::getId);
     }
 
-    public void delete(TravelGuideLike like) {
-        log.info("delete {}", like);
-        likeRepository.delete(like);
+    public void deleteById(Long id) {
+        log.info("delete like: {}", id);
+        likeRepository.deleteById(id);
     }
 
     public Set<Long> findGuidesIdsByUserId(Long id, int pageSize, int offset) {

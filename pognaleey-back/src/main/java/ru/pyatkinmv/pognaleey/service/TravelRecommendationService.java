@@ -6,8 +6,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import ru.pyatkinmv.pognaleey.client.GptHttpClient;
-import ru.pyatkinmv.pognaleey.client.ImageSearchHttpClient;
 import ru.pyatkinmv.pognaleey.dto.GptResponseRecommendationDetailsDto;
+import ru.pyatkinmv.pognaleey.dto.ImageDto;
 import ru.pyatkinmv.pognaleey.dto.TravelRecommendationListDto;
 import ru.pyatkinmv.pognaleey.mapper.TravelMapper;
 import ru.pyatkinmv.pognaleey.model.ProcessingStatus;
@@ -18,17 +18,15 @@ import ru.pyatkinmv.pognaleey.repository.TravelRecommendationRepository;
 import ru.pyatkinmv.pognaleey.util.Utils;
 
 import java.time.Instant;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import static ru.pyatkinmv.pognaleey.service.GptAnswerResolveHelper.parseSearchableItems;
 import static ru.pyatkinmv.pognaleey.service.GptAnswerResolveHelper.resolveInCaseGeneratedMoreOrLessThanExpected;
-import static ru.pyatkinmv.pognaleey.util.Utils.get;
+import static ru.pyatkinmv.pognaleey.util.Utils.getOrEmpty;
 
 @Slf4j
 @Service
@@ -37,20 +35,19 @@ public class TravelRecommendationService {
     public static final int RECOMMENDATIONS_NUMBER = 5;
 
     private final GptHttpClient gptHttpClient;
-    private final ImageSearchHttpClient<?> imageSearchHttpClient;
+    private final ImageService imageService;
     private final TravelRecommendationRepository recommendationRepository;
     private final TravelInquiryRepository inquiryRepository;
     private final TravelGuideRepository guideRepository;
     private final ExecutorService executorService;
 
-    private static List<TitleAndImageSearchPhrase> parseQuick(String quickRecommendationsAnswer) {
+    private static List<TitleAndImageQuery> parseQuick(String quickRecommendationsAnswer) {
         var parsed = parseSearchableItems(quickRecommendationsAnswer);
 
         return parsed.stream()
-                .map(it -> new TitleAndImageSearchPhrase(it.title().trim(), it.imageSearchPhrase().trim()))
+                .map(it -> new TitleAndImageQuery(it.title().trim(), it.imageSearchPhrase().trim()))
                 .toList();
     }
-
 
     @SneakyThrows
     static GptResponseRecommendationDetailsDto parseDetailed(String gptRecommendationsAnswerRaw) {
@@ -67,11 +64,10 @@ public class TravelRecommendationService {
         }
     }
 
-    private static TravelRecommendation enrichWithShortInfoOrSetFailed(TravelRecommendation recommendation,
-                                                                       Optional<TitleAndImageSearchPhrase> shortInfo) {
-        if (shortInfo.isPresent()) {
+    static TravelRecommendation enrichWithTitleOrSetFailed(TravelRecommendation recommendation,
+                                                           Optional<TitleAndImageQuery> shortInfo) {
+        if (shortInfo.isPresent() && shortInfo.get().imageQuery() != null && shortInfo.get().title() != null) {
             recommendation.setTitle(shortInfo.get().title());
-            recommendation.setImageSearchPhrase(shortInfo.get().imageSearchPhrase());
             recommendation.setStatus(ProcessingStatus.IN_PROGRESS);
         } else {
             recommendation.setStatus(ProcessingStatus.FAILED);
@@ -81,54 +77,83 @@ public class TravelRecommendationService {
     }
 
     @Async
-    public void enrichRecommendationsAsync(List<TravelRecommendation> recommendations, String inquiryParams) {
-        var inquiryId = recommendations.stream().map(TravelRecommendation::getInquiryId).findFirst().orElseThrow();
+    public void enrichRecommendationsAsync(List<TravelRecommendation> blueprintRecommendations, String inquiryParams) {
+        var inquiryId = blueprintRecommendations.stream()
+                .map(TravelRecommendation::getInquiryId)
+                .findFirst().orElseThrow();
         log.info("begin createRecommendationsAsync for inquiryId {}", inquiryId);
 
-        List<TravelRecommendation> recommendationsWithShortInfo;
+        List<TravelRecommendation> updated;
+        List<TitleAndImageQuery> titleAndImageQueries;
 
         try {
-            recommendationsWithShortInfo = enrichWithShortInfoOrSetFailed(recommendations, inquiryParams);
+            var prompt = PromptService.generateQuickPrompt(RECOMMENDATIONS_NUMBER, inquiryParams);
+            var answer = gptHttpClient.ask(prompt);
+            var titleAndImageQueriesParsed = parseQuick(answer);
+            titleAndImageQueries = resolveInCaseGeneratedMoreOrLessThanExpected(titleAndImageQueriesParsed);
+
+            var recs = IntStream.range(0, blueprintRecommendations.size())
+                    .mapToObj(i -> enrichWithTitleOrSetFailed(
+                                    blueprintRecommendations.get(i),
+                                    getOrEmpty(titleAndImageQueries, i)
+                            )
+                    )
+                    .toList();
+            log.info("save recommendations {}", recs);
+
+            updated = recommendationRepository.saveAllFromIterable(recs);
         } catch (Exception e) {
-            var recommendationIds = Utils.extracting(recommendations, TravelRecommendation::getId);
+            var recommendationIds = Utils.extracting(blueprintRecommendations, TravelRecommendation::getId);
             log.error("enrichRecommendationsAsync error: {}, set failed for: {}", e, recommendationIds);
             recommendationRepository.setFailed(recommendationIds);
 
             return;
         }
 
-        var withShortInfo = recommendationsWithShortInfo.stream()
-                .filter(it -> it.getTitle() != null && it.getImageSearchPhrase() != null)
+        // TODO: Нет гарантий, что imageQuery != null
+        var withShortInfo = updated.stream()
+                .filter(it -> it.getStatus() != ProcessingStatus.FAILED)
                 .toList();
 
         enrichWithDetailsAsyncEach(withShortInfo, inquiryParams);
-        enrichWithImagesAsyncAll(withShortInfo);
+        enrichWithImagesAsyncEach(withShortInfo, titleAndImageQueries);
     }
 
-    List<TravelRecommendation> enrichWithShortInfoOrSetFailed(List<TravelRecommendation> blueprintRecommendations,
-                                                              String inquiryParams) {
-        var prompt = PromptService.generateQuickPrompt(RECOMMENDATIONS_NUMBER, inquiryParams);
-        var answer = gptHttpClient.ask(prompt);
-        var titleAndImageSearchPhrasesParsed = parseQuick(answer);
-        var titleAndImageSearchPhrases = resolveInCaseGeneratedMoreOrLessThanExpected(titleAndImageSearchPhrasesParsed);
-
-        var recommendations = IntStream.range(0, blueprintRecommendations.size())
-                .mapToObj(i -> enrichWithShortInfoOrSetFailed(
-                                blueprintRecommendations.get(i),
-                                get(titleAndImageSearchPhrases, i)
-                        )
-                )
-                .toList();
-        log.info("save recommendations {}", recommendations);
-
-        return recommendationRepository.saveAllFromIterable(recommendations);
-    }
+//    List<TravelRecommendation> enrichWithShortInfoOrSetFailed(List<TravelRecommendation> blueprintRecommendations,
+//                                                              String inquiryParams) {
+//        var prompt = PromptService.generateQuickPrompt(RECOMMENDATIONS_NUMBER, inquiryParams);
+//        var answer = gptHttpClient.ask(prompt);
+//        var titleAndImageQueriesParsed = parseQuick(answer);
+//        var titleAndImageSearchPhrases = resolveInCaseGeneratedMoreOrLessThanExpected(titleAndImageQueriesParsed);
+//
+//        var recommendations = IntStream.range(0, blueprintRecommendations.size())
+//                .mapToObj(i -> enrichWithShortInfoOrSetFailed(
+//                                blueprintRecommendations.get(i),
+//                                getOrEmpty(titleAndImageSearchPhrases, i)
+//                        )
+//                )
+//                .toList();
+//        log.info("save recommendations {}", recommendations);
+//
+//        return recommendationRepository.saveAllFromIterable(recommendations);
+//    }
 
     @SneakyThrows
     void enrichWithDetailsAsyncEach(List<TravelRecommendation> recommendations, String inquiryParams) {
         log.info("begin enrichWithDetailsAsyncEach for recommendations {}", recommendations);
         recommendations.forEach(
                 it -> executorService.execute(() -> enrichWithDetails(it, inquiryParams))
+        );
+    }
+
+    void enrichWithImagesAsyncEach(List<TravelRecommendation> recommendations,
+                                   List<TitleAndImageQuery> titleAndImageQueries) {
+        var titleToImageQuery = titleAndImageQueries.stream()
+                .collect(Collectors.toMap(TitleAndImageQuery::title, TitleAndImageQuery::imageQuery));
+        log.info("begin enrichWithImagesAsyncAll for recommendations {}", recommendations);
+        recommendations.forEach(it -> executorService.execute(
+                        () -> searchAndSaveAndUpdateStatus(it, titleToImageQuery.get(it.getTitle()))
+                )
         );
     }
 
@@ -155,19 +180,14 @@ public class TravelRecommendationService {
         return recommendationRepository.findByInquiryId(inquiryId);
     }
 
-    void enrichWithImagesAsyncAll(List<TravelRecommendation> recommendations) {
-        log.info("begin enrichWithImagesAsyncAll for recommendations {}", recommendations);
-        executorService.execute(() -> recommendations.forEach(this::searchAndSaveAndUpdateStatus));
-    }
 
     @SneakyThrows
-    private void searchAndSaveAndUpdateStatus(TravelRecommendation recommendation) {
-        var searchText = recommendation.getImageSearchPhrase();
-        var image = imageSearchHttpClient.searchImage(searchText);
+    private void searchAndSaveAndUpdateStatus(TravelRecommendation recommendation, String imageQuery) {
+        var image = imageService.searchImageAndSave(recommendation.getTitle(), imageQuery);
 
         if (image.isPresent()) {
             log.info("Update image {} for recommendation {}", image, recommendation.getId());
-            recommendationRepository.updateImageUrlAndStatus(recommendation.getId(), image.get().largeImageUrl());
+            recommendationRepository.updateImageIdAndStatus(recommendation.getId(), image.get().id());
         } else {
             log.error("Not found image url for recommendation {}, set failed status", recommendation.getId());
             recommendationRepository.setStatus(recommendation.getId(), ProcessingStatus.FAILED.name());
@@ -182,8 +202,9 @@ public class TravelRecommendationService {
         var recommendations = recommendationRepository.findAllByIdIn(recommendationIds);
         var recommendationsIds = recommendations.stream().map(TravelRecommendation::getId).toList();
         var recommendationIdToGuideIdMap = getRecommendationToGuideMap(recommendationsIds);
+        var idToImageMap = getIdToImageMap(recommendations);
 
-        return TravelMapper.toRecommendationListDto(recommendations, recommendationIdToGuideIdMap);
+        return TravelMapper.toRecommendationListDto(recommendations, idToImageMap, recommendationIdToGuideIdMap);
     }
 
     private Map<Long, Long> getRecommendationToGuideMap(List<Long> recommendationIds) {
@@ -204,13 +225,25 @@ public class TravelRecommendationService {
         var recommendations = findByInquiryId(inquiryId);
 
         if (recommendations.isEmpty()) {
-            return TravelMapper.toRecommendationListDto(Collections.emptyList(), Collections.emptyMap());
+            return TravelMapper.toRecommendationListDto(
+                    Collections.emptyList(), Collections.emptyMap(), Collections.emptyMap()
+            );
         }
 
         var recommendationsIds = recommendations.stream().map(TravelRecommendation::getId).toList();
         var recommendationIdToGuideIdMap = getRecommendationToGuideMap(recommendationsIds);
+        var idToImageMap = getIdToImageMap(recommendations);
 
-        return TravelMapper.toRecommendationListDto(recommendations, recommendationIdToGuideIdMap);
+        return TravelMapper.toRecommendationListDto(recommendations, idToImageMap, recommendationIdToGuideIdMap);
+    }
+
+    private Map<Long, ImageDto> getIdToImageMap(List<TravelRecommendation> recommendations) {
+        var imagesIds = recommendations.stream()
+                .map(TravelRecommendation::getImageId)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toSet());
+
+        return imageService.getIdToImageMap(imagesIds);
     }
 
     public List<TravelRecommendation> createBlueprintRecommendations(Long inquiryId) {
@@ -225,6 +258,6 @@ public class TravelRecommendationService {
         return recommendationRepository.saveAllFromIterable(recommendations);
     }
 
-    record TitleAndImageSearchPhrase(String title, String imageSearchPhrase) {
+    record TitleAndImageQuery(String title, String imageQuery) {
     }
 }

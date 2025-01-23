@@ -6,7 +6,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Table;
-import org.springframework.lang.Nullable;
 
 import java.time.Instant;
 
@@ -14,21 +13,14 @@ import java.time.Instant;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@Table("travel_guides")
-public class TravelGuide {
+@Table("images")
+public class Image {
     @Id
     private Long id;
 
-    private Long recommendationId;
-
-    @Nullable
-    private Long userId;
-
     private Instant createdAt;
-
-    @Nullable
     private String title;
-
-    @Nullable
-    private Long imageId;
+    private String url;
+    private String thumbnailUrl;
+    private String query;
 }

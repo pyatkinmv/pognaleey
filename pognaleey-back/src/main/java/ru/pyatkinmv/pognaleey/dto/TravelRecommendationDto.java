@@ -13,8 +13,4 @@ public record TravelRecommendationDto(
     public record DetailsDto(String description, String reasoning) {
 
     }
-
-    public record ImageDto(String thumbnailUrl, String imageUrl) {
-
-    }
 }

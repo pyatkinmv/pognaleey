@@ -27,16 +27,14 @@ public class TravelRecommendation {
     @ToString.Include
     private String title;
 
-    private String imageSearchPhrase;
+    @Nullable
+    private Long imageId;
 
     /**
      * {@link GptResponseRecommendationDetailsDto} stored here
      */
     @Nullable
     private String details;
-
-    @Nullable
-    private String imageUrl;
 
     // TODO: Подумать насчет статуса Inquiry вместо этого
     private ProcessingStatus status;

@@ -14,12 +14,11 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Instant;
-import java.util.Collection;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
+import java.util.concurrent.Future;
 import java.util.function.Function;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 @Slf4j
 @UtilityClass
@@ -83,7 +82,7 @@ public final class Utils {
         }
     }
 
-    public static <T> Optional<T> get(Collection<T> collection, int i) {
+    public static <T> Optional<T> getOrEmpty(Collection<T> collection, int i) {
         if (i < collection.size()) {
             return Optional.of(collection.stream().toList().get(i));
         } else {
@@ -93,6 +92,26 @@ public final class Utils {
 
     public static <T, R> List<R> extracting(Collection<T> collection, Function<T, R> function) {
         return collection.stream().map(function).toList();
+    }
+
+    public static <T> Map<String, T> toCaseInsensitiveTreeMap(List<T> searchableItems, Function<T, String> keyFun) {
+        return searchableItems.stream()
+                .collect(Collectors.toMap(
+                        keyFun,
+                        it -> it,
+                        (a, b) -> b,
+                        () -> new TreeMap<>(String.CASE_INSENSITIVE_ORDER)
+                ));
+    }
+
+    public static <T> Optional<T> tryOrEmpty(Future<T> supplier) {
+        try {
+            return Optional.of(supplier.get());
+        } catch (Exception e) {
+            log.error("couldn't get from future");
+
+            return Optional.empty();
+        }
     }
 
     public static <T> T peek(Runnable runnable, T obj) {

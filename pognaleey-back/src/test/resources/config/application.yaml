@@ -4,10 +4,10 @@ spring:
   profiles:
     active: test
 image-search-client:
-  base-url: url
-  api-key: apiKey
-  folder-id: folderId
-  permits-per-second: 100
+  # noinspection SpringBootApplicationYaml
+  current: null
+  pixabay:
+    base-url: url
 gpt-client:
   # noinspection SpringBootApplicationYaml
   current: null

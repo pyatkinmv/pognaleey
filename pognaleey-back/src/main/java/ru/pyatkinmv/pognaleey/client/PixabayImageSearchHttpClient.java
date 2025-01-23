@@ -3,8 +3,8 @@ package ru.pyatkinmv.pognaleey.client;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
+import ru.pyatkinmv.pognaleey.dto.ImageSearchClientImageDto;
 import ru.pyatkinmv.pognaleey.dto.PixabayImagesResponseDto;
-import ru.pyatkinmv.pognaleey.dto.SearchImageDto;
 
 import java.net.URI;
 import java.util.Optional;
@@ -22,9 +22,9 @@ public class PixabayImageSearchHttpClient extends ImageSearchHttpClient<PixabayI
     }
 
     @Override
-    Optional<SearchImageDto> mapToImage(PixabayImagesResponseDto response) {
+    Optional<ImageSearchClientImageDto> mapToImage(PixabayImagesResponseDto response, String searchQuery) {
         return Optional.of(response.hits().getFirst())
-                .map(it -> new SearchImageDto(it.webformatURL(), it.webformatURL()));
+                .map(it -> new ImageSearchClientImageDto(it.largeImageURL(), it.webformatURL(), searchQuery));
     }
 
     @Override

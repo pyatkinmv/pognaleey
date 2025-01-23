@@ -2,7 +2,7 @@ package ru.pyatkinmv.pognaleey.client;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import ru.pyatkinmv.pognaleey.dto.SearchImageDto;
+import ru.pyatkinmv.pognaleey.dto.ImageSearchClientImageDto;
 
 import java.net.URI;
 import java.util.Optional;
@@ -11,7 +11,7 @@ import java.util.Optional;
 @Slf4j
 public abstract class ImageSearchHttpClient<T> {
 
-    public Optional<SearchImageDto> searchImage(String searchQuery) {
+    public Optional<ImageSearchClientImageDto> searchImage(String searchQuery) {
         log.info("searchImage for searchQuery {}", searchQuery);
 
         if (searchQuery.isEmpty()) {
@@ -24,7 +24,7 @@ public abstract class ImageSearchHttpClient<T> {
         log.info("searchImage uri {}", withoutSecret(uri));
 
         var responseRaw = makeRequest(uri);
-        var image = responseRaw.flatMap(this::mapToImage);
+        var image = responseRaw.flatMap(it -> mapToImage(it, searchQuery));
 
         log.info("searchImage result {}", image);
 
@@ -46,7 +46,7 @@ public abstract class ImageSearchHttpClient<T> {
 
     abstract T doMakeRequest(URI uri);
 
-    abstract Optional<SearchImageDto> mapToImage(T responseRaw);
+    abstract Optional<ImageSearchClientImageDto> mapToImage(T responseRaw, String searchQuery);
 
     abstract URI buildUri(String searchQuery);
 
