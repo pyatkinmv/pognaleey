@@ -5,7 +5,8 @@ import org.mockito.Mockito;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import ru.pyatkinmv.pognaleey.client.GptHttpClient;
-import ru.pyatkinmv.pognaleey.client.ImagesSearchHttpClient;
+import ru.pyatkinmv.pognaleey.client.YandexImagesSearchHttpClient;
+import ru.pyatkinmv.pognaleey.dto.SearchImageDto;
 
 import java.util.Optional;
 
@@ -51,9 +52,10 @@ public class ClientsConfig {
     }
 
     @Bean
-    public ImagesSearchHttpClient imagesSearchHttpClient() {
-        var imageSearchHttpClientMock = Mockito.mock(ImagesSearchHttpClient.class);
-        when(imageSearchHttpClientMock.searchImageUrlWithRateLimiting(any())).thenReturn(Optional.of("imageUrl"));
+    public YandexImagesSearchHttpClient imagesSearchHttpClient() {
+        var imageSearchHttpClientMock = Mockito.mock(YandexImagesSearchHttpClient.class);
+        when(imageSearchHttpClientMock.searchImage(any()))
+                .thenReturn(Optional.of(new SearchImageDto("imageUrl", "imageUrl")));
 
         return imageSearchHttpClientMock;
     }

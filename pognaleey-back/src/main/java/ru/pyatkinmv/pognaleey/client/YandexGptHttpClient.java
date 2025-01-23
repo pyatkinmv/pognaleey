@@ -12,6 +12,7 @@ import java.util.Optional;
 
 @Slf4j
 @RequiredArgsConstructor
+@Deprecated
 public class YandexGptHttpClient implements GptHttpClient {
     private final RestTemplate restTemplate;
 

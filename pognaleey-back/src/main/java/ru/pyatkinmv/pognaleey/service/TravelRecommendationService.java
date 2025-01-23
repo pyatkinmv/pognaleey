@@ -6,7 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import ru.pyatkinmv.pognaleey.client.GptHttpClient;
-import ru.pyatkinmv.pognaleey.client.ImagesSearchHttpClient;
+import ru.pyatkinmv.pognaleey.client.YandexImagesSearchHttpClient;
 import ru.pyatkinmv.pognaleey.dto.GptResponseRecommendationDetailsDto;
 import ru.pyatkinmv.pognaleey.dto.TravelRecommendationListDto;
 import ru.pyatkinmv.pognaleey.mapper.TravelMapper;
@@ -37,7 +37,7 @@ public class TravelRecommendationService {
     public static final int RECOMMENDATIONS_NUMBER = 5;
 
     private final GptHttpClient gptHttpClient;
-    private final ImagesSearchHttpClient imagesSearchHttpClient;
+    private final YandexImagesSearchHttpClient imagesSearchHttpClient;
     private final TravelRecommendationRepository recommendationRepository;
     private final TravelInquiryRepository inquiryRepository;
     private final TravelGuideRepository guideRepository;
@@ -163,11 +163,11 @@ public class TravelRecommendationService {
     @SneakyThrows
     private void searchAndSaveAndUpdateStatus(TravelRecommendation recommendation) {
         var searchText = recommendation.getImageSearchPhrase();
-        var imageUrl = imagesSearchHttpClient.searchImageUrlWithRateLimiting(searchText);
+        var image = imagesSearchHttpClient.searchImage(searchText);
 
-        if (imageUrl.isPresent()) {
-            log.info("Update imageUrl {} for recommendation {}", imageUrl, recommendation.getId());
-            recommendationRepository.updateImageUrlAndStatus(recommendation.getId(), imageUrl.get());
+        if (image.isPresent()) {
+            log.info("Update image {} for recommendation {}", image, recommendation.getId());
+            recommendationRepository.updateImageUrlAndStatus(recommendation.getId(), image.get().largeImageUrl());
         } else {
             log.error("Not found image url for recommendation {}, set failed status", recommendation.getId());
             recommendationRepository.setStatus(recommendation.getId(), ProcessingStatus.FAILED.name());

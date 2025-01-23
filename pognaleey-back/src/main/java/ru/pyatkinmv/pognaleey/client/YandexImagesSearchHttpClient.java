@@ -1,6 +1,5 @@
 package ru.pyatkinmv.pognaleey.client;
 
-import com.google.common.util.concurrent.RateLimiter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -10,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
+import ru.pyatkinmv.pognaleey.dto.SearchImageDto;
 
 import java.net.URI;
 import java.util.ArrayList;
@@ -17,11 +17,11 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.regex.Pattern;
 
-@SuppressWarnings("UnstableApiUsage")
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class ImagesSearchHttpClient {
+@Deprecated
+public class YandexImagesSearchHttpClient extends ImageSearchHttpClientBase<String> {
     private final RestTemplate restTemplate;
     private final RestTemplate restTemplateWithTimeout;
     private final RateLimiter rateLimiter;
@@ -35,28 +35,24 @@ public class ImagesSearchHttpClient {
     @Value("${image-search-client.base-url}")
     private String imageSearchBaseUrl;
 
-    public Optional<String> searchImageUrlWithRateLimiting(String text) {
-        rateLimiter.acquire();
-
-        return searchImageUrl(text);
+    @Override
+    String makeRequest(URI uri) {
+        return Objects.requireNonNull(restTemplate.getForObject(uri, String.class));
     }
 
-    private Optional<String> searchImageUrl(String text) {
-        log.info("searchImageUrl for text {}", text);
+    @Override
+    public Optional<SearchImageDto> searchImage(String searchQuery) {
+        rateLimiter.acquire();
 
-        if (text.isEmpty()) {
-            log.info("text is empty");
-            return Optional.empty();
-        }
+        return super.searchImage(searchQuery);
+    }
 
-        var uri = buildUri(text);
-        log.info("searchImageUrl uri {}", withoutSecret(uri));
-        var responseXml = Objects.requireNonNull(restTemplate.getForObject(uri, String.class));
-
+    @Override
+    Optional<SearchImageDto> extractResponse(String responseRaw) {
         // Either url or image-link must work
         var regex = "<url>(.*?)</url>|<image-link>(.*?)</image-link>";
         var pattern = Pattern.compile(regex);
-        var matcher = pattern.matcher(responseXml);
+        var matcher = pattern.matcher(responseRaw);
         var imageUrls = new ArrayList<String>();
 
         while (matcher.find()) {
@@ -74,32 +70,34 @@ public class ImagesSearchHttpClient {
             log.error("no imageUrls found; possibly bad response");
         }
 
-        // TODO: Fix. Подумать еще раз: что если картинку не удалось сгенерировать, мб показывать загрушку
-        var resultUrl = imageUrls.stream().filter(this::isUrlValid).findFirst().orElseGet(() -> {
-            log.error("no valid imageUrl found; response {}", responseXml);
+        var resultUrl = imageUrls.stream().filter(this::isUrlValid)
+                .findFirst()
+                .orElseGet(() -> {
+                    log.error("no valid imageUrl found; response {}", responseRaw);
 
-            return null;
-        });
+                    return null;
+                });
 
-        log.info("searchImageUrl resultUrl {}", resultUrl);
-
-        return Optional.ofNullable(resultUrl);
+        return Optional.ofNullable(resultUrl).map(it -> new SearchImageDto(it, it));
     }
 
-    private URI buildUri(String text) {
+
+    @Override
+    URI buildUri(String searchQuery) {
         return UriComponentsBuilder.fromUriString(imageSearchBaseUrl)
                 .queryParam("apikey", imageSearchApiKey)  // Добавление параметров
                 .queryParam("folderid", imageSearchFolderId)
                 .queryParam("isize", "large")
                 .queryParam("groupby", "attr=ii.groups-on-page=5")
-                .queryParam("text", text)
+                .queryParam("text", searchQuery)
                 .build()
                 .encode() // Кодировка параметров
                 .toUri();
     }
 
-    private String withoutSecret(URI uri) {
-        return uri.toString().replace(imageSearchApiKey, "SECRET");
+    @Override
+    String getApiKey() {
+        return imageSearchApiKey;
     }
 
     private boolean isUrlValid(String imageUrl) {

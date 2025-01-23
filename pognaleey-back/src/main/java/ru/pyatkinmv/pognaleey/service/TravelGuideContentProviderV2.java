@@ -6,7 +6,7 @@ import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.support.TransactionTemplate;
 import ru.pyatkinmv.pognaleey.client.GptHttpClient;
-import ru.pyatkinmv.pognaleey.client.ImagesSearchHttpClient;
+import ru.pyatkinmv.pognaleey.client.YandexImagesSearchHttpClient;
 import ru.pyatkinmv.pognaleey.model.ProcessingStatus;
 import ru.pyatkinmv.pognaleey.model.TravelGuide;
 import ru.pyatkinmv.pognaleey.model.TravelGuideContentItem;
@@ -35,7 +35,7 @@ public class TravelGuideContentProviderV2 extends TravelGuideContentProvider {
     private final TravelGuideRepository guideRepository;
     private final TransactionTemplate transactionTemplate;
 
-    public TravelGuideContentProviderV2(ImagesSearchHttpClient imagesSearchHttpClient,
+    public TravelGuideContentProviderV2(YandexImagesSearchHttpClient imagesSearchHttpClient,
                                         TravelInquiryService inquiryService, ExecutorService executorService,
                                         GptHttpClient gptHttpClient,
                                         TravelGuideContentItemRepository contentItemRepository,
