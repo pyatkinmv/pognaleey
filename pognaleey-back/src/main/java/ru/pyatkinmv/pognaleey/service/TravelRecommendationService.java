@@ -6,7 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import ru.pyatkinmv.pognaleey.client.GptHttpClient;
-import ru.pyatkinmv.pognaleey.client.YandexImagesSearchHttpClient;
+import ru.pyatkinmv.pognaleey.client.ImageSearchHttpClient;
 import ru.pyatkinmv.pognaleey.dto.GptResponseRecommendationDetailsDto;
 import ru.pyatkinmv.pognaleey.dto.TravelRecommendationListDto;
 import ru.pyatkinmv.pognaleey.mapper.TravelMapper;
@@ -37,7 +37,7 @@ public class TravelRecommendationService {
     public static final int RECOMMENDATIONS_NUMBER = 5;
 
     private final GptHttpClient gptHttpClient;
-    private final YandexImagesSearchHttpClient imagesSearchHttpClient;
+    private final ImageSearchHttpClient<?> imageSearchHttpClient;
     private final TravelRecommendationRepository recommendationRepository;
     private final TravelInquiryRepository inquiryRepository;
     private final TravelGuideRepository guideRepository;
@@ -163,7 +163,7 @@ public class TravelRecommendationService {
     @SneakyThrows
     private void searchAndSaveAndUpdateStatus(TravelRecommendation recommendation) {
         var searchText = recommendation.getImageSearchPhrase();
-        var image = imagesSearchHttpClient.searchImage(searchText);
+        var image = imageSearchHttpClient.searchImage(searchText);
 
         if (image.isPresent()) {
             log.info("Update image {} for recommendation {}", image, recommendation.getId());

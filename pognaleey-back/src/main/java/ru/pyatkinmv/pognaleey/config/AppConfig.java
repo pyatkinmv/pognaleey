@@ -9,10 +9,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.web.client.RestTemplate;
-import ru.pyatkinmv.pognaleey.client.ChatGptHttpClient;
-import ru.pyatkinmv.pognaleey.client.GptHttpClient;
-import ru.pyatkinmv.pognaleey.client.RateLimiter;
-import ru.pyatkinmv.pognaleey.client.YandexGptHttpClient;
+import ru.pyatkinmv.pognaleey.client.*;
+import ru.pyatkinmv.pognaleey.dto.PixabayImagesResponseDto;
 
 import java.time.Duration;
 import java.util.concurrent.ExecutorService;
@@ -64,8 +62,32 @@ public class AppConfig {
     }
 
     @Bean
-    public RateLimiter imagesSearchClientRateLimiter(
-            @Value("${image-search-client.permits-per-second}") double permitsPerSecond) {
-        return new RateLimiter(permitsPerSecond);
+    @ConditionalOnProperty(prefix = "image-search-client", name = "current", havingValue = "pixabay")
+    public ImageSearchHttpClient<PixabayImagesResponseDto> pixabayImageSearchHttpClient(
+            @Autowired RestTemplate restTemplate,
+            @Value("${image-search-client.pixabay.api-key}") String apiKey,
+            @Value("${image-search-client.pixabay.base-url}") String baseUrl
+    ) {
+        return new PixabayImageSearchHttpClient(restTemplate, apiKey, baseUrl);
+    }
+
+    @Bean
+    @ConditionalOnProperty(prefix = "image-search-client", name = "current", havingValue = "yandex")
+    public ImageSearchHttpClient<String> yandexImageSearchHttpClient(
+            @Autowired RestTemplate restTemplate,
+            @Autowired RestTemplate restTemplateWithTimeout,
+            @Value("${image-search-client.yandex.api-key}") String apiKey,
+            @Value("${image-search-client.yandex.folder-id}") String folderId,
+            @Value("${image-search-client.yandex.base-url}") String baseUrl,
+            @Value("${image-search-client.yandex.permits-per-second}") double permitsPerSecond
+    ) {
+        return new YandexImageSearchHttpClient(
+                restTemplate,
+                restTemplateWithTimeout,
+                new RateLimiter(permitsPerSecond),
+                apiKey,
+                folderId,
+                baseUrl
+        );
     }
 }

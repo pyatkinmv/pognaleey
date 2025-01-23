@@ -18,10 +18,16 @@ logging:
   level:
     root: INFO
 image-search-client:
-  base-url: https://yandex.ru/images-xml
-  api-key: ${IMAGE_SEARCH_API_KEY}
-  folder-id: ${IMAGE_SEARCH_FOLDER_ID}
-  permits-per-second: 0.5
+  # noinspection SpringBootApplicationYaml
+  current: ${CURRENT_IMAGE_SEARCH_CLIENT}
+  yandex:
+    base-url: https://yandex.ru/images-xml
+    api-key: ${YANDEX_IMAGE_SEARCH_API_KEY}
+    folder-id: ${YANDEX_IMAGE_SEARCH_FOLDER_ID}
+    permits-per-second: 0.5
+  pixabay:
+    base-url: https://pixabay.com/api/
+    api-key: ${PIXABAY_IMAGE_SEARCH_API_KEY}
 gpt-client:
   # noinspection SpringBootApplicationYaml
   current: ${CURRENT_GPT_CLIENT}

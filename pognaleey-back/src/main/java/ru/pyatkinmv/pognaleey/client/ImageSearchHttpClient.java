@@ -9,8 +9,7 @@ import java.util.Optional;
 
 @RequiredArgsConstructor
 @Slf4j
-public abstract class ImageSearchHttpClientBase<T> {
-
+public abstract class ImageSearchHttpClient<T> {
 
     public Optional<SearchImageDto> searchImage(String searchQuery) {
         log.info("searchImage for searchQuery {}", searchQuery);
@@ -25,16 +24,29 @@ public abstract class ImageSearchHttpClientBase<T> {
         log.info("searchImage uri {}", withoutSecret(uri));
 
         var responseRaw = makeRequest(uri);
-        var image = extractResponse(responseRaw);
+        var image = responseRaw.flatMap(this::mapToImage);
 
         log.info("searchImage result {}", image);
 
         return image;
     }
 
-    abstract T makeRequest(URI uri);
+    Optional<T> makeRequest(URI uri) {
+        T response = null;
 
-    abstract Optional<SearchImageDto> extractResponse(T responseRaw);
+        try {
+            // TODO: Retry?
+            response = doMakeRequest(uri);
+        } catch (Exception e) {
+            log.error("could not get response", e);
+        }
+
+        return Optional.ofNullable(response);
+    }
+
+    abstract T doMakeRequest(URI uri);
+
+    abstract Optional<SearchImageDto> mapToImage(T responseRaw);
 
     abstract URI buildUri(String searchQuery);
 

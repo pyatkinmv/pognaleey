@@ -2,42 +2,33 @@ package ru.pyatkinmv.pognaleey.client;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 import ru.pyatkinmv.pognaleey.dto.SearchImageDto;
 
 import java.net.URI;
 import java.util.ArrayList;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.regex.Pattern;
 
 @Slf4j
-@Component
 @RequiredArgsConstructor
 @Deprecated
-public class YandexImagesSearchHttpClient extends ImageSearchHttpClientBase<String> {
+public class YandexImageSearchHttpClient extends ImageSearchHttpClient<String> {
     private final RestTemplate restTemplate;
     private final RestTemplate restTemplateWithTimeout;
     private final RateLimiter rateLimiter;
 
-    @Value("${image-search-client.api-key}")
-    private String imageSearchApiKey;
-
-    @Value("${image-search-client.folder-id}")
-    private String imageSearchFolderId;
-
-    @Value("${image-search-client.base-url}")
-    private String imageSearchBaseUrl;
+    private final String imageSearchApiKey;
+    private final String imageSearchFolderId;
+    private final String imageSearchBaseUrl;
 
     @Override
-    String makeRequest(URI uri) {
-        return Objects.requireNonNull(restTemplate.getForObject(uri, String.class));
+    String doMakeRequest(URI uri) {
+        return restTemplate.getForObject(uri, String.class);
     }
 
     @Override
@@ -48,7 +39,7 @@ public class YandexImagesSearchHttpClient extends ImageSearchHttpClientBase<Stri
     }
 
     @Override
-    Optional<SearchImageDto> extractResponse(String responseRaw) {
+    Optional<SearchImageDto> mapToImage(String responseRaw) {
         // Either url or image-link must work
         var regex = "<url>(.*?)</url>|<image-link>(.*?)</image-link>";
         var pattern = Pattern.compile(regex);
