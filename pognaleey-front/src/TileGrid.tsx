@@ -34,7 +34,13 @@ const TileGrid: React.FC<TileGridProps> = ({tiles, onLike, lastTileRef, isLoadin
                     onClick={() => navigate(`/travel-guides/${tile.id}`)}
                 >
                     <div className="tile-image-wrapper">
-                        <img src={tile.image.thumbnailUrl} alt={tile.title} className="tile-image"/>
+                        {tile.image ? <img src={tile.image.thumbnailUrl} alt={tile.title} className="tile-image"/>
+                            : (<img
+                                className="tile-image"
+                                src="/not-found512.png"
+                                alt="Not Found"
+                            />)
+                        }
                     </div>
                     <div className="tile-title">{tile.title}</div>
                     <div className="tile-likes">
