@@ -24,8 +24,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-import static ru.pyatkinmv.pognaleey.service.GptAnswerResolveHelper.parseSearchableItems;
-import static ru.pyatkinmv.pognaleey.service.GptAnswerResolveHelper.resolveInCaseGeneratedMoreOrLessThanExpected;
+import static ru.pyatkinmv.pognaleey.service.GptAnswerResolveHelper.*;
 import static ru.pyatkinmv.pognaleey.util.Utils.getOrEmpty;
 
 @Slf4j
@@ -51,6 +50,7 @@ public class TravelRecommendationService {
 
     @SneakyThrows
     static GptResponseRecommendationDetailsDto parseDetailed(String gptRecommendationsAnswerRaw) {
+        gptRecommendationsAnswerRaw = removeJsonTagsIfPresent(gptRecommendationsAnswerRaw);
         var regex = "\\{[\\s\\S]*\"description\":[\\s\\S]*\\}";
         var pattern = Pattern.compile(regex);
         var matcher = pattern.matcher(gptRecommendationsAnswerRaw);
@@ -119,25 +119,6 @@ public class TravelRecommendationService {
         enrichWithImagesAsyncEach(withShortInfo, titleAndImageQueries);
     }
 
-//    List<TravelRecommendation> enrichWithShortInfoOrSetFailed(List<TravelRecommendation> blueprintRecommendations,
-//                                                              String inquiryParams) {
-//        var prompt = PromptService.generateQuickPrompt(RECOMMENDATIONS_NUMBER, inquiryParams);
-//        var answer = gptHttpClient.ask(prompt);
-//        var titleAndImageQueriesParsed = parseQuick(answer);
-//        var titleAndImageSearchPhrases = resolveInCaseGeneratedMoreOrLessThanExpected(titleAndImageQueriesParsed);
-//
-//        var recommendations = IntStream.range(0, blueprintRecommendations.size())
-//                .mapToObj(i -> enrichWithShortInfoOrSetFailed(
-//                                blueprintRecommendations.get(i),
-//                                getOrEmpty(titleAndImageSearchPhrases, i)
-//                        )
-//                )
-//                .toList();
-//        log.info("save recommendations {}", recommendations);
-//
-//        return recommendationRepository.saveAllFromIterable(recommendations);
-//    }
-
     @SneakyThrows
     void enrichWithDetailsAsyncEach(List<TravelRecommendation> recommendations, String inquiryParams) {
         log.info("begin enrichWithDetailsAsyncEach for recommendations {}", recommendations);
@@ -152,7 +133,7 @@ public class TravelRecommendationService {
                 .collect(Collectors.toMap(TitleAndImageQuery::title, TitleAndImageQuery::imageQuery));
         log.info("begin enrichWithImagesAsyncAll for recommendations {}", recommendations);
         recommendations.forEach(it -> executorService.execute(
-                        () -> searchAndSaveAndUpdateStatus(it, titleToImageQuery.get(it.getTitle()))
+                () -> searchAndSaveImageAndUpdateStatus(it, titleToImageQuery.get(it.getTitle()))
                 )
         );
     }
@@ -182,16 +163,24 @@ public class TravelRecommendationService {
 
 
     @SneakyThrows
-    private void searchAndSaveAndUpdateStatus(TravelRecommendation recommendation, String imageQuery) {
-        var image = imageService.searchImageAndSave(recommendation.getTitle(), imageQuery);
+    private void searchAndSaveImageAndUpdateStatus(TravelRecommendation recommendation, String imageQuery) {
+        try {
+            var image = imageService.searchImageAndSave(recommendation.getTitle(), imageQuery);
 
-        if (image.isPresent()) {
-            log.info("Update image {} for recommendation {}", image, recommendation.getId());
-            recommendationRepository.updateImageIdAndStatus(recommendation.getId(), image.get().id());
-        } else {
-            log.error("Not found image url for recommendation {}, set failed status", recommendation.getId());
+            if (image.isPresent()) {
+                log.info("Update image {} for recommendation {}", image.get(), recommendation.getId());
+            } else {
+                log.warn("Not found image url for recommendation {}, searchQuery {}, set failed status",
+                        recommendation.getId(), imageQuery);
+            }
+            var imageId = image.map(ImageDto::id).orElse(null);
+            recommendationRepository.updateImageIdAndStatus(recommendation.getId(), imageId);
+        } catch (Exception e) {
+            log.error("Couldn't searchAndSaveImageAndUpdateStatus for recommendation {}, set failed status",
+                    recommendation.getId(), e);
             recommendationRepository.setStatus(recommendation.getId(), ProcessingStatus.FAILED.name());
         }
+
     }
 
     public TravelRecommendation findById(long recommendationId) {

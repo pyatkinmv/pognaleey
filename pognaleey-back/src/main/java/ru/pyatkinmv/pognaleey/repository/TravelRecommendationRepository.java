@@ -18,11 +18,12 @@ public interface TravelRecommendationRepository extends CrudRepository<TravelRec
                 UPDATE travel_recommendations
                 SET
                     details = :details,
-                    status = CASE
-                                WHEN image_id IS NOT NULL THEN 'READY'
-                                ELSE status
-                             END
-                WHERE id = :id;
+                    status  = CASE
+                                  WHEN status = 'IMAGE_SEARCH_FINISHED' THEN 'READY'
+                                  WHEN status = 'IN_PROGRESS' THEN 'CONTENT_GENERATED'
+                                  ELSE status
+                        END
+                WHERE id=:id;
             """)
     void updateDetailsAndStatus(Long id, String details);
 
@@ -32,7 +33,8 @@ public interface TravelRecommendationRepository extends CrudRepository<TravelRec
                 SET
                     image_id = :imageId,
                     status = CASE
-                                WHEN details IS NOT NULL THEN 'READY'
+                                WHEN status = 'CONTENT_GENERATED' THEN 'READY'
+                                WHEN status = 'IN_PROGRESS' THEN 'IMAGE_SEARCH_FINISHED'
                                 ELSE status
                              END
                 WHERE id = :id;

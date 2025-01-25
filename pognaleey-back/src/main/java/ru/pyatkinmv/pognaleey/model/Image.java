@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Table;
+import org.springframework.lang.Nullable;
 
 import java.time.Instant;
 
@@ -23,4 +24,10 @@ public class Image {
     private String url;
     private String thumbnailUrl;
     private String query;
+    @Nullable
+    private String licenceUrl;
+    @Nullable
+    private String ownerName;
+    @Nullable
+    private String ownerUrl;
 }

@@ -108,7 +108,7 @@ public final class Utils {
         try {
             return Optional.of(supplier.get());
         } catch (Exception e) {
-            log.error("couldn't get from future");
+            log.error("couldn't get from future {}", e.getMessage());
 
             return Optional.empty();
         }

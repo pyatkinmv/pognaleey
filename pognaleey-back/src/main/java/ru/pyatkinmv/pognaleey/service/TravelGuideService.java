@@ -145,7 +145,7 @@ public class TravelGuideService {
 
     private Map<Long, ImageDto> getIdToImageMap(List<TravelGuide> guides) {
         var imageIds = guides.stream()
-                .map(it -> it.getImageId())
+                .map(TravelGuide::getImageId)
                 .filter(Objects::nonNull)
                 .collect(Collectors.toSet());
 

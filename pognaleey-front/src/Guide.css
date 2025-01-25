@@ -120,3 +120,35 @@
 }
 
 
+.guide-details .image-guide-container {
+    text-align: center; /* Центрирование контейнера для изображения */
+    /*margin: 20px 0;*/
+}
+
+.guide-details .image {
+    max-width: 80%; /* Ограничение ширины изображения */
+    height: auto; /* Сохраняем пропорции */
+    border-radius: 0.333rem; /* 10px */
+
+}
+
+.guide-details .image-guide-container:hover {
+    transform: scale(1.01);
+}
+
+.guide-details .image-caption {
+    font-size: 0.85rem; /* Уменьшенный шрифт для подписи */
+    color: #333; /* Нейтральный цвет */
+    margin-top: 0.5rem; /* Расстояние от изображения до подписи */
+}
+
+.guide-details .image-caption a {
+    color: #007bff; /* Цвет ссылок */
+    text-decoration: none; /* Убираем подчёркивание */
+}
+
+.guide-details .image-caption a:hover {
+    text-decoration: underline; /* Подчёркивание при наведении */
+    color: #f87f76; /* Цвет при наведении */
+}
+

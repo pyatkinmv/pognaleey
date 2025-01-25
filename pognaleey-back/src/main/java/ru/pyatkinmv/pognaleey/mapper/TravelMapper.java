@@ -52,7 +52,7 @@ public class TravelMapper {
         return new TravelRecommendationDto(
                 recommendation.getId(),
                 recommendation.getTitle(),
-                recommendation.getStatus().name(),
+                mapToApi(recommendation.getStatus()),
                 details,
                 image,
                 guideId
@@ -106,7 +106,8 @@ public class TravelMapper {
         return new TravelGuideContentDto(
                 items.stream()
                         .map(it -> new TravelGuideContentDto.TravelGuideContentItemDto(
-                                it.getId(), it.getGuideId(), it.getOrdinal(), it.getContent(), it.getStatus().name()
+                                it.getId(), it.getGuideId(), it.getOrdinal(), it.getContent(), mapToApi(it.getStatus()),
+                                it.getType().name()
                         ))
                         .sorted(Comparator.comparing(TravelGuideContentDto.TravelGuideContentItemDto::ordinal))
                         .toList()
@@ -114,10 +115,19 @@ public class TravelMapper {
     }
 
     public static Image toImage(ImageSearchClientImageDto dto, String title) {
-        return new Image(null, Instant.now(), title, dto.url(), dto.thumbnailUrl(), dto.query());
+        return new Image(null, Instant.now(), title, dto.url(), dto.thumbnailUrl(), dto.query(), dto.licenceUrl(),
+                dto.ownerName(), dto.ownerUrl());
     }
 
     public static ImageDto toImageDto(Image image) {
-        return new ImageDto(image.getId(), image.getTitle(), image.getUrl(), image.getThumbnailUrl(), image.getQuery());
+        return new ImageDto(image.getId(), image.getTitle(), image.getUrl(), image.getThumbnailUrl(), image.getQuery(),
+                image.getLicenceUrl(), image.getOwnerName(), image.getOwnerUrl());
+    }
+
+    public static String mapToApi(ProcessingStatus status) {
+        return switch (status) {
+            case IN_PROGRESS, CONTENT_GENERATED, IMAGE_SEARCH_FINISHED -> ProcessingStatus.IN_PROGRESS.name();
+            default -> status.name();
+        };
     }
 }

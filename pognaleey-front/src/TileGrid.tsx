@@ -1,8 +1,8 @@
-// TileGrid.tsx
 import React from "react";
 import "./TileGrid.css";
 import {useNavigate} from "react-router-dom";
 import CircleLoader from "./CircleLoader";
+import {ImageDto} from "./ImageDto";
 
 interface Tile {
     id: number;
@@ -10,11 +10,6 @@ interface Tile {
     image: ImageDto;
     isLiked: boolean;
     totalLikes: number;
-}
-
-interface ImageDto {
-    url: string;
-    thumbnailUrl: string;
 }
 
 interface TileGridProps {

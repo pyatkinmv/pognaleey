@@ -22,7 +22,7 @@ public class PixabayImageSearchHttpClient extends ImageSearchHttpClient<PixabayI
     }
 
     @Override
-    Optional<ImageSearchClientImageDto> mapToImage(PixabayImagesResponseDto response, String searchQuery) {
+    Optional<ImageSearchClientImageDto> retrieveTargetImages(PixabayImagesResponseDto response, String searchQuery) {
         return Optional.of(response.hits().getFirst())
                 .map(it -> new ImageSearchClientImageDto(it.largeImageURL(), it.webformatURL(), searchQuery));
     }

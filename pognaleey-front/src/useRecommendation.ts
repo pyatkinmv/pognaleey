@@ -1,4 +1,5 @@
 import usePolling from "./usePolling";
+import {ImageDto} from "./ImageDto";
 
 interface Recommendation {
     id: number;
@@ -8,10 +9,7 @@ interface Recommendation {
         description: string;
         reasoning: string;
     };
-    image?: {
-        thumbnailUrl: string;
-        url: string;
-    };
+    image?: ImageDto;
     guideId?: number | null;
 }
 

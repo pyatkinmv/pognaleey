@@ -6,6 +6,8 @@ import MainContainer from "./MainContainer";
 import useRecommendations from "./useRecommendation";
 import apiClient from "./apiClient";
 import PencilLoader from "./PencilLoader";
+import ModalImage from "./ModalImage";
+import {ImageDto} from "./ImageDto";
 
 // TODO: Исправить прыгающий размер и элементы
 const Recommendations: React.FC = () => {
@@ -17,10 +19,10 @@ const Recommendations: React.FC = () => {
 
     const {recommendations, isLoading, error} = useRecommendations(inquiryId);
 
-    const [selectedImage, setSelectedImage] = useState<string | null>(null);
+    const [selectedImage, setSelectedImage] = useState<ImageDto | null>(null);
 
-    const handleImageClick = (imageUrl: string) => {
-        setSelectedImage(imageUrl);
+    const handleImageClick = (image: ImageDto) => {
+        setSelectedImage(image);
     };
 
     const closeModal = () => {
@@ -65,13 +67,20 @@ const Recommendations: React.FC = () => {
                                     src={recommendation.image.thumbnailUrl}
                                     alt={recommendation.title}
                                     onClick={() =>
-                                        handleImageClick(recommendation.image?.url || "")
+                                        handleImageClick(recommendation.image!)
                                     }
                                 />
-                            ) : (
+                            ) : recommendation.status === "IN_PROGRESS" ? (
                                 <div className="circle-loader"/>
+                            ) : (
+                                <img
+                                    className="recommendation-image"
+                                    src="/not-found512.png"
+                                    alt="Not Found"
+                                />
                             )}
                         </div>
+
                         <div className="recommendation-content">
                             <h2 className="recommendation-title">{recommendation.title}</h2>
                             {recommendation.details ? (
@@ -102,17 +111,8 @@ const Recommendations: React.FC = () => {
                     </div>
                 ))}
             </div>
-
-            {selectedImage && (
-                <div className="modal-overlay" onClick={closeModal}>
-                    <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-                        <img className="modal-image" src={selectedImage} alt="Enlarged"/>
-                        <button className="modal-close" onClick={closeModal}>
-                            &times;
-                        </button>
-                    </div>
-                </div>
-            )}
+            {/* Модальное окно */}
+            <ModalImage image={selectedImage} onClose={closeModal}/>
         </MainContainer>
     );
 };

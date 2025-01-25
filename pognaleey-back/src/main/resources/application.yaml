@@ -28,6 +28,11 @@ image-search-client:
   pixabay:
     base-url: https://pixabay.com/api/
     api-key: ${PIXABAY_IMAGE_SEARCH_API_KEY}
+  flickr:
+    base-url: https://www.flickr.com/services/rest/
+    api-key: ${FLICKR_IMAGE_SEARCH_API_KEY}
+  openverse:
+    base-url: https://api.openverse.org/v1/images/
 gpt-client:
   # noinspection SpringBootApplicationYaml
   current: ${CURRENT_GPT_CLIENT}

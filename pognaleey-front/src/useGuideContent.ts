@@ -6,6 +6,7 @@ interface ContentItem {
     ordinal: number;
     content: string;
     status: "READY" | "IN_PROGRESS" | "FAILED";
+    type: "MARKDOWN" | "IMAGE";
 }
 
 const useGuideContent = (guideId: string | null, timeout: number = 30000) => {

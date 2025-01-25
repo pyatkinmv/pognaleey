@@ -10,6 +10,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.web.client.RestTemplate;
 import ru.pyatkinmv.pognaleey.client.*;
+import ru.pyatkinmv.pognaleey.dto.FlickrImagesResponseDto;
+import ru.pyatkinmv.pognaleey.dto.OpenverseImagesResponseDto;
 import ru.pyatkinmv.pognaleey.dto.PixabayImagesResponseDto;
 
 import java.time.Duration;
@@ -69,6 +71,25 @@ public class AppConfig {
             @Value("${image-search-client.pixabay.base-url}") String baseUrl
     ) {
         return new PixabayImageSearchHttpClient(restTemplate, apiKey, baseUrl);
+    }
+
+    @Bean
+    @ConditionalOnProperty(prefix = "image-search-client", name = "current", havingValue = "openverse")
+    public ImageSearchHttpClient<OpenverseImagesResponseDto> openverseImageSearchHttpClient(
+            @Autowired RestTemplate restTemplate,
+            @Value("${image-search-client.openverse.base-url}") String baseUrl
+    ) {
+        return new OpenverseImageSearchHttpClient(restTemplate, baseUrl);
+    }
+
+    @Bean
+    @ConditionalOnProperty(prefix = "image-search-client", name = "current", havingValue = "flickr")
+    public ImageSearchHttpClient<FlickrImagesResponseDto> flickrImageSearchHttpClient(
+            @Autowired RestTemplate restTemplate,
+            @Value("${image-search-client.flickr.api-key}") String apiKey,
+            @Value("${image-search-client.flickr.base-url}") String baseUrl
+    ) {
+        return new FlickrImageSearchHttpClient(restTemplate, apiKey, baseUrl);
     }
 
     @Bean

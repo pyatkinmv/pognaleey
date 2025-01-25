@@ -24,7 +24,7 @@ public interface TravelGuideRepository extends CrudRepository<TravelGuide, Long>
                         LEFT JOIN travel_guides_likes l ON g.id = l.guide_id
                         WHERE COALESCE(:userId, g.user_id) = g.user_id
                         GROUP BY g.id
-                        ORDER BY likesCount DESC, g.id
+                        ORDER BY likesCount DESC, g.id DESC
                         LIMIT :limit OFFSET :offset
             """, resultSetExtractorClass = GuideLikesExtractor.class)
     Map<Long, Integer> findTopGuides(@Param("userId") @Nullable Long userId, @Param("limit") int limit,

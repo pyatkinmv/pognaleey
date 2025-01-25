@@ -7,6 +7,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.support.TransactionTemplate;
 import ru.pyatkinmv.pognaleey.client.GptHttpClient;
 import ru.pyatkinmv.pognaleey.dto.ImageDto;
+import ru.pyatkinmv.pognaleey.model.GuideContentItemType;
 import ru.pyatkinmv.pognaleey.model.ProcessingStatus;
 import ru.pyatkinmv.pognaleey.model.TravelGuide;
 import ru.pyatkinmv.pognaleey.model.TravelGuideContentItem;
@@ -25,7 +26,10 @@ import static ru.pyatkinmv.pognaleey.service.GptAnswerResolveHelper.replaceQuote
 
 @Component
 @Slf4j
+@Deprecated
 public class TravelGuideContentProviderV1 extends TravelGuideContentProvider {
+    private static final String MARKDOWN_IMAGE_FORMAT =
+            "<img src=\"%s\" alt=\"%s\" style=\"width: 55rem; display: block; margin: 0 auto;\">";
 
     private final TravelInquiryService inquiryService;
     private final ExecutorService executorService;
@@ -155,6 +159,27 @@ public class TravelGuideContentProviderV1 extends TravelGuideContentProvider {
         log.info("end enrichGuideWithContent for guide: {}", guide.getId());
     }
 
+
+    private static String enrichWithContentImages(String guideDetailsWithoutImages,
+                                                  Map<String, ImageDto> titleToImageMap) {
+        var result = guideDetailsWithoutImages;
+
+        for (var title : titleToImageMap.keySet()) {
+            var target = String.format("{%s}", title);
+            var titleStr = GptAnswerResolveHelper.replaceQuotes(title);
+            var image = titleToImageMap.get(title);
+
+            if (image != null && image.url() != null) {
+                var replacement = String.format(MARKDOWN_IMAGE_FORMAT + "\n", image.url(), titleStr);
+                result = result.replace(target, replacement);
+            } else {
+                log.warn("Not found image for title {}", title);
+            }
+        }
+
+        return result;
+    }
+
     public List<TravelGuideContentItem> createBlueprintContentItems(long guideId, String initialTitle, Long imageId) {
         var image = imageService.findByIdOrThrow(imageId);
         var imageStr = String.format(MARKDOWN_IMAGE_FORMAT, replaceQuotes(image.url()), initialTitle);
@@ -163,6 +188,7 @@ public class TravelGuideContentProviderV1 extends TravelGuideContentProvider {
                 .content(String.format("# %s\n%s\n\n## Введение\n\n", initialTitle, imageStr))
                 .guideId(guideId)
                 .ordinal(1)
+                .type(GuideContentItemType.MARKDOWN)
                 .status(ProcessingStatus.IN_PROGRESS)
                 .build();
 

@@ -12,15 +12,12 @@ import useGuideContent from "./useGuideContent"; // Импортируем на�
 import LoginPopup from "./LoginPopup";
 import PencilLoader from "./PencilLoader";
 import CircleLoader from "./CircleLoader";
+import ModalImage from "./ModalImage";
+import {ImageDto} from "./ImageDto";
 
 interface UserDto {
     id: number;
     username: string;
-}
-
-interface ImageDto {
-    url: string;
-    thumbnailUrl: string;
 }
 
 interface TravelGuideInfoDto {
@@ -85,6 +82,16 @@ const Guide: React.FC = () => {
             prevGuide?.id === guideId ? {...prevGuide, isLiked, totalLikes} : prevGuide
         );
     };
+    const [selectedImage, setSelectedImage] = useState<ImageDto | null>(null);
+
+    const handleImageClick = (image: ImageDto) => {
+        setSelectedImage(image);
+    };
+
+    const closeModal = () => {
+        setSelectedImage(null);
+    };
+
 
     if (loadingGuide) {
         return <CircleLoader/>;
@@ -101,6 +108,33 @@ const Guide: React.FC = () => {
     const handlePdfDownload = async () => {
         window.print();
     };
+
+    const renderImage = (image: ImageDto) => (
+        <div className="image-guide-container">
+            <img
+                className="image"
+                src={image.url}
+                alt={image.title}
+                style={{maxWidth: "80%", margin: "0 auto", display: "block"}}
+                onClick={() =>
+                    handleImageClick(image)
+                }
+            />
+            <div className="image-caption">
+                {image.ownerName && image.ownerUrl && (
+                    <span>
+                        Автор: <a href={image.ownerUrl}>{image.ownerName}</a>
+                    </span>
+                )}
+                {image.licenceUrl && (
+                    <>
+                        {image.ownerName && image.ownerUrl && "; "}
+                        <a href={image.licenceUrl}>Лицензия</a>
+                    </>
+                )}
+            </div>
+        </div>
+    );
 
     return (
         <MainContainer>
@@ -128,22 +162,27 @@ const Guide: React.FC = () => {
 
             <div className="guide-details">
                 {errorContent && <div className="error">Ошибка: {errorContent}</div>}
-                {contentItems.map((item) => (
+                {contentItems.map((item) =>
                     <div key={item.id} className="content-item">
-                        <ReactMarkdown rehypePlugins={[rehypeRaw]}>
-                            {item.content || ""}
-                        </ReactMarkdown>
-                        {item.status === "IN_PROGRESS" &&
-                            <PencilLoader/>
-                        }
+                        {item.type === "MARKDOWN" && (
+                            <ReactMarkdown rehypePlugins={[rehypeRaw]}>
+                                {item.content || ""}
+                            </ReactMarkdown>
+                        )}
+                        {item.type === "IMAGE" && renderImage(JSON.parse(item.content))}
+                        {item.status === "IN_PROGRESS" && <PencilLoader/>}
+
                     </div>
-                ))}
+                )}
             </div>
             {
                 showLoginPopup && (
                     <LoginPopup onClose={() => setShowLoginPopup(false)} onLogin={() => navigate("/login")}/>
                 )
             }
+
+            {/* Модальное окно */}
+            <ModalImage image={selectedImage} onClose={closeModal}/>
         </MainContainer>
     )
         ;

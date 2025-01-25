@@ -25,4 +25,6 @@ public class TravelGuideContentItem {
     private Integer ordinal;
 
     private ProcessingStatus status;
+
+    private GuideContentItemType type;
 }

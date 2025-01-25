@@ -40,15 +40,15 @@ class TravelRecommendationServiceTest extends DatabaseCleaningTest {
                 .isEqualTo(
                         List.of(
                                 new TravelRecommendationDto(-1L, "Грузия, Тбилиси и винные регионы", ProcessingStatus.READY.name(), null,
-                                        new ImageDto(-1L, "Грузия, Тбилиси и винные регионы", "imageUrl", "thumbnailUrl", "Грузия весна пейзаж"), null),
+                                        new ImageDto(-1L, "Грузия, Тбилиси и винные регионы", "imageUrl", "thumbnailUrl", "Грузия весна пейзаж", null, null, null), null),
                                 new TravelRecommendationDto(-1L, "Париж, Франция: Город любви", ProcessingStatus.READY.name(), null,
-                                        new ImageDto(-1L, "Париж, Франция: Город любви", "imageUrl", "thumbnailUrl", "Париж Эйфелева башня закат"), null),
+                                        new ImageDto(-1L, "Париж, Франция: Город любви", "imageUrl", "thumbnailUrl", "Париж Эйфелева башня закат", null, null, null), null),
                                 new TravelRecommendationDto(-1L, "Красная Поляна, Сочи: Горнолыжный отдых", ProcessingStatus.READY.name(), null,
-                                        new ImageDto(-1L, "Красная Поляна, Сочи: Горнолыжный отдых", "imageUrl", "thumbnailUrl", "Красная Поляна лыжи снег"), null),
+                                        new ImageDto(-1L, "Красная Поляна, Сочи: Горнолыжный отдых", "imageUrl", "thumbnailUrl", "Красная Поляна лыжи снег", null, null, null), null),
                                 new TravelRecommendationDto(-1L, "Индонезия, Бали: Пляжный отдых", ProcessingStatus.READY.name(), null,
-                                        new ImageDto(-1L, "Индонезия, Бали: Пляжный отдых", "imageUrl", "thumbnailUrl", "Бали пляжи закат"), null),
+                                        new ImageDto(-1L, "Индонезия, Бали: Пляжный отдых", "imageUrl", "thumbnailUrl", "Бали пляжи закат", null, null, null), null),
                                 new TravelRecommendationDto(-1L, "Исландия: Природные чудеса", ProcessingStatus.READY.name(), null,
-                                        new ImageDto(-1L, "Исландия: Природные чудеса", "imageUrl", "thumbnailUrl", "Исландия водопады ледники"), null)
+                                        new ImageDto(-1L, "Исландия: Природные чудеса", "imageUrl", "thumbnailUrl", "Исландия водопады ледники", null, null, null), null)
                         )
                 );
     }

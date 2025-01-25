@@ -7,6 +7,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.support.TransactionTemplate;
 import ru.pyatkinmv.pognaleey.client.GptHttpClient;
 import ru.pyatkinmv.pognaleey.dto.ImageDto;
+import ru.pyatkinmv.pognaleey.model.GuideContentItemType;
 import ru.pyatkinmv.pognaleey.model.ProcessingStatus;
 import ru.pyatkinmv.pognaleey.model.TravelGuide;
 import ru.pyatkinmv.pognaleey.model.TravelGuideContentItem;
@@ -14,14 +15,13 @@ import ru.pyatkinmv.pognaleey.repository.TravelGuideContentItemRepository;
 import ru.pyatkinmv.pognaleey.repository.TravelGuideRepository;
 import ru.pyatkinmv.pognaleey.util.Utils;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static ru.pyatkinmv.pognaleey.service.GptAnswerResolveHelper.*;
+import static ru.pyatkinmv.pognaleey.service.GptAnswerResolveHelper.parseSearchableItems;
+import static ru.pyatkinmv.pognaleey.service.GptAnswerResolveHelper.splitWithPipe;
 import static ru.pyatkinmv.pognaleey.service.PromptService.*;
 
 @Component
@@ -106,8 +106,58 @@ public class TravelGuideContentProviderV2 extends TravelGuideContentProvider {
                 });
     }
 
-    private void enrichSightseeingOrSetFailed(TravelGuideContentItem sightseeing, String guideTitle, String inquiryParams) {
-        enrichOrSetFailed(sightseeing,
+    static List<TravelGuideContentItem> extractItems(String sightseeingContentResponse,
+                                                     TravelGuideContentItem sightseeingFirst,
+                                                     Map<String, ImageDto> titleToImageMap) {
+        var result = new ArrayList<TravelGuideContentItem>();
+
+        var split = Arrays.stream(sightseeingContentResponse.split("### ")).toList();
+
+        if (split.size() <= 1) {
+            throw new RuntimeException();
+        }
+
+        if (split.getFirst().contains("##")) {
+            // TODO: fix side effect
+            sightseeingFirst.setContent(split.getFirst());
+            result.add(sightseeingFirst);
+        }
+
+        for (int i = 1, ordinal = sightseeingFirst.getOrdinal(); i < split.size(); i++) {
+            var part = split.get(i);
+            var topicWithBrackets = GptAnswerResolveHelper.findFirstByRegex(part, "\\{.*?\\}");
+
+            if (topicWithBrackets.isPresent()) {
+                var topic = topicWithBrackets.get().replaceAll("\\{", "").replaceAll("}", "");
+                var withImageRemoved = part.replace(topicWithBrackets.get(), "");
+                var partNew = String.format("### %s", withImageRemoved);
+                var newMdItem = new TravelGuideContentItem(null, sightseeingFirst.getGuideId(), partNew,
+                        ++ordinal, ProcessingStatus.IN_PROGRESS, GuideContentItemType.MARKDOWN);
+                result.add(newMdItem);
+
+                if (titleToImageMap.containsKey(topic)) {
+                    var newImageItem = new TravelGuideContentItem(null, sightseeingFirst.getGuideId(),
+                            Utils.toJson(titleToImageMap.get(topic)),
+                            ++ordinal, ProcessingStatus.IN_PROGRESS, GuideContentItemType.IMAGE);
+                    result.add(newImageItem);
+                } else {
+                    log.warn("Couldn't find topic {} in titleToImageMap {}; just remove it", topic, titleToImageMap);
+                }
+            }
+        }
+
+        return result;
+    }
+
+    private static TravelGuideContentItem getByType(List<TravelGuideContentItem> items, GuideStructureType type) {
+        return items.stream()
+                .filter(it -> getType(it) == type)
+                .findFirst()
+                .orElseThrow();
+    }
+
+    private void enrichSightseeingOrSetFailed(TravelGuideContentItem sightseeingFirst, String guideTitle, String inquiryParams) {
+        enrichOrSetFailed(sightseeingFirst,
                 () -> {
                     var sightseeingImagesPrompt = PromptService.generateGuideImagesPrompt(guideTitle, inquiryParams);
                     var sightseeingImagesResponseRaw = gptHttpClient.ask(sightseeingImagesPrompt);
@@ -124,45 +174,12 @@ public class TravelGuideContentProviderV2 extends TravelGuideContentProvider {
                             .map(it -> Utils.toCaseInsensitiveTreeMap(it, ImageDto::title))
                             .orElse(Map.of());
 
-                    var sightseeingContent = Optional.of(sightseeingContentResponseRaw)
-                            .map(it -> enrichWithContentImages(it, titleToImageMap))
-                            .map(GptAnswerResolveHelper::stripCurlyBraces)
-                            .orElseThrow();
-                    sightseeing.setContent(sightseeingContent);
-                    sightseeing.setStatus(ProcessingStatus.READY);
-                    contentItemRepository.save(sightseeing);
+                    var contentItems = Optional.of(sightseeingContentResponseRaw)
+                            .map(it -> extractItems(it, sightseeingFirst, titleToImageMap))
+                            .orElse(List.of());
+                    contentItems.forEach(it -> it.setStatus(ProcessingStatus.READY));
+                    contentItemRepository.saveAll(contentItems);
                 });
-    }
-
-    // TODO: Refactor
-    private void enrichPracticalItem(TravelGuideContentItem practicalFirst, String practicalTitle, List<String> titles, String guideTitle,
-                                     long guideId, String inquiryParams) {
-        var index = titles.indexOf(practicalTitle);
-        var allTitles = String.join("|", titles);
-        var prompt = PromptService.generateGuidePracticalTitlePrompt(guideTitle, inquiryParams, allTitles, practicalTitle);
-
-        if (index >= GUIDE_PRACTICAL_TITLES_COUNT) {
-            log.error("index {} is bigger than expected", index);
-            return;
-        }
-
-        if (index == 0) {
-            enrichOrSetFailed(practicalFirst, () -> {
-                var responseRaw = gptHttpClient.ask(prompt);
-                practicalFirst.setStatus(ProcessingStatus.READY);
-                practicalFirst.setContent(String.format("%s\n\n%s", practicalFirst.getContent(), responseRaw));
-                contentItemRepository.save(practicalFirst);
-            });
-        } else {
-            var responseRaw = gptHttpClient.ask(prompt);
-            var item = TravelGuideContentItem.builder()
-                    .content(responseRaw)
-                    .guideId(guideId)
-                    .status(ProcessingStatus.READY)
-                    .ordinal(index + GuideStructureType.PRACTICAL.itemOrdinal)
-                    .build();
-            contentItemRepository.save(item);
-        }
     }
 
     @Override
@@ -203,40 +220,79 @@ public class TravelGuideContentProviderV2 extends TravelGuideContentProvider {
         log.info("end enrichGuideWithContent for guide: {}", guide.getId());
     }
 
+    // TODO: Refactor
+    private void enrichPracticalItem(TravelGuideContentItem practicalFirst, String practicalTitle, List<String> titles, String guideTitle,
+                                     long guideId, String inquiryParams) {
+        var index = titles.indexOf(practicalTitle);
+        var allTitles = String.join("|", titles);
+        var prompt = PromptService.generateGuidePracticalTitlePrompt(guideTitle, inquiryParams, allTitles, practicalTitle);
+
+        if (index >= GUIDE_PRACTICAL_TITLES_COUNT) {
+            log.error("index {} is bigger than expected", index);
+            return;
+        }
+
+        if (index == 0) {
+            enrichOrSetFailed(practicalFirst, () -> {
+                var responseRaw = gptHttpClient.ask(prompt);
+                practicalFirst.setStatus(ProcessingStatus.READY);
+                practicalFirst.setContent(String.format("%s\n\n%s", practicalFirst.getContent(), responseRaw));
+                contentItemRepository.save(practicalFirst);
+            });
+        } else {
+            var responseRaw = gptHttpClient.ask(prompt);
+            var item = TravelGuideContentItem.builder()
+                    .content(responseRaw)
+                    .guideId(guideId)
+                    .type(GuideContentItemType.MARKDOWN)
+                    .status(ProcessingStatus.READY)
+                    .ordinal(index + GuideStructureType.PRACTICAL.itemOrdinal)
+                    .build();
+            contentItemRepository.save(item);
+        }
+    }
+
+    // TODO: Refactor
     @Override
-    public List<TravelGuideContentItem> createBlueprintContentItems(long guideId, String initialTitle, Long imageId) {
+    public List<TravelGuideContentItem> createBlueprintContentItems(long guideId, String initialTitle,
+                                                                    @Nullable Long imageId) {
         var items = Stream.of(GuideStructureType.values())
                 .map(it -> TravelGuideContentItem.builder()
                         .content(it.initialContent)
                         .guideId(guideId)
                         .ordinal(it.itemOrdinal)
                         .status(it.initialStatus)
+                        .type(it.type)
                         .build())
-                .toList();
-        var image = imageService.findByIdOrThrow(imageId);
-        var imageStr = String.format(MARKDOWN_IMAGE_FORMAT, image.url(), replaceQuotes(initialTitle));
-        var titleWithImage = items.stream()
-                .filter(it -> it.getOrdinal().equals(GuideStructureType.TITLE_WITH_IMAGE.itemOrdinal))
-                .findFirst()
-                .orElseThrow();
-        titleWithImage.setContent(String.format("# %s\n%s\n\n", initialTitle, imageStr));
+                .collect(Collectors.toCollection(ArrayList::new));
+        var title = getByType(items, GuideStructureType.TITLE);
+        title.setContent(String.format("# %s\n", initialTitle));
+        var titleImage = getByType(items, GuideStructureType.TITLE_IMAGE);
+        var imageJson = Optional.ofNullable(imageId).map(imageService::findByIdOrThrow)
+                .map(Utils::toJson);
+        if (imageJson.isPresent()) {
+            titleImage.setContent(imageJson.get());
+        } else {
+            items.remove(titleImage);
+        }
 
         return contentItemRepository.saveAllFromIterable(items);
     }
 
     @RequiredArgsConstructor
     enum GuideStructureType {
-        TITLE_WITH_IMAGE(1, null, ProcessingStatus.READY, false),
-        INTRO(2, "## Введение\n\n", ProcessingStatus.IN_PROGRESS, true),
-        SIGHTSEEING(3, "## Достопримечательности, маршруты, развлечения\n\n", ProcessingStatus.IN_PROGRESS, true),
-        PRACTICAL(4, "## Практическая информация\n\n", ProcessingStatus.IN_PROGRESS, false),
+        TITLE(1, null, ProcessingStatus.READY, GuideContentItemType.MARKDOWN),
+        TITLE_IMAGE(2, null, ProcessingStatus.READY, GuideContentItemType.IMAGE),
+        INTRO(3, "## Введение\n\n", ProcessingStatus.IN_PROGRESS, GuideContentItemType.MARKDOWN),
+        SIGHTSEEING(4, "## Достопримечательности, маршруты, развлечения\n\n", ProcessingStatus.IN_PROGRESS, GuideContentItemType.MARKDOWN),
+        PRACTICAL(20, "## Практическая информация\n\n", ProcessingStatus.IN_PROGRESS, GuideContentItemType.MARKDOWN),
         // Another titles generated in process
-        CONCLUSION(4 + GUIDE_PRACTICAL_TITLES_COUNT, "## Заключение\n\n", ProcessingStatus.IN_PROGRESS, true);
+        CONCLUSION(20 + GUIDE_PRACTICAL_TITLES_COUNT, "## Заключение\n\n", ProcessingStatus.IN_PROGRESS, GuideContentItemType.MARKDOWN);
 
         private final int itemOrdinal;
         @Nullable
         private final String initialContent;
         private final ProcessingStatus initialStatus;
-        private final boolean isOverridable;
+        private final GuideContentItemType type;
     }
 }

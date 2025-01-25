@@ -28,6 +28,10 @@ public class GptAnswerResolveHelper {
         return recommendations;
     }
 
+    public static String removeJsonTagsIfPresent(String json) {
+        return json.trim().replace("\\(json\\)", "").replace("json", "");
+    }
+
     public static String stripCurlyBraces(String input) {
         var regex = "\\{.*?\\}";
         var pattern = Pattern.compile(regex);

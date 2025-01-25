@@ -39,11 +39,11 @@ public class YandexImageSearchHttpClient extends ImageSearchHttpClient<String> {
     }
 
     @Override
-    Optional<ImageSearchClientImageDto> mapToImage(String responseRaw, String searchQuery) {
+    Optional<ImageSearchClientImageDto> retrieveTargetImages(String response, String searchQuery) {
         // Either url or image-link must work
         var regex = "<url>(.*?)</url>|<image-link>(.*?)</image-link>";
         var pattern = Pattern.compile(regex);
-        var matcher = pattern.matcher(responseRaw);
+        var matcher = pattern.matcher(response);
         var imageUrls = new ArrayList<String>();
 
         while (matcher.find()) {
@@ -64,7 +64,7 @@ public class YandexImageSearchHttpClient extends ImageSearchHttpClient<String> {
         var resultUrl = imageUrls.stream().filter(this::isUrlValid)
                 .findFirst()
                 .orElseGet(() -> {
-                    log.error("no valid imageUrl found; response {}", responseRaw);
+                    log.error("no valid imageUrl found; response {}", response);
 
                     return null;
                 });
