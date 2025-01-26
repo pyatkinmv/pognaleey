@@ -172,6 +172,17 @@ const Guide: React.FC = () => {
                     </div>
                 )}
             </div>
+            <footer className="guide-footer">
+                <img
+                    src="/ai-256x384.png"
+                    alt="AI Logo"
+                    className="footer-ai-logo"
+                />
+                <p>
+                    Этот текст сгенерирован с использованием Искусственного Интеллекта. Мы рекомендуем проверять
+                    факты и информацию перед принятием решений на основе прочитанного.
+                </p>
+            </footer>
             {
                 showLoginPopup && (
                     <LoginPopup
@@ -180,13 +191,10 @@ const Guide: React.FC = () => {
                     />
                 )
             }
-
-
             {/* Модальное окно */}
             <ModalImage image={selectedImage} onClose={closeModal}/>
         </MainContainer>
     )
-        ;
 };
 
 export default Guide;

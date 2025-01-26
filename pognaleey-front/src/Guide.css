@@ -7,7 +7,7 @@
 }
 
 .guide-actions .like-button {
-    font-size: 2.5rem; /* Пример переопределения */
+    font-size: 2.5rem;
 }
 
 .guide-header p {
@@ -148,3 +148,21 @@
     color: #f87f76; /* Цвет при наведении */
 }
 
+.guide-footer {
+    display: flex;
+    align-items: center;
+    background-color: #f1e7dd; /* Светлый фон */
+    color: #333; /* Тёмный текст */
+    border-top: 1px solid #ccc; /* Разделительная линия сверху */
+    font-size: 0.875rem; /* Размер текста */
+    font-style: italic;
+    line-height: 1.5; /* Высота строки */
+}
+
+.footer-ai-logo {
+    width: 3rem; /* Ширина логотипа */
+    height: 3rem; /* Высота логотипа */
+    object-fit: contain; /* Адаптация изображения */
+    /*margin-top: 1rem;*/
+    margin: 0.4rem;
+}

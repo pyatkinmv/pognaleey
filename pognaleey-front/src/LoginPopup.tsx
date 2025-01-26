@@ -83,7 +83,6 @@ const LoginPopup: React.FC<LoginPopupProps> = ({onClose, onLoginSuccess}) => {
                     setMessages({
                         global: {type: "success", text: "Регистрация успешна! Теперь войдите в аккаунт."},
                     });
-                    setIsLoginMode(true); // Переключаемся на вход
                 }
             } else {
                 setMessages({
