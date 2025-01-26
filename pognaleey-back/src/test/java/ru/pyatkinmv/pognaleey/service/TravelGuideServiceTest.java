@@ -222,7 +222,7 @@ class TravelGuideServiceTest extends DatabaseCleaningTest {
         assertThat(inquiry.getParams()).isEqualTo(inquiryParams);
         assertThat(inquiry.getId()).isNotNull();
         var image = imageRepository.save(
-                new Image(null, Instant.now(), "image", "url", "thumbnailUrl", "query", null, null, null)
+                new Image(null, Instant.now(), "image", "url", "thumbnailUrl", "query", false, null, null, null)
         );
         var recommendation = travelRecommendationRepository.save(
                 new TravelRecommendation(null, Instant.now(), inquiry.getId(), "Москва", image.getId(), "details", ProcessingStatus.IN_PROGRESS)

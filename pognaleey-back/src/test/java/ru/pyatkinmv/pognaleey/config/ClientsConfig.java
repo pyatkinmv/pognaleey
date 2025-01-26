@@ -40,14 +40,28 @@ public class ClientsConfig {
                 # Пиво в Татарстане
                 {Пиво в Татарстане}
                 text3""";
-        when(gptHttpClientMock.ask(ArgumentMatchers.contains(QUICK_PROMPT_FORMAT.substring(0, 10))))
+        var sightseeingRaw = """
+                ## Достопримечательности и маршруты Казани
+                ### Проспект Баумана
+                text1
+                {Проспект Баумана}
+                ### Казанский кремль
+                text2
+                {Казанский кремль}
+                ### Башня Сююмбике
+                text3
+                {Башня Сююмбике}
+                """;
+        when(gptHttpClientMock.ask(ArgumentMatchers.contains(QUICK_PROMPT_FORMAT.substring(0, 14))))
                 .thenReturn(shortRecommendationRaw);
-        when(gptHttpClientMock.ask(ArgumentMatchers.contains(DETAILED_PROMPT_FORMAT.substring(0, 10))))
+        when(gptHttpClientMock.ask(ArgumentMatchers.contains(DETAILED_PROMPT_FORMAT.substring(0, 14))))
                 .thenReturn(detailedRecommendationRaw);
-        when(gptHttpClientMock.ask(ArgumentMatchers.contains(GUIDE_IMAGES_PROMPT_FORMAT.substring(0, 10))))
+        when(gptHttpClientMock.ask(ArgumentMatchers.contains(GUIDE_IMAGES_PROMPT_FORMAT.substring(0, 14))))
                 .thenReturn(guideImagesRaw);
-        when(gptHttpClientMock.ask(ArgumentMatchers.contains(GUIDE_PROMPT_FORMAT.substring(0, 10))))
+        when(gptHttpClientMock.ask(ArgumentMatchers.contains(GUIDE_PROMPT_FORMAT.substring(0, 14))))
                 .thenReturn(guideRaw);
+        when(gptHttpClientMock.ask(ArgumentMatchers.contains(GUIDE_VISUAL_PROMPT_FORMAT.substring(0, 14))))
+                .thenReturn(sightseeingRaw);
 
         return gptHttpClientMock;
     }

@@ -22,3 +22,5 @@ gpt-client:
     api-key: apiKey
 jwt:
   secret: tests-environment-secret-key-for-jwt-auth
+app:
+  domain-name: https://domain.name
