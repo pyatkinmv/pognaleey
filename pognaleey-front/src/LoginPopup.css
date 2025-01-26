@@ -1,5 +1,7 @@
 .popup-overlay {
     position: fixed;
+    top: 0;
+    left: 0;
     width: 100vw;
     height: 100vh;
     background-color: rgba(0, 0, 0, 0.5);
@@ -16,7 +18,11 @@
     text-align: center;
     box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.3);
     max-width: 21rem;
-    width: 90%;
+    width: 100%;
+    transform: translate(-50%, -50%);
+    position: absolute; /* Центрируем попап */
+    top: 50%;
+    left: 50%;
 }
 
 .login-button-popup {
