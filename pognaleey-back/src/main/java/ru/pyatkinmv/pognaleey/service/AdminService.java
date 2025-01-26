@@ -68,11 +68,11 @@ public class AdminService {
             var recommendation = recommendationService.findById(guide.getRecommendationId());
 
             transactionTemplate.executeWithoutResult(it -> {
-                var originalFilename = upload.file().getOriginalFilename();
-                var largeImageResourceId = saveResourceConvertingLarge(inputStream, originalFilename, upload.file.getSize());
+                var largeImageResourceId = saveResourceConvertingLarge(inputStream, upload);
 
                 var largeImageResource = resourceRepository.findById(largeImageResourceId);
-                var thumbnailImageResourceId = saveResourceConverting(largeImageResource.data(), originalFilename, ConvertType.THUMBNAIL);
+                var thumbnailImageResourceId = saveResourceConverting(largeImageResource.data(),
+                        upload.file().getOriginalFilename(), ConvertType.THUMBNAIL);
 
                 var imageDto = new ImageDto(null, recommendation.getTitle(), buildUrl(largeImageResourceId),
                         buildUrl(thumbnailImageResourceId), recommendation.getTitle(), upload.aiGenerated, null,
@@ -115,14 +115,14 @@ public class AdminService {
         return String.format("%s%s/resources/%d", domainName, contextPath, resourceId);
     }
 
-    private Long saveResourceConvertingLarge(InputStream inputStream, String originalFileName, long fileSize) {
-        if (fileSize <= MAX_FILE_SIZE_BYTES_TO_STORE_AS_IS) {
+    private Long saveResourceConvertingLarge(InputStream inputStream, UploadImageDto upload) {
+        if (upload.file().getSize() <= MAX_FILE_SIZE_BYTES_TO_STORE_AS_IS || upload.keepOriginal()) {
             return resourceRepository.save(
-                    ConvertType.LARGE.buildResourceName(originalFileName),
+                    ConvertType.buildBaseResourceName(upload.file().getOriginalFilename()),
                     inputStream
             );
         } else {
-            return saveResourceConverting(inputStream, originalFileName, ConvertType.LARGE);
+            return saveResourceConverting(inputStream, upload.file().getOriginalFilename(), ConvertType.LARGE);
         }
     }
 
@@ -153,15 +153,19 @@ public class AdminService {
         private final String extension;
         private final double quality;
 
+        static String buildBaseResourceName(String originalFileName) {
+            return Optional.ofNullable(originalFileName).orElseGet(() -> UUID.randomUUID().toString());
+        }
+
         String buildResourceName(@Nullable String original) {
-            var base = Optional.ofNullable(original).orElseGet(() -> UUID.randomUUID().toString());
+            var base = buildBaseResourceName(original);
 
             return String.format(FILENAME_FORMAT, base, width, extension);
         }
     }
 
-    public record UploadImageDto(MultipartFile file, Long guideId, boolean aiGenerated, @Nullable String authorName,
-                                 @Nullable String authorUrl) {
+    public record UploadImageDto(MultipartFile file, Long guideId, boolean aiGenerated, boolean keepOriginal,
+                                 @Nullable String authorName, @Nullable String authorUrl) {
     }
 
 }

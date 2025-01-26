@@ -1,7 +1,5 @@
 import {Route, Routes} from "react-router-dom";
 import Recommendations from "./Recommendations";
-import LoginForm from "./LoginForm";
-import RegisterForm from "./RegisterForm";
 import PrivateRoute from "./PrivateRoute";
 import Guide from "./Guide";
 import React from "react";
@@ -11,11 +9,6 @@ import Inquiry from "./Inquiry";
 const AppRouter: React.FC = () => {
     return (
         <Routes>
-            {/* Доступные без авторизации страницы */}
-            <Route path="/login" element={<LoginForm/>}/>
-            <Route path="/register" element={<RegisterForm/>}/>
-
-            {/* Защищенные маршруты */}
             <Route
                 path="/"
                 element={

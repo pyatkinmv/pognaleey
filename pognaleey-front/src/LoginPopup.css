@@ -71,10 +71,42 @@
 }
 
 .signup-link {
-    text-decoration: none;
+    color: #dd746b;
+    cursor: pointer;
     font-weight: bold;
+    text-decoration: none;
 }
 
 .signup-link:hover {
     text-decoration: underline;
+}
+
+/* Глобальные сообщения */
+.global-message {
+    font-size: 0.875rem;
+    margin-bottom: 1rem;
+}
+
+.global-message.success {
+    color: green;
+    font-weight: bold;
+}
+
+.global-message.error {
+    color: red;
+    font-weight: bold;
+}
+
+/* Сообщения для полей */
+.field-message {
+    font-size: 0.75rem;
+    margin-top: 0.25rem;
+}
+
+.field-message.success {
+    color: green;
+}
+
+.field-message.error {
+    color: red;
 }

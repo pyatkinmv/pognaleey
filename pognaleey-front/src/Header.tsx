@@ -1,10 +1,12 @@
-import React from "react";
+import React, {useState} from "react";
 import {useAppContext} from "./AppContext";
 import DropdownMenu from "./DropdownMenu";
 import "./Header.css";
+import LoginPopup from "./LoginPopup";
 
 const Header: React.FC = () => {
     const {user, language, languages, handleLogout, handleLanguageChange} = useAppContext();
+    const [showLoginPopup, setShowLoginPopup] = useState<boolean>(false);
 
     const currentLanguage = languages.find((lang) => lang.code === language);
 
@@ -54,10 +56,18 @@ const Header: React.FC = () => {
                             ]}
                         />
                     ) : (
-                        <a href="/login" className="nav-link">🔒 Войти</a>
+                        <a className="nav-link" onClick={() => setShowLoginPopup(true)}>🔒 Войти</a>
                     )}
                 </div>
             </nav>
+            {
+                showLoginPopup && (
+                    <LoginPopup
+                        onClose={() => setShowLoginPopup(false)}
+                        onLoginSuccess={() => setShowLoginPopup(false)}
+                    />
+                )
+            }
         </header>
     );
 };

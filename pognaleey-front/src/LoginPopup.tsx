@@ -1,5 +1,4 @@
 import React, {useState} from "react";
-import {useNavigate} from "react-router-dom";
 import "./LoginPopup.css";
 import {validatePassword, validateUsername} from "./validators";
 import {useAppContext} from "./AppContext";
@@ -9,75 +8,93 @@ interface LoginPopupProps {
     onLoginSuccess: () => void; // Callback для успешного входа
 }
 
+type MessageType = "error" | "success";
+
+interface Message {
+    type: MessageType;
+    text: string;
+}
+
 const LoginPopup: React.FC<LoginPopupProps> = ({onClose, onLoginSuccess}) => {
+    const [isLoginMode, setIsLoginMode] = useState(true); // Режим (вход или регистрация)
     const [credentials, setCredentials] = useState({
         username: "",
         password: "",
     });
-    const [errors, setErrors] = useState<{ username?: string; password?: string }>({});
-    const [isSubmitting, setIsSubmitting] = useState(false);
-    const navigate = useNavigate();
 
+    const [messages, setMessages] = useState<{
+        global?: Message;
+        username?: Message;
+        password?: Message;
+    }>({});
+
+    const [isSubmitting, setIsSubmitting] = useState(false);
     const {loginUser} = useAppContext(); // Используем loginUser из контекста
 
     const validateForm = () => {
-        const newErrors: { username?: string; password?: string } = {};
-
+        const newMessages: typeof messages = {};
         const usernameError = validateUsername(credentials.username);
         if (usernameError) {
-            newErrors.username = usernameError;
+            newMessages.username = {type: "error", text: usernameError};
         }
 
         const passwordError = validatePassword(credentials.password);
         if (passwordError) {
-            newErrors.password = passwordError;
+            newMessages.password = {type: "error", text: passwordError};
         }
 
-        setErrors(newErrors);
-        return Object.keys(newErrors).length === 0;
+        setMessages(newMessages);
+        return Object.keys(newMessages).length === 0;
     };
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const {name, value} = e.target;
-        setCredentials({
-            ...credentials,
-            [name]: value,
-        });
+        setCredentials({...credentials, [name]: value});
 
-        setErrors({
-            ...errors,
-            [name]: "",
-        });
+        // Сбрасываем сообщение для конкретного поля
+        setMessages({...messages, [name]: undefined});
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
-        if (!validateForm()) {
-            return;
-        }
+        if (!validateForm()) return;
 
         setIsSubmitting(true);
 
         try {
-            const response = await fetch(`${process.env.REACT_APP_API_URL}/auth/login`, {
+            const endpoint = isLoginMode
+                ? `${process.env.REACT_APP_API_URL}/auth/login`
+                : `${process.env.REACT_APP_API_URL}/auth/register`;
+
+            const response = await fetch(endpoint, {
                 method: "POST",
                 headers: {"Content-Type": "application/json"},
                 body: JSON.stringify(credentials),
             });
 
             if (response.ok) {
-                const token = await response.text();
-                loginUser(token); // Обновляем контекст пользователя
-                localStorage.setItem("jwtToken", token); // Сохранение токена в localStorage
-                onLoginSuccess(); // Вызываем callback успешного входа
-                navigate("/");
+                if (isLoginMode) {
+                    const token = await response.text();
+                    loginUser(token);
+                    localStorage.setItem("jwtToken", token);
+                    onLoginSuccess();
+                } else {
+                    setMessages({
+                        global: {type: "success", text: "Регистрация успешна! Теперь войдите в аккаунт."},
+                    });
+                    setIsLoginMode(true); // Переключаемся на вход
+                }
             } else {
-                alert("Ошибка входа. Проверьте имя пользователя и пароль.");
+                setMessages({
+                    global: {type: "error", text: isLoginMode ? "Ошибка входа." : "Ошибка регистрации."},
+                });
             }
         } catch (error) {
-            console.error("Ошибка при входе:", error);
-            alert("Не удалось войти. Попробуйте позже.");
+            console.error("Ошибка:", error);
+            setMessages({
+                global: {type: "error", text: "Произошла ошибка. Попробуйте позже."},
+            });
         } finally {
             setIsSubmitting(false);
         }
@@ -86,7 +103,15 @@ const LoginPopup: React.FC<LoginPopupProps> = ({onClose, onLoginSuccess}) => {
     return (
         <div className="popup-overlay" onClick={onClose}>
             <div className="popup-content" onClick={(e) => e.stopPropagation()}>
-                <h3>Вход в аккаунт</h3>
+                <h3>{isLoginMode ? "Вход в аккаунт" : "Регистрация"}</h3>
+
+                {/* Глобальное сообщение */}
+                {messages.global && (
+                    <p className={`global-message ${messages.global.type}`}>
+                        {messages.global.text}
+                    </p>
+                )}
+
                 <form onSubmit={handleSubmit}>
                     <div className="form-group">
                         <label htmlFor="username">Имя пользователя:</label>
@@ -98,7 +123,11 @@ const LoginPopup: React.FC<LoginPopupProps> = ({onClose, onLoginSuccess}) => {
                             onChange={handleChange}
                             required
                         />
-                        {errors.username && <p className="error-message">{errors.username}</p>}
+                        {messages.username && (
+                            <p className={`field-message ${messages.username.type}`}>
+                                {messages.username.text}
+                            </p>
+                        )}
                     </div>
 
                     <div className="form-group">
@@ -111,19 +140,42 @@ const LoginPopup: React.FC<LoginPopupProps> = ({onClose, onLoginSuccess}) => {
                             onChange={handleChange}
                             required
                         />
-                        {errors.password && <p className="error-message">{errors.password}</p>}
+                        {messages.password && (
+                            <p className={`field-message ${messages.password.type}`}>
+                                {messages.password.text}
+                            </p>
+                        )}
                     </div>
 
                     <button type="submit" className="login-button-popup" disabled={isSubmitting}>
-                        {isSubmitting ? "Вход..." : "Войти"}
+                        {isSubmitting ? "Загрузка..." : isLoginMode ? "Войти" : "Зарегистрироваться"}
                     </button>
                 </form>
-                {/* Текст с ссылкой на регистрацию */}
+
                 <div className="signup-prompt">
-                    {/*TODO: Add logic*/}
+                    {isLoginMode ? (
+                        <>
+                            Ещё нет аккаунта?{" "}
+                            <span
+                                className="signup-link"
+                                onClick={() => setIsLoginMode(false)}
+                            >
+                                Зарегистрироваться
+                            </span>
+                        </>
+                    ) : (
+                        <>
+                            Уже есть аккаунт?{" "}
+                            <span
+                                className="signup-link"
+                                onClick={() => setIsLoginMode(true)}
+                            >
+                                Войти
+                            </span>
+                        </>
+                    )}
                 </div>
             </div>
-
         </div>
     );
 };

@@ -1,6 +1,7 @@
-import React from "react";
+import React, {useState} from "react";
 import {Navigate} from "react-router-dom";
 import {jwtDecode} from "jwt-decode";
+import LoginPopup from "./LoginPopup";
 
 interface PrivateRouteProps {
     children: React.ReactNode;
@@ -21,17 +22,37 @@ const isTokenExpired = (token: string): boolean => {
     }
 };
 
-
-const PrivateRoute: React.FC<{ children: React.ReactNode }> = ({children}) => {
+const PrivateRoute: React.FC<PrivateRouteProps> = ({children}) => {
     const token = localStorage.getItem("jwtToken");
+    const [showLoginPopup, setShowLoginPopup] = useState(false);
 
-    if (token && isTokenExpired(token)) {
-        alert("Ваша сессия истекла. Пожалуйста, войдите снова.");
-        localStorage.removeItem("jwtToken"); // Удаляем токен из локального хранилища
-        return <Navigate to="/login" replace/>;
+    if (!token || isTokenExpired(token)) {
+        if (!showLoginPopup) {
+            setShowLoginPopup(true); // Показываем попап только один раз
+        }
+        localStorage.removeItem("jwtToken"); // Удаляем истёкший или отсутствующий токен
     }
 
-    return <>{children}</>;
+    const handleLoginSuccess = () => {
+        setShowLoginPopup(false); // Закрываем попап после успешного входа
+    };
+
+    const handlePopupClose = () => {
+        setShowLoginPopup(false); // Закрываем попап, если пользователь решил его закрыть
+        return <Navigate to="/" replace/>; // При желании, можно перенаправить на главную
+    };
+
+    return (
+        <>
+            {showLoginPopup && (
+                <LoginPopup
+                    onClose={handlePopupClose}
+                    onLoginSuccess={handleLoginSuccess}
+                />
+            )}
+            {!showLoginPopup && token && !isTokenExpired(token) && children}
+        </>
+    );
 };
 
 export default PrivateRoute;

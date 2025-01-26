@@ -20,13 +20,14 @@ public class AdminController {
 
     @PostMapping("/uploadTitleImage")
     public ResponseEntity<String> uploadResource(@RequestParam(required = false, defaultValue = "true") boolean aiGenerated,
+                                                 @RequestParam(required = false, defaultValue = "false") boolean keepOriginal,
                                                  @RequestParam(required = false) @Nullable String authorName,
                                                  @RequestParam(required = false) @Nullable String authorUrl,
                                                  @RequestParam Long guideId,
                                                  @RequestBody MultipartFile file) {
         try {
             validateUser();
-            adminService.uploadTitleImage(new UploadImageDto(file, guideId, aiGenerated, authorName, authorUrl));
+            adminService.uploadTitleImage(new UploadImageDto(file, guideId, aiGenerated, keepOriginal, authorName, authorUrl));
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         } catch (Exception e) {
