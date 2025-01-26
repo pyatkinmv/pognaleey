@@ -28,14 +28,14 @@ public class UserService implements UserDetailsService {
 
 
     public boolean isValidUser(AuthRequestDto authRequestDto) {
-        var user = loadUserByUsername(authRequestDto.username());
+        var user = loadUserByUsername(authRequestDto.username().toLowerCase());
 
         return passwordEncoder.matches(authRequestDto.password(), user.getPassword());
     }
 
     @Override
     public User loadUserByUsername(String username) throws UsernameNotFoundException {
-        return userRepository.findByUsername(username)
+        return userRepository.findByUsername(username.toLowerCase())
                 .orElseThrow(() -> new UsernameNotFoundException(String.format("User %s not found", username)));
     }
 
