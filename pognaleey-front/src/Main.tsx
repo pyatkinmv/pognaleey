@@ -118,9 +118,14 @@ const Main: React.FC = () => {
                 error={error}
             />
 
-            {showLoginPopup && (
-                <LoginPopup onClose={() => setShowLoginPopup(false)} onLogin={() => navigate("/login")}/>
-            )}
+            {
+                showLoginPopup && (
+                    <LoginPopup
+                        onClose={() => setShowLoginPopup(false)}
+                        onLoginSuccess={() => setShowLoginPopup(false)}
+                    />
+                )
+            }
         </MainContainer>
     );
 };

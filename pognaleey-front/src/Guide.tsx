@@ -174,9 +174,13 @@ const Guide: React.FC = () => {
             </div>
             {
                 showLoginPopup && (
-                    <LoginPopup onClose={() => setShowLoginPopup(false)} onLogin={() => navigate("/login")}/>
+                    <LoginPopup
+                        onClose={() => setShowLoginPopup(false)}
+                        onLoginSuccess={() => setShowLoginPopup(false)}
+                    />
                 )
             }
+
 
             {/* Модальное окно */}
             <ModalImage image={selectedImage} onClose={closeModal}/>

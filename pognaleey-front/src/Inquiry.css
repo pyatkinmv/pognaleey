@@ -60,15 +60,6 @@
     margin-bottom: 1rem;
 }
 
-/* Стиль формы */
-form {
-    max-width: 50rem; /* 800px */
-    background: #ffffff; /* Белый фон для контраста */
-    padding: 1.25rem 1.875rem; /* 20px 30px */
-    border-radius: 0.9375rem; /* 15px */
-    box-shadow: 0 0.375rem 0.9375rem rgba(0, 0, 0, 0.1); /* Тень формы */
-}
-
 .question-container {
     margin-top: 1rem;
     display: flex;
