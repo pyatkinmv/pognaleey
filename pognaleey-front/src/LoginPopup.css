@@ -82,31 +82,31 @@
 }
 
 /* Глобальные сообщения */
-.global-message {
-    font-size: 0.875rem;
+.popup-content .global-message {
+    font-size: 1rem;
     margin-bottom: 1rem;
 }
 
-.global-message.success {
+.popup-content .global-message.success {
     color: green;
     font-weight: bold;
 }
 
-.global-message.error {
+.popup-content .global-message.error {
     color: red;
     font-weight: bold;
 }
 
 /* Сообщения для полей */
-.field-message {
-    font-size: 0.75rem;
+.form-group .field-message {
+    font-size: 1rem;
     margin-top: 0.25rem;
 }
 
-.field-message.success {
+.form-group .field-message .success {
     color: green;
 }
 
-.field-message.error {
+.form-group .field-message .error {
     color: red;
 }
