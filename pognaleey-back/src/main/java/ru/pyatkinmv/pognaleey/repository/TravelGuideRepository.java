@@ -22,7 +22,7 @@ public interface TravelGuideRepository extends CrudRepository<TravelGuide, Long>
             SELECT g.id AS guideId, COUNT(l.id) AS likesCount
                         FROM travel_guides g
                         LEFT JOIN travel_guides_likes l ON g.id = l.guide_id
-                        WHERE COALESCE(:userId, g.user_id) = g.user_id
+                        WHERE (:userId IS NOT NULL AND :userId = g.user_id) OR :userId IS NULL
                         GROUP BY g.id
                         ORDER BY likesCount DESC, g.id DESC
                         LIMIT :limit OFFSET :offset

@@ -1,6 +1,7 @@
 package ru.pyatkinmv.pognaleey.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.pyatkinmv.pognaleey.client.ImageSearchHttpClient;
 import ru.pyatkinmv.pognaleey.dto.ImageDto;
@@ -16,17 +17,28 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
+import static ru.pyatkinmv.pognaleey.mapper.TravelMapper.toImage;
+import static ru.pyatkinmv.pognaleey.mapper.TravelMapper.toImageDto;
+
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class ImageService {
     private final ImageRepository imageRepository;
     private final ImageSearchHttpClient<?> imageSearchHttpClient;
 
     public Optional<ImageDto> searchImageAndSave(String title, String searchQuery) {
         return imageSearchHttpClient.searchImage(searchQuery)
-                .map(it -> TravelMapper.toImage(it, title))
+                .map(it -> toImage(it, title))
                 .map(imageRepository::save)
                 .map(TravelMapper::toImageDto);
+    }
+
+    public ImageDto saveImage(ImageDto imageDto) {
+        Image saved = imageRepository.save(toImage(imageDto));
+        log.info("Saved image {}", saved.getId());
+
+        return toImageDto(saved);
     }
 
     public ImageDto findByIdOrThrow(Long imageId) {

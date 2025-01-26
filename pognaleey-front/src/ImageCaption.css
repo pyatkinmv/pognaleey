@@ -1,0 +1,15 @@
+.image-caption {
+    font-size: 0.85rem; /* Уменьшенный шрифт для подписи */
+    color: #333; /* Нейтральный цвет */
+    margin-top: 0.5rem; /* Расстояние от изображения до подписи */
+}
+
+.image-caption a {
+    color: #007bff; /* Цвет ссылок */
+    text-decoration: none; /* Убираем подчёркивание */
+}
+
+.image-caption a:hover {
+    text-decoration: underline; /* Подчёркивание при наведении */
+    color: #f87f76; /* Цвет при наведении */
+}

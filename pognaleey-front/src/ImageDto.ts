@@ -2,7 +2,8 @@ export interface ImageDto {
     thumbnailUrl: string;
     url: string;
     title: string;
+    aiGenerated: boolean;
     licenceUrl?: string;
-    ownerName?: string;
-    ownerUrl?: string;
+    authorName?: string;
+    authorUrl?: string;
 }

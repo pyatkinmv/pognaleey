@@ -43,7 +43,7 @@ const Main: React.FC = () => {
         setIsLoading(true);
         setError(null);
 
-        const url = `${process.env.REACT_APP_API_URL}/travel-guides/${filter}?page=${reset ? 0 : page}&size=8`;
+        const url = `${process.env.REACT_APP_API_URL}/travel-guides/${filter}?page=${reset ? 0 : page}&size=12`;
 
         try {
             if ((filter === "liked" || filter === "my") && !localStorage.getItem("jwtToken")) {

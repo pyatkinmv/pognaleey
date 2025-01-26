@@ -280,14 +280,13 @@ public class TravelGuideContentProviderV2 extends TravelGuideContentProvider {
     }
 
     @RequiredArgsConstructor
-    enum GuideStructureType {
-        TITLE(1, null, ProcessingStatus.READY, GuideContentItemType.MARKDOWN),
-        TITLE_IMAGE(2, null, ProcessingStatus.READY, GuideContentItemType.IMAGE),
-        INTRO(3, "## Введение\n\n", ProcessingStatus.IN_PROGRESS, GuideContentItemType.MARKDOWN),
-        SIGHTSEEING(4, "## Достопримечательности, маршруты, развлечения\n\n", ProcessingStatus.IN_PROGRESS, GuideContentItemType.MARKDOWN),
-        PRACTICAL(20, "## Практическая информация\n\n", ProcessingStatus.IN_PROGRESS, GuideContentItemType.MARKDOWN),
-        // Another titles generated in process
-        CONCLUSION(20 + GUIDE_PRACTICAL_TITLES_COUNT, "## Заключение\n\n", ProcessingStatus.IN_PROGRESS, GuideContentItemType.MARKDOWN);
+    public enum GuideStructureType {
+        TITLE(0, null, ProcessingStatus.READY, GuideContentItemType.MARKDOWN),
+        TITLE_IMAGE(10, null, ProcessingStatus.READY, GuideContentItemType.IMAGE),
+        INTRO(20, "## Введение\n\n", ProcessingStatus.IN_PROGRESS, GuideContentItemType.MARKDOWN),
+        SIGHTSEEING(30, "## Достопримечательности, маршруты, развлечения\n\n", ProcessingStatus.IN_PROGRESS, GuideContentItemType.MARKDOWN),
+        PRACTICAL(40, "## Практическая информация\n\n", ProcessingStatus.IN_PROGRESS, GuideContentItemType.MARKDOWN),
+        CONCLUSION(50, "## Заключение\n\n", ProcessingStatus.IN_PROGRESS, GuideContentItemType.MARKDOWN);
 
         private final int itemOrdinal;
         @Nullable

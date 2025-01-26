@@ -24,10 +24,11 @@ public class Image {
     private String url;
     private String thumbnailUrl;
     private String query;
+    private Boolean aiGenerated;
     @Nullable
     private String licenceUrl;
     @Nullable
-    private String ownerName;
+    private String authorName;
     @Nullable
-    private String ownerUrl;
+    private String authorUrl;
 }

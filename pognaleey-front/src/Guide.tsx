@@ -14,6 +14,7 @@ import PencilLoader from "./PencilLoader";
 import CircleLoader from "./CircleLoader";
 import ModalImage from "./ModalImage";
 import {ImageDto} from "./ImageDto";
+import ImageCaption from "./ImageCaption";
 
 interface UserDto {
     id: number;
@@ -120,18 +121,14 @@ const Guide: React.FC = () => {
                     handleImageClick(image)
                 }
             />
-            <div className="image-caption">
-                {image.ownerName && image.ownerUrl && (
-                    <span>
-                        Автор: <a href={image.ownerUrl}>{image.ownerName}</a>
-                    </span>
-                )}
-                {image.licenceUrl && (
-                    <>
-                        {image.ownerName && image.ownerUrl && "; "}
-                        <a href={image.licenceUrl}>Лицензия</a>
-                    </>
-                )}
+            <div className="image-wrapper">
+                <ImageCaption
+                    aiGenerated={image.aiGenerated}
+                    authorName={image.authorName}
+                    authorUrl={image.authorUrl}
+                    licenceUrl={image.licenceUrl}
+                    className={"image-caption"}
+                />
             </div>
         </div>
     );

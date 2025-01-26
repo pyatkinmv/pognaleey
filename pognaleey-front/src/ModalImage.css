@@ -52,19 +52,19 @@
     color: #f87f76;
 }
 
-.image-caption {
+.modal-image-caption {
     font-size: 0.85rem; /* Размер шрифта подписи */
     color: #fff; /* Белый цвет для контраста */
     margin-top: 0.5rem; /* Отступ от изображения */
     text-align: center; /* Центрирование текста */
 }
 
-.image-caption a {
+.modal-image-caption a {
     color: #f1f1f1; /* Цвет ссылок */
     text-decoration: none; /* Убираем подчёркивание */
 }
 
-.image-caption a:hover {
+.modal-image-caption a:hover {
     text-decoration: underline; /* Подчёркивание при наведении */
     color: #f87f76; /* Цвет при наведении */
 }

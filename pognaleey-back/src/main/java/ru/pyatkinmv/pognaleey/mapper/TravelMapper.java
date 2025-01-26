@@ -94,7 +94,8 @@ public class TravelMapper {
                 it.getCreatedAt().toEpochMilli(),
                 Optional.ofNullable(user)
                         .map(TravelMapper::toUserDto)
-                        .orElse(null)
+                        .orElse(null),
+                it.getRecommendationId()
         );
     }
 
@@ -115,13 +116,18 @@ public class TravelMapper {
     }
 
     public static Image toImage(ImageSearchClientImageDto dto, String title) {
-        return new Image(null, Instant.now(), title, dto.url(), dto.thumbnailUrl(), dto.query(), dto.licenceUrl(),
-                dto.ownerName(), dto.ownerUrl());
+        return new Image(null, Instant.now(), title, dto.url(), dto.thumbnailUrl(), dto.query(), false, dto.licenceUrl(),
+                dto.authorName(), dto.authorUrl());
+    }
+
+    public static Image toImage(ImageDto dto) {
+        return new Image(dto.id(), Instant.now(), dto.title(), dto.url(), dto.thumbnailUrl(), dto.query(),
+                dto.aiGenerated(), dto.licenceUrl(), dto.authorName(), dto.authorUrl());
     }
 
     public static ImageDto toImageDto(Image image) {
         return new ImageDto(image.getId(), image.getTitle(), image.getUrl(), image.getThumbnailUrl(), image.getQuery(),
-                image.getLicenceUrl(), image.getOwnerName(), image.getOwnerUrl());
+                image.getAiGenerated(), image.getLicenceUrl(), image.getAuthorName(), image.getAuthorUrl());
     }
 
     public static String mapToApi(ProcessingStatus status) {

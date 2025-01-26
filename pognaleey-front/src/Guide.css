@@ -132,10 +132,6 @@
 
 }
 
-.guide-details .image-guide-container:hover {
-    transform: scale(1.01);
-}
-
 .guide-details .image-caption {
     font-size: 0.85rem; /* Уменьшенный шрифт для подписи */
     color: #333; /* Нейтральный цвет */
