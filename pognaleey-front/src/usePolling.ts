@@ -1,4 +1,5 @@
 import {useEffect, useState} from "react";
+import apiClient from "./apiClient";
 
 interface PollingOptions<T> {
     url: string;
@@ -25,7 +26,7 @@ const usePolling = <T>(
 
         while (Date.now() - startTime < timeout) {
             try {
-                const response = await fetch(url);
+                const response = await apiClient(url);
                 if (!response.ok) {
                     throw new Error(`Failed to fetch data: ${response.status}`);
                 }
