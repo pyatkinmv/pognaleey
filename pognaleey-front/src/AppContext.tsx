@@ -1,6 +1,6 @@
 import React, {createContext, useContext, useEffect, useState} from "react";
 import {useNavigate} from "react-router-dom";
-import i18n from "i18next"; // Импортируем i18next
+import i18next from "i18next";
 
 interface AppContextProps {
     user: { username: string | null };
@@ -16,8 +16,9 @@ const AppContext = createContext<AppContextProps | undefined>(undefined);
 export const AppProvider: React.FC<{ children: React.ReactNode }> = ({children}) => {
     const navigate = useNavigate();
     const [user, setUser] = useState<{ username: string | null }>({username: null});
-    const [language, setLanguage] = useState<string>("ru");
-    const [isInitialized, setIsInitialized] = useState<boolean>(false); // Для отслеживания инициализации
+    const [language, setLanguage] = useState<string>(
+        localStorage.getItem("language") || "ru" // Читаем язык из localStorage
+    );
 
     const languages = [
         {code: "ru", label: "Русский"},
@@ -25,20 +26,16 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({children})
     ];
 
     useEffect(() => {
+        // Устанавливаем язык в i18next при инициализации
+        i18next.changeLanguage(language);
+
+        // Проверяем токен и восстанавливаем состояние пользователя
         const token = localStorage.getItem("jwtToken");
         if (token) {
             const username = getUsernameFromToken(token);
             setUser({username});
         }
-
-        setIsInitialized(true); // Контекст инициализирован
-    }, []);
-
-    useEffect(() => {
-        if (isInitialized && i18n.isInitialized) {
-            i18n.changeLanguage(language); // Меняем язык только после полной инициализации
-        }
-    }, [language, isInitialized]);
+    }, [language]);
 
     const getUsernameFromToken = (token: string) => {
         try {
@@ -58,9 +55,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({children})
         window.location.reload();
     };
 
-    // Функция для смены языка
     const handleLanguageChange = (code: string) => {
-        setLanguage(code); // Обновляем состояние языка
+        setLanguage(code);
+        localStorage.setItem("language", code); // Сохраняем выбранный язык
+        i18next.changeLanguage(code); // Меняем язык в i18next
     };
 
     const loginUser = (token: string) => {
