@@ -31,4 +31,6 @@ public class TravelGuide {
 
     @Nullable
     private Long imageId;
+
+    private Language language;
 }

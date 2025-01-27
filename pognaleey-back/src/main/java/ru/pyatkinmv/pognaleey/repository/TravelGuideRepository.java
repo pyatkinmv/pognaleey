@@ -22,12 +22,14 @@ public interface TravelGuideRepository extends CrudRepository<TravelGuide, Long>
             SELECT g.id AS guideId, COUNT(l.id) AS likesCount
                         FROM travel_guides g
                         LEFT JOIN travel_guides_likes l ON g.id = l.guide_id
-                        WHERE (:userId IS NOT NULL AND :userId = g.user_id) OR :userId IS NULL
+                        WHERE (:ownerId IS NOT NULL AND :ownerId = g.user_id)
+                           OR (:ownerId IS NULL AND g.language = :language)
                         GROUP BY g.id
                         ORDER BY likesCount DESC, g.id DESC
                         LIMIT :limit OFFSET :offset
             """, resultSetExtractorClass = GuideLikesExtractor.class)
-    Map<Long, Integer> findTopGuides(@Param("userId") @Nullable Long userId, @Param("limit") int limit,
+    Map<Long, Integer> findTopGuides(@Param("ownerId") @Nullable Long ownerId,
+                                     @Param("language") String language, @Param("limit") int limit,
                                      @Param("offset") int offset);
 
     List<TravelGuide> findAllByIdIn(Collection<Long> ids);

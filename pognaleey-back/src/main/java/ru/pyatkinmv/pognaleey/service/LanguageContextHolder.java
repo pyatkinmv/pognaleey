@@ -10,7 +10,7 @@ public class LanguageContextHolder {
         localeThreadLocal.set(language);
     }
 
-    public static Language getLocale() {
+    public static Language getLanguage() {
         return localeThreadLocal.get();
     }
 

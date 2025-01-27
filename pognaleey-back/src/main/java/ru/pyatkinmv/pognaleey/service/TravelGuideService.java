@@ -95,7 +95,8 @@ public class TravelGuideService {
         var user = getCurrentUserOrThrow();
         var totalCount = guideRepository.countAllByUserId(user.getId());
         var offset = pageable.getPageSize() * pageable.getPageNumber();
-        var guideIdToLikesCountMap = guideRepository.findTopGuides(user.getId(), pageable.getPageSize(), offset);
+        var guideIdToLikesCountMap = guideRepository.findTopGuides(user.getId(),
+                LanguageContextHolder.getLanguage().name(), pageable.getPageSize(), offset);
         var userGuides = guideRepository.findAllByIdIn(guideIdToLikesCountMap.keySet());
         var currentUserLikedGuidesIds = getCurrentUser()
                 .map(it -> likeService.findGuidesIdsByUserId(it.getId(), Integer.MAX_VALUE, 0))
@@ -129,7 +130,8 @@ public class TravelGuideService {
 
     public Page<TravelGuideInfoDto> getFeedGuides(Pageable pageable) {
         var offset = pageable.getPageSize() * pageable.getPageNumber();
-        var topGuideIdToLikeCountMap = guideRepository.findTopGuides(null, pageable.getPageSize(), offset);
+        var topGuideIdToLikeCountMap = guideRepository.findTopGuides(null,
+                LanguageContextHolder.getLanguage().name(), pageable.getPageSize(), offset);
         var topGuides = guideRepository.findAllByIdIn(topGuideIdToLikeCountMap.keySet());
         var totalCount = guideRepository.count();
         var users = findUsersByGuides(topGuides);
@@ -172,6 +174,7 @@ public class TravelGuideService {
                         .recommendationId(recommendationId)
                         .userId(Optional.ofNullable(user).map(User::getId).orElse(null))
                         .createdAt(Instant.now())
+                        .language(LanguageContextHolder.getLanguage())
                         .build()
         );
 
