@@ -1,6 +1,5 @@
 package ru.pyatkinmv.pognaleey.config;
 
-import org.mockito.ArgumentMatchers;
 import org.mockito.Mockito;
 import org.mockito.stubbing.Answer;
 import org.springframework.context.annotation.Bean;
@@ -13,7 +12,6 @@ import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
-import static ru.pyatkinmv.pognaleey.service.PromptService.*;
 
 @Configuration
 public class ClientsConfig {
@@ -52,16 +50,16 @@ public class ClientsConfig {
                 text3
                 {Башня Сююмбике}
                 """;
-        when(gptHttpClientMock.ask(ArgumentMatchers.contains(QUICK_PROMPT_FORMAT.substring(0, 14))))
-                .thenReturn(shortRecommendationRaw);
-        when(gptHttpClientMock.ask(ArgumentMatchers.contains(DETAILED_PROMPT_FORMAT.substring(0, 14))))
-                .thenReturn(detailedRecommendationRaw);
-        when(gptHttpClientMock.ask(ArgumentMatchers.contains(GUIDE_IMAGES_PROMPT_FORMAT.substring(0, 14))))
-                .thenReturn(guideImagesRaw);
-        when(gptHttpClientMock.ask(ArgumentMatchers.contains(GUIDE_PROMPT_FORMAT.substring(0, 14))))
-                .thenReturn(guideRaw);
-        when(gptHttpClientMock.ask(ArgumentMatchers.contains(GUIDE_VISUAL_PROMPT_FORMAT.substring(0, 14))))
-                .thenReturn(sightseeingRaw);
+//        when(gptHttpClientMock.ask(ArgumentMatchers.contains(QUICK_PROMPT_FORMAT.substring(0, 14))))
+//                .thenReturn(shortRecommendationRaw);
+//        when(gptHttpClientMock.ask(ArgumentMatchers.contains(DETAILED_PROMPT_FORMAT.substring(0, 14))))
+//                .thenReturn(detailedRecommendationRaw);
+//        when(gptHttpClientMock.ask(ArgumentMatchers.contains(GUIDE_IMAGES_PROMPT_FORMAT.substring(0, 14))))
+//                .thenReturn(guideImagesRaw);
+//        when(gptHttpClientMock.ask(ArgumentMatchers.contains(GUIDE_PROMPT_FORMAT.substring(0, 14))))
+//                .thenReturn(guideRaw);
+//        when(gptHttpClientMock.ask(ArgumentMatchers.contains(GUIDE_VISUAL_PROMPT_FORMAT.substring(0, 14))))
+//                .thenReturn(sightseeingRaw);
 
         return gptHttpClientMock;
     }

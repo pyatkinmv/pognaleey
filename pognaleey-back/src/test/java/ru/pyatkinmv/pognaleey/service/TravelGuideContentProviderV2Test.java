@@ -10,7 +10,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static ru.pyatkinmv.pognaleey.model.GuideContentItemType.IMAGE;
 import static ru.pyatkinmv.pognaleey.model.GuideContentItemType.MARKDOWN;
 import static ru.pyatkinmv.pognaleey.model.ProcessingStatus.IN_PROGRESS;
-import static ru.pyatkinmv.pognaleey.service.TravelGuideContentProviderV2.GuideStructureType.SIGHTSEEING;
+import static ru.pyatkinmv.pognaleey.service.TravelGuideContentProviderV2.GuideStructureType.ATTRACTIONS;
 
 class TravelGuideContentProviderV2Test {
 
@@ -37,7 +37,7 @@ class TravelGuideContentProviderV2Test {
                 "topic3", new ImageDto("url3", "title3", "thumb3", "q3")
         );
         var guideId = 157L;
-        int firstOrdinal = SIGHTSEEING.ordinal();
+        int firstOrdinal = ATTRACTIONS.ordinal();
         var sightseeingFirst = new TravelGuideContentItem(null, guideId, null, firstOrdinal, IN_PROGRESS, MARKDOWN);
         var contentItems = TravelGuideContentProviderV2.extractItems(sightseeingContentResponse, sightseeingFirst, titleToImageMap);
 

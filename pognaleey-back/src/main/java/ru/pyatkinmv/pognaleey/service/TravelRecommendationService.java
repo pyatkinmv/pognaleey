@@ -39,6 +39,7 @@ public class TravelRecommendationService {
     private final TravelInquiryRepository inquiryRepository;
     private final TravelGuideRepository guideRepository;
     private final ExecutorService executorService;
+    private final PromptService promptService;
 
     private static List<TitleAndImageQuery> parseQuick(String quickRecommendationsAnswer) {
         var parsed = parseSearchableItems(quickRecommendationsAnswer);
@@ -87,7 +88,7 @@ public class TravelRecommendationService {
         List<TitleAndImageQuery> titleAndImageQueries;
 
         try {
-            var prompt = PromptService.generateQuickPrompt(RECOMMENDATIONS_NUMBER, inquiryParams);
+            var prompt = promptService.generateQuickPrompt(RECOMMENDATIONS_NUMBER, inquiryParams);
             var answer = gptHttpClient.ask(prompt);
             var titleAndImageQueriesParsed = parseQuick(answer);
             titleAndImageQueries = resolveInCaseGeneratedMoreOrLessThanExpected(titleAndImageQueriesParsed);
@@ -142,7 +143,7 @@ public class TravelRecommendationService {
         log.info("begin enrichWithDetails for recommendation: {}", recommendation.getId());
 
         try {
-            var prompt = PromptService.generateDetailedPrompt(recommendation, inquiryParams);
+            var prompt = promptService.generateDetailedPrompt(recommendation, inquiryParams);
             var recommendationDetailsRaw = gptHttpClient.ask(prompt);
             var details = parseDetailed(recommendationDetailsRaw);
             var detailsJson = Utils.toJson(details);

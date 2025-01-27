@@ -13,7 +13,7 @@ public enum Language {
         try {
             return Optional.of(valueOf(language.toUpperCase()));
         } catch (IllegalArgumentException e) {
-            log.error("Couldn't parse language from {}", language);
+            log.warn("Couldn't parse language from {}", language);
             return Optional.empty();
         }
     }
@@ -21,4 +21,5 @@ public enum Language {
     public static Language getDefault() {
         return RU;
     }
+
 }

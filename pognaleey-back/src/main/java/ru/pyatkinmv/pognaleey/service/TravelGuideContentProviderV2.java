@@ -2,6 +2,7 @@ package ru.pyatkinmv.pognaleey.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.MessageSource;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.support.TransactionTemplate;
@@ -22,7 +23,7 @@ import java.util.stream.Stream;
 
 import static ru.pyatkinmv.pognaleey.service.GptAnswerResolveHelper.parseSearchableItems;
 import static ru.pyatkinmv.pognaleey.service.GptAnswerResolveHelper.splitWithPipe;
-import static ru.pyatkinmv.pognaleey.service.PromptService.*;
+import static ru.pyatkinmv.pognaleey.service.PromptService.GUIDE_PRACTICAL_TITLES_COUNT;
 
 @Component
 @Slf4j
@@ -33,30 +34,35 @@ public class TravelGuideContentProviderV2 extends TravelGuideContentProvider {
     private final TravelGuideContentItemRepository contentItemRepository;
     private final TravelGuideRepository guideRepository;
     private final TransactionTemplate transactionTemplate;
+    private final PromptService promptService;
+    private final MessageSource messageSource;
 
     public TravelGuideContentProviderV2(ImageService imageService,
                                         TravelInquiryService inquiryService, ExecutorService executorService,
                                         GptHttpClient gptHttpClient,
                                         TravelGuideContentItemRepository contentItemRepository,
                                         TravelGuideRepository guideRepository,
-                                        TransactionTemplate transactionTemplate) {
+                                        PromptService promptService,
+                                        TransactionTemplate transactionTemplate, MessageSource messageSource) {
         super(imageService);
         this.inquiryService = inquiryService;
         this.executorService = executorService;
         this.gptHttpClient = gptHttpClient;
         this.contentItemRepository = contentItemRepository;
         this.guideRepository = guideRepository;
+        this.promptService = promptService;
         this.transactionTemplate = transactionTemplate;
+        this.messageSource = messageSource;
     }
 
-    private static String generateSightseeingPrompt(String guideTitle,
-                                                    String inquiryParams,
-                                                    List<GptAnswerResolveHelper.SearchableItem> searchableGuideItems) {
+    private String generateSightseeingPrompt(String guideTitle,
+                                             String inquiryParams,
+                                             List<GptAnswerResolveHelper.SearchableItem> searchableGuideItems) {
         var titleToImagePhraseMap = searchableGuideItems.stream()
                 .collect(Collectors.toMap(GptAnswerResolveHelper.SearchableItem::title, GptAnswerResolveHelper.SearchableItem::imageSearchPhrase));
         var guideVisualTopics = String.join("|", titleToImagePhraseMap.keySet());
 
-        return PromptService.generateGuideVisualPrompt(guideTitle, inquiryParams, guideVisualTopics);
+        return promptService.generateGuideAttractionsPrompt(guideTitle, inquiryParams, guideVisualTopics);
     }
 
     private static GuideStructureType getType(TravelGuideContentItem item) {
@@ -88,7 +94,7 @@ public class TravelGuideContentProviderV2 extends TravelGuideContentProvider {
         enrichOrSetFailed(
                 intro,
                 () -> {
-                    var introPrompt = generateGuideIntroPrompt(guideTitle, inquiryParams);
+                    var introPrompt = promptService.generateGuideIntroPrompt(guideTitle, inquiryParams);
                     var response = gptHttpClient.ask(introPrompt);
                     intro.setContent(response);
                     intro.setStatus(ProcessingStatus.READY);
@@ -98,7 +104,7 @@ public class TravelGuideContentProviderV2 extends TravelGuideContentProvider {
         var conclusion = typeToItemMap.get(GuideStructureType.CONCLUSION);
         enrichOrSetFailed(conclusion,
                 () -> {
-                    var introPrompt = generateGuideConclusionPrompt(guideTitle, inquiryParams);
+                    var introPrompt = promptService.generateGuideConclusionPrompt(guideTitle, inquiryParams);
                     var response = gptHttpClient.ask(introPrompt);
                     conclusion.setContent(response);
                     conclusion.setStatus(ProcessingStatus.READY);
@@ -159,7 +165,7 @@ public class TravelGuideContentProviderV2 extends TravelGuideContentProvider {
     private void enrichSightseeingOrSetFailed(TravelGuideContentItem sightseeingFirst, String guideTitle, String inquiryParams) {
         enrichOrSetFailed(sightseeingFirst,
                 () -> {
-                    var sightseeingImagesPrompt = PromptService.generateGuideImagesPrompt(guideTitle, inquiryParams);
+                    var sightseeingImagesPrompt = promptService.generateGuideImagesPrompt(guideTitle, inquiryParams);
                     var sightseeingImagesResponseRaw = gptHttpClient.ask(sightseeingImagesPrompt);
                     var searchableGuideItems = parseSearchableItems(sightseeingImagesResponseRaw);
 
@@ -195,11 +201,11 @@ public class TravelGuideContentProviderV2 extends TravelGuideContentProvider {
             executorService.submit(() -> enrichIntroAndConclusionOrSetFailed(typeToItemMap, guideTitle, inquiryParams));
 
 
-            var sightseeing = typeToItemMap.get(GuideStructureType.SIGHTSEEING);
+            var sightseeing = typeToItemMap.get(GuideStructureType.ATTRACTIONS);
             executorService.submit(() -> enrichSightseeingOrSetFailed(sightseeing, guideTitle, inquiryParams));
 
             var practicalFirst = typeToItemMap.get(GuideStructureType.PRACTICAL);
-            var practicalTitlesPrompt = PromptService.generateGuidePracticalTitlesPrompt(guideTitle, inquiryParams);
+            var practicalTitlesPrompt = promptService.generateGuidePracticalTitlesPrompt(guideTitle, inquiryParams);
             var practicalTitlesResponseRaw = gptHttpClient.ask(practicalTitlesPrompt);
             var titles = splitWithPipe(practicalTitlesResponseRaw);
             log.info("practical title {}", titles);
@@ -225,7 +231,7 @@ public class TravelGuideContentProviderV2 extends TravelGuideContentProvider {
                                      long guideId, String inquiryParams) {
         var index = titles.indexOf(practicalTitle);
         var allTitles = String.join("|", titles);
-        var prompt = PromptService.generateGuidePracticalTitlePrompt(guideTitle, inquiryParams, allTitles, practicalTitle);
+        var prompt = promptService.generateGuidePracticalTitlePrompt(guideTitle, inquiryParams, allTitles, practicalTitle);
 
         if (index >= GUIDE_PRACTICAL_TITLES_COUNT) {
             log.error("index {} is bigger than expected", index);
@@ -258,7 +264,7 @@ public class TravelGuideContentProviderV2 extends TravelGuideContentProvider {
                                                                     @Nullable Long imageId) {
         var items = Stream.of(GuideStructureType.values())
                 .map(it -> TravelGuideContentItem.builder()
-                        .content(it.initialContent)
+                        .content(initialContent(it))
                         .guideId(guideId)
                         .ordinal(it.itemOrdinal)
                         .status(it.initialStatus)
@@ -266,7 +272,7 @@ public class TravelGuideContentProviderV2 extends TravelGuideContentProvider {
                         .build())
                 .collect(Collectors.toCollection(ArrayList::new));
         var title = getByType(items, GuideStructureType.TITLE);
-        title.setContent(String.format("# %s\n", initialTitle));
+        title.setContent(initialContent(GuideStructureType.TITLE, initialTitle));
         var titleImage = getByType(items, GuideStructureType.TITLE_IMAGE);
         var imageJson = Optional.ofNullable(imageId).map(imageService::findByIdOrThrow)
                 .map(Utils::toJson);
@@ -279,18 +285,25 @@ public class TravelGuideContentProviderV2 extends TravelGuideContentProvider {
         return contentItemRepository.saveAllFromIterable(items);
     }
 
+    @Nullable
+    private String initialContent(GuideStructureType type, Object... objects) {
+        return Optional.ofNullable(type.initialContentFormat)
+                .map(it -> messageSource.getMessage(it, objects, LanguageContextHolder.getLanguageLocale()))
+                .orElse(null);
+    }
+
     @RequiredArgsConstructor
     public enum GuideStructureType {
-        TITLE(0, null, ProcessingStatus.READY, GuideContentItemType.MARKDOWN),
+        TITLE(0, "guide.structure.title", ProcessingStatus.READY, GuideContentItemType.MARKDOWN),
         TITLE_IMAGE(10, null, ProcessingStatus.READY, GuideContentItemType.IMAGE),
-        INTRO(20, "## Введение\n\n", ProcessingStatus.IN_PROGRESS, GuideContentItemType.MARKDOWN),
-        SIGHTSEEING(30, "## Достопримечательности, маршруты, развлечения\n\n", ProcessingStatus.IN_PROGRESS, GuideContentItemType.MARKDOWN),
-        PRACTICAL(40, "## Практическая информация\n\n", ProcessingStatus.IN_PROGRESS, GuideContentItemType.MARKDOWN),
-        CONCLUSION(50, "## Заключение\n\n", ProcessingStatus.IN_PROGRESS, GuideContentItemType.MARKDOWN);
+        INTRO(20, "guide.structure.intro", ProcessingStatus.IN_PROGRESS, GuideContentItemType.MARKDOWN),
+        ATTRACTIONS(30, "guide.structure.attractions", ProcessingStatus.IN_PROGRESS, GuideContentItemType.MARKDOWN),
+        PRACTICAL(40, "guide.structure.practical_info", ProcessingStatus.IN_PROGRESS, GuideContentItemType.MARKDOWN),
+        CONCLUSION(50, "guide.structure.conclusion", ProcessingStatus.IN_PROGRESS, GuideContentItemType.MARKDOWN);
 
         private final int itemOrdinal;
         @Nullable
-        private final String initialContent;
+        private final String initialContentFormat;
         private final ProcessingStatus initialStatus;
         private final GuideContentItemType type;
     }

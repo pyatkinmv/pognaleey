@@ -36,6 +36,7 @@ public class TravelGuideContentProviderV1 extends TravelGuideContentProvider {
     private final GptHttpClient gptHttpClient;
     private final TravelGuideContentItemRepository contentItemRepository;
     private final TravelGuideRepository guideRepository;
+    private final PromptService promptService;
     private final TransactionTemplate transactionTemplate;
 
     public TravelGuideContentProviderV1(ImageService imageService,
@@ -43,6 +44,7 @@ public class TravelGuideContentProviderV1 extends TravelGuideContentProvider {
                                         GptHttpClient gptHttpClient,
                                         TravelGuideContentItemRepository contentItemRepository,
                                         TravelGuideRepository guideRepository,
+                                        PromptService promptService,
                                         TransactionTemplate transactionTemplate) {
         super(imageService);
         this.inquiryService = inquiryService;
@@ -50,6 +52,7 @@ public class TravelGuideContentProviderV1 extends TravelGuideContentProvider {
         this.gptHttpClient = gptHttpClient;
         this.contentItemRepository = contentItemRepository;
         this.guideRepository = guideRepository;
+        this.promptService = promptService;
         this.transactionTemplate = transactionTemplate;
     }
 
@@ -72,14 +75,14 @@ public class TravelGuideContentProviderV1 extends TravelGuideContentProvider {
         return result;
     }
 
-    private static String generateGuidePrompt(String guideTitle,
-                                              String inquiryParams,
-                                              List<GptAnswerResolveHelper.SearchableItem> searchableGuideItems) {
+    private String generateGuidePrompt(String guideTitle,
+                                       String inquiryParams,
+                                       List<GptAnswerResolveHelper.SearchableItem> searchableGuideItems) {
         var titleToImagePhraseMap = searchableGuideItems.stream()
                 .collect(Collectors.toMap(GptAnswerResolveHelper.SearchableItem::title, GptAnswerResolveHelper.SearchableItem::imageSearchPhrase));
         var guideTopics = String.join("|", titleToImagePhraseMap.keySet());
 
-        return PromptService.generateCreateGuidePrompt(guideTitle, inquiryParams, guideTopics);
+        return promptService.generateCreateGuidePrompt(guideTitle, inquiryParams, guideTopics);
     }
 
     /**
@@ -119,7 +122,7 @@ public class TravelGuideContentProviderV1 extends TravelGuideContentProvider {
 
         try {
             var inquiry = inquiryService.findById(inquiryId);
-            var guideImagesPrompt = PromptService.generateGuideImagesPrompt(recommendationTitle, inquiry.getParams());
+            var guideImagesPrompt = promptService.generateGuideImagesPrompt(recommendationTitle, inquiry.getParams());
             var imagesGuideResponseRaw = gptHttpClient.ask(guideImagesPrompt);
             var searchableGuideItems = parseSearchableItems(imagesGuideResponseRaw);
 
