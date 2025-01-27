@@ -2,6 +2,7 @@ import React, {useState} from "react";
 import "./LoginPopup.css";
 import {validatePassword, validateUsername} from "./validators";
 import {useAppContext} from "./AppContext";
+import {useTranslation} from "react-i18next";
 
 interface LoginPopupProps {
     onClose: () => void;
@@ -21,6 +22,8 @@ const LoginPopup: React.FC<LoginPopupProps> = ({onClose, onLoginSuccess}) => {
         username: "",
         password: "",
     });
+    const {t} = useTranslation();
+
 
     const [messages, setMessages] = useState<{
         global?: Message;
@@ -33,12 +36,12 @@ const LoginPopup: React.FC<LoginPopupProps> = ({onClose, onLoginSuccess}) => {
 
     const validateForm = () => {
         const newMessages: typeof messages = {};
-        const usernameError = validateUsername(credentials.username);
+        const usernameError = validateUsername(credentials.username, t);
         if (usernameError) {
             newMessages.username = {type: "error", text: usernameError};
         }
 
-        const passwordError = validatePassword(credentials.password);
+        const passwordError = validatePassword(credentials.password, t);
         if (passwordError) {
             newMessages.password = {type: "error", text: passwordError};
         }
@@ -81,18 +84,18 @@ const LoginPopup: React.FC<LoginPopupProps> = ({onClose, onLoginSuccess}) => {
                     onLoginSuccess();
                 } else {
                     setMessages({
-                        global: {type: "success", text: "Регистрация успешна! Теперь войдите в аккаунт."},
+                        global: {type: "success", text: t("registrationSuccess")},
                     });
                 }
             } else {
                 setMessages({
-                    global: {type: "error", text: isLoginMode ? "Ошибка входа." : "Ошибка регистрации."},
+                    global: {type: "error", text: isLoginMode ? t("loginError") : t("registerError")},
                 });
             }
         } catch (error) {
-            console.error("Ошибка:", error);
+            console.error(t("error"), error);
             setMessages({
-                global: {type: "error", text: "Произошла ошибка. Попробуйте позже."},
+                global: {type: "error", text: t("generalError")},
             });
         } finally {
             setIsSubmitting(false);
@@ -102,7 +105,7 @@ const LoginPopup: React.FC<LoginPopupProps> = ({onClose, onLoginSuccess}) => {
     return (
         <div className="popup-overlay" onClick={onClose}>
             <div className="popup-content" onClick={(e) => e.stopPropagation()}>
-                <h3>{isLoginMode ? "Вход в аккаунт" : "Регистрация"}</h3>
+                <h3>{isLoginMode ? t("loginToAccount") : t("registerTitle")}</h3>
 
                 {/* Глобальное сообщение */}
                 {messages.global && (
@@ -113,7 +116,7 @@ const LoginPopup: React.FC<LoginPopupProps> = ({onClose, onLoginSuccess}) => {
 
                 <form onSubmit={handleSubmit}>
                     <div className="form-group">
-                        <label htmlFor="username">Имя пользователя:</label>
+                        <label htmlFor="username">{t("username")}</label>
                         <input
                             type="text"
                             id="username"
@@ -130,7 +133,7 @@ const LoginPopup: React.FC<LoginPopupProps> = ({onClose, onLoginSuccess}) => {
                     </div>
 
                     <div className="form-group">
-                        <label htmlFor="password">Пароль:</label>
+                        <label htmlFor="password">{t("password")}</label>
                         <input
                             type="password"
                             id="password"
@@ -147,29 +150,29 @@ const LoginPopup: React.FC<LoginPopupProps> = ({onClose, onLoginSuccess}) => {
                     </div>
 
                     <button type="submit" className="login-button-popup" disabled={isSubmitting}>
-                        {isSubmitting ? "Загрузка..." : isLoginMode ? "Войти" : "Зарегистрироваться"}
+                        {isSubmitting ? t("loading") : isLoginMode ? t("login") : t("register")}
                     </button>
                 </form>
 
                 <div className="signup-prompt">
                     {isLoginMode ? (
                         <>
-                            Ещё нет аккаунта?{" "}
+                            {t("noAccount")}{" "}
                             <span
                                 className="signup-link"
                                 onClick={() => setIsLoginMode(false)}
                             >
-                                Зарегистрироваться
+                                {t("register")}
                             </span>
                         </>
                     ) : (
                         <>
-                            Уже есть аккаунт?{" "}
+                            {t("alreadyHaveAccount")}{" "}
                             <span
                                 className="signup-link"
                                 onClick={() => setIsLoginMode(true)}
                             >
-                                Войти
+                                {t("login")}
                             </span>
                         </>
                     )}

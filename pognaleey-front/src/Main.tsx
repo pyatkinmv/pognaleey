@@ -8,6 +8,7 @@ import LoginPopup from "./LoginPopup";
 import apiClient from "./apiClient";
 import MainContainer from "./MainContainer";
 import {useLikeHandler} from "./useLikeHandler";
+import {useTranslation} from "react-i18next";
 
 const Main: React.FC = () => {
     const navigate = useNavigate();
@@ -18,6 +19,7 @@ const Main: React.FC = () => {
     const [page, setPage] = useState<number>(0);
     const [hasMore, setHasMore] = useState<boolean>(true);
     const [showLoginPopup, setShowLoginPopup] = useState<boolean>(false);
+    const {t} = useTranslation();
 
     const observer = useRef<IntersectionObserver | null>(null);
     const lastTileRef = useRef<HTMLDivElement | null>(null);
@@ -54,7 +56,7 @@ const Main: React.FC = () => {
             const response = await apiClient(url);
 
             if (!response.ok) {
-                throw new Error("Ошибка загрузки данных");
+                throw new Error(t("loadingError"));
             }
 
             const data = await response.json();
@@ -62,7 +64,7 @@ const Main: React.FC = () => {
             setPage((prevPage) => (reset ? 1 : prevPage + 1));
             setHasMore(!data.last);
         } catch (err: any) {
-            setError(err.message || "Неизвестная ошибка");
+            setError(err.message || t("unknownError"));
         } finally {
             setIsLoading(false);
         }
@@ -104,8 +106,8 @@ const Main: React.FC = () => {
             <Header/>
             <div className="image-container">
                 <img src="/main.webp" alt="Main Banner" className="banner-image"/>
-                <div className="banner-text">Каждое путешествие<br/>начинается с идеи!</div>
-                <button className="action-button" onClick={() => navigate("/travel-inquiries")}>Погнали!</button>
+                <div className="banner-text">{t('bannerText1')}<br/>{t('bannerText2')}</div>
+                <button className="action-button" onClick={() => navigate("/travel-inquiries")}>{t("goButton")}</button>
             </div>
 
             <FilterButtons selectedFilter={selectedFilter} onFilterChange={handleFilterChange}/>

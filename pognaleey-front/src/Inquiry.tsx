@@ -4,6 +4,8 @@ import "./Inquiry.css";
 import apiClient from "./apiClient";
 import Header from "./Header";
 import MainContainer from "./MainContainer";
+import {useTranslation} from "react-i18next";
+
 
 const Inquiry: React.FC = () => {
     const [formData, setFormData] = useState({
@@ -52,82 +54,84 @@ const Inquiry: React.FC = () => {
                 alert("Ошибка отправки формы.");
             }
         } catch (error) {
-            console.error("Ошибка:", error);
+            console.error(t("error"), error);
             alert("Не удалось отправить форму.");
         }
     };
 
+    const {t} = useTranslation();
+
     const purposeOptions = [
-        {value: "релаксация", label: "Отдых и релаксация", icon: "🧘"},
-        {value: "активный отдых", label: "Активный отдых", icon: "🚴"},
-        {value: "культура", label: "Культура", icon: "🏛️"},
-        {value: "шоппинг", label: "Шоппинг", icon: "🛍️"},
-        {value: "оздоровление", label: "Оздоровление", icon: "🌿"}
+        {value: t("inquiry.relaxation"), label: t("inquiry.relaxation"), icon: "🧘"},
+        {value: t("inquiry.activeRest"), label: t("inquiry.activeRest"), icon: "🚴"},
+        {value: t("inquiry.culture"), label: t("inquiry.culture"), icon: "🏛️"},
+        {value: t("inquiry.shopping"), label: t("inquiry.shopping"), icon: "🛍️"},
+        {value: t("inquiry.wellness"), label: t("inquiry.wellness"), icon: "🌿"}
     ];
 
     const companionOptions = [
-        {value: "один", label: "Один", icon: "🧍"},
-        {value: "с партнёром", label: "С партнером", icon: "❤️"},
-        {value: "семья", label: "С семьёй", icon: "👨‍👩‍👧‍👦"},
-        {value: "друзья", label: "С друзьями", icon: "👫"},
-        {value: "группа", label: "В группе", icon: "🚌"},
+        {value: t("inquiry.alone"), label: t("inquiry.alone"), icon: "🧍"},
+        {value: t("inquiry.withPartner"), label: t("inquiry.withPartner"), icon: "❤️"},
+        {value: t("inquiry.family"), label: t("inquiry.family"), icon: "👨‍👩‍👧‍👦"},
+        {value: t("inquiry.friends"), label: t("inquiry.friends"), icon: "👫"},
+        {value: t("inquiry.group"), label: t("inquiry.group"), icon: "🚌"}
     ];
 
     const durationOptions = [
-        {value: "1-3 дня", label: "1-3 дня"},
-        {value: "4-7 дней", label: "4-7 дней"},
-        {value: "8-14 дней", label: "8-14 дней"},
-        {value: "Более двух недель", label: "Более двух недель"},
-    ]
+        {value: t("inquiry.1-3Days"), label: t("inquiry.1-3Days")},
+        {value: t("inquiry.4-7Days"), label: t("inquiry.4-7Days")},
+        {value: t("inquiry.8-14Days"), label: t("inquiry.8-14Days")},
+        {value: t("inquiry.moreThanTwoWeeks"), label: t("inquiry.moreThanTwoWeeks")}
+    ];
 
     const transportOptions = [
-        {value: "автомобиль", label: "Автомобиль", icon: "🚗"},
-        {value: "самолет", label: "Самолёт", icon: "✈️"},
-        {value: "поезд", label: "Поезд", icon: "🚂"},
-        {value: "автобус", label: "Автобус", icon: "🚌"},
-        {value: "корабль", label: "Корабль", icon: "🛳️"},
+        {value: t("inquiry.car"), label: t("inquiry.car"), icon: "🚗"},
+        {value: t("inquiry.plane"), label: t("inquiry.plane"), icon: "✈️"},
+        {value: t("inquiry.train"), label: t("inquiry.train"), icon: "🚂"},
+        {value: t("inquiry.bus"), label: t("inquiry.bus"), icon: "🚌"},
+        {value: t("inquiry.ship"), label: t("inquiry.ship"), icon: "🛳️"}
     ];
 
     const budgetOptions = [
-        {value: "economy", label: "Хочу сэкономить", icon: "🪙"}, // Economy — Экономичный
-        {value: "standard", label: "Стандартный", icon: "💵"}, // Standard — Стандартный
-        {value: "comfort", label: "Комфортный", icon: "💳"}, // Comfort — Комфортный
-        {value: "luxury", label: "Максимальный комфорт", icon: "💎"} // Luxury — Роскошный
+        {value: t("inquiry.economy"), label: t("inquiry.economy"), icon: "🪙"},
+        {value: t("inquiry.standard"), label: t("inquiry.standard"), icon: "💵"},
+        {value: t("inquiry.comfort"), label: t("inquiry.comfort"), icon: "💳"},
+        {value: t("inquiry.luxury"), label: t("inquiry.luxury"), icon: "💎"}
     ];
 
     const preferencesOptions = [
-        {value: "море и пляжи", label: "Море и пляжи", icon: "🏖️"}, // Пляжный отдых
-        {value: "спа", label: "СПА", icon: "🛀"}, // СПА и релакс
-        {value: "горы", label: "Горы", icon: "🏔️"}, // Активный отдых в горах
-        {value: "мегаполис", label: "Мегаполисы", icon: "🏙️"}, // Экскурсии и культурный туризм
-        {value: "сельская местность", label: "Сельская местность", icon: "🐓"},
-        {value: "кемпинг", label: "Кемпинг", icon: "⛺"}, // СПА и релакс
-        {value: "история и культура", label: "История и культура", icon: "🎭"}, // Исторический туризм
-        {value: "лыжи", label: "Горнолыжка", icon: "🎿"}, // Лыжи, снег
-        {value: "сафари", label: "Сафари", icon: "🦁"}, // Экзотическая природа, животные
-        {value: "круиз", label: "Круизы", icon: "🛳️"}, // Морские путешествия
-        {value: "еда", label: "Кулинария", icon: "🍔"}, // Еда и дегустации
-        {value: "алкоголь", label: "Алкоголь", icon: "🍷"}, // Еда и дегустации
-        {value: "фестивали", label: "Фестивали", icon: "🎉"}, // Еда и дегустации
-        {value: "ночная жизнь", label: "Ночная жизнь", icon: "🌃"}, // Еда и дегустации
-        {value: "экзотика", label: "Экзотика", icon: "🐪"}, // Еда и дегустации\
-        {value: "маленькие города", label: "Маленькие города", icon: "🏡"}
+        {value: t("inquiry.seaAndBeaches"), label: t("inquiry.seaAndBeaches"), icon: "🏖️"},
+        {value: t("inquiry.spa"), label: t("inquiry.spa"), icon: "🛀"},
+        {value: t("inquiry.mountains"), label: t("inquiry.mountains"), icon: "🏔️"},
+        {value: t("inquiry.megapolis"), label: t("inquiry.megapolis"), icon: "🏙️"},
+        {value: t("inquiry.countryside"), label: t("inquiry.countryside"), icon: "🐓"},
+        {value: t("inquiry.camping"), label: t("inquiry.camping"), icon: "⛺"},
+        {value: t("inquiry.historyAndCulture"), label: t("inquiry.historyAndCulture"), icon: "🎭"},
+        {value: t("inquiry.skiing"), label: t("inquiry.skiing"), icon: "🎿"},
+        {value: t("inquiry.safari"), label: t("inquiry.safari"), icon: "🦁"},
+        {value: t("inquiry.cruise"), label: t("inquiry.cruise"), icon: "🛳️"},
+        {value: t("inquiry.food"), label: t("inquiry.food"), icon: "🍔"},
+        {value: t("inquiry.alcohol"), label: t("inquiry.alcohol"), icon: "🍷"},
+        {value: t("inquiry.festivals"), label: t("inquiry.festivals"), icon: "🎉"},
+        {value: t("inquiry.nightLife"), label: t("inquiry.nightLife"), icon: "🌃"},
+        {value: t("inquiry.exotic"), label: t("inquiry.exotic"), icon: "🐪"},
+        {value: t("inquiry.smallTowns"), label: t("inquiry.smallTowns"), icon: "🏡"}
     ];
 
     const seasonOptions = [
-        {value: "зима", label: "Зима", icon: "❄️"}, // Холодное время года, горнолыжный отдых, рождественские ярмарки
-        {value: "весна", label: "Весна", icon: "🌸"}, // Цветение, мягкая погода, романтичные поездки
-        {value: "лето", label: "Лето", icon: "☀️"}, // Жаркая погода, пляжи, каникулы
-        {value: "осень", label: "Осень", icon: "🍂"},
-    ]
+        {value: t("inquiry.winter"), label: t("inquiry.winter"), icon: "❄️"},
+        {value: t("inquiry.spring"), label: t("inquiry.spring"), icon: "🌸"},
+        {value: t("inquiry.summer"), label: t("inquiry.summer"), icon: "☀️"},
+        {value: t("inquiry.autumn"), label: t("inquiry.autumn"), icon: "🍂"}
+    ];
 
     const regionOptions = [
-        {value: "россия", label: "Россия", icon: "🪆"}, // Путешествия внутри страны
-        {value: "европа", label: "Европа", icon: "🗼"}, // Европейские страны
-        {value: "азия", label: "Азия", icon: "🐉"}, // Восточная культура
-        {value: "африка", label: "Африка", icon: "🌴"}, // Африканские страны
-        {value: "южная и северная америка", label: "Америка", icon: "🌵"}, // Северная и Южная Америка
-        {value: "австралия и океания", label: "Австралия и Океания", icon: "🌊"}, // Австралия и острова
+        {value: t("inquiry.russia"), label: t("inquiry.russia"), icon: "🪆"},
+        {value: t("inquiry.europe"), label: t("inquiry.europe"), icon: "🗼"},
+        {value: t("inquiry.asia"), label: t("inquiry.asia"), icon: "🐉"},
+        {value: t("inquiry.africa"), label: t("inquiry.africa"), icon: "🌴"},
+        {value: t("inquiry.america"), label: t("inquiry.america"), icon: "🌵"},
+        {value: t("inquiry.australiaOceania"), label: t("inquiry.australiaOceania"), icon: "🌊"}
     ];
 
     const handleCardMultiSelect = (field: keyof typeof formData, value: string) => {
@@ -161,11 +165,11 @@ const Inquiry: React.FC = () => {
         <MainContainer>
             <Header/>
             <div className="form-heading">
-                Ответьте на вопросы, чтобы мы могли подобрать идеальное путешествие!
+                {t("answerQuestions")}
             </div>
 
             {/* Цель поездки */}
-            <QuestionContainer label="Какова цель вашего путешествия?">
+            <QuestionContainer label={t("purposeOfTravel")}>
                 <div className="card-grid">
                     {purposeOptions.map((option) => (
                         <div
@@ -183,7 +187,7 @@ const Inquiry: React.FC = () => {
 
             {/* Вопрос о компаньонах */}
             {/* Цель поездки */}
-            <QuestionContainer label="С кем вы путешествуете?">
+            <QuestionContainer label={t("travelCompanions")}>
                 <div className="card-grid">
                     {companionOptions.map((option) => (
                         <div
@@ -198,7 +202,7 @@ const Inquiry: React.FC = () => {
                 </div>
             </QuestionContainer>
 
-            <QuestionContainer label="Какой вид транспорта вы предпочитаете?">
+            <QuestionContainer label={t("preferredTransport")}>
                 <div className="card-grid">
                     {transportOptions.map((option) => (
                         <div
@@ -214,7 +218,7 @@ const Inquiry: React.FC = () => {
             </QuestionContainer>
 
             {/* Бюджет */}
-            <QuestionContainer label="Каков ваш бюджет на путешествие?">
+            <QuestionContainer label={t("budget")}>
                 <div className="card-grid">
                     {budgetOptions.map((option) => (
                         <div
@@ -230,7 +234,7 @@ const Inquiry: React.FC = () => {
             </QuestionContainer>
 
             {/* Куда */}
-            <QuestionContainer label="Куда вы хотите поехать?">
+            <QuestionContainer label={t("destination")}>
                 <div className="card-grid">
                     {regionOptions.map((option) => (
                         <div
@@ -246,7 +250,7 @@ const Inquiry: React.FC = () => {
             </QuestionContainer>
 
             {/* Вопрос о предпочтениях */}
-            <QuestionContainer label="Какие направления и условия отдыха вас интересуют?">
+            <QuestionContainer label={t("preferences")}>
                 <div className="card-grid">
                     {preferencesOptions.map((option) => (
                         <div
@@ -262,7 +266,7 @@ const Inquiry: React.FC = () => {
             </QuestionContainer>
 
             {/* Сезон */}
-            <QuestionContainer label="Когда вы планируете путешествовать?">
+            <QuestionContainer label={t("travelSeason")}>
                 <div className="card-grid">
                     {seasonOptions.map((option) => (
                         <div
@@ -278,7 +282,7 @@ const Inquiry: React.FC = () => {
             </QuestionContainer>
 
             {/* Вопрос о продолжительности */}
-            <QuestionContainer label="Какова продолжительность вашей поездки?">
+            <QuestionContainer label={t("travelDuration")}>
                 <div className="card-grid">
                     {durationOptions.map((option) => (
                         <div
@@ -293,34 +297,34 @@ const Inquiry: React.FC = () => {
             </QuestionContainer>
 
             {/* Вопрос: Откуда вы начнете путешествие? */}
-            <QuestionContainer label="Откуда вы начнете путешествие?">
+            <QuestionContainer label={t("departureLocation")}>
                 <input
                     type="text"
                     name="locationFrom"
                     value={formData.locationFrom}
                     onChange={handleChange}
                     maxLength={25} // Ограничение на количество символов
-                    placeholder="Введите ваш город"
+                    placeholder={t("enterYourCity")}
                     className="text-input"
                 />
             </QuestionContainer>
 
             {/* Дополнительные предпочтения */}
-            <QuestionContainer label="Есть ли у вас дополнительные предпочтения?">
+            <QuestionContainer label={t("additionalPreferences")}>
                 <input
                     type="text"
                     name="additionalPreferences"
                     value={formData.additionalPreferences}
                     onChange={handleChange}
                     maxLength={50} // Ограничение на количество символов
-                    placeholder="Напишите любые дополнительные детали"
+                    placeholder={t("writeAdditionalDetails")}
                     className="text-input"
                 />
             </QuestionContainer>
 
             {/* Кнопка отправки */}
             <button className="button" type="submit" onClick={handleSubmit}>
-                Отправить
+                {t("submit")}
             </button>
         </MainContainer>
     );

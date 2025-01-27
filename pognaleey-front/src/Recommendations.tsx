@@ -8,11 +8,13 @@ import apiClient from "./apiClient";
 import PencilLoader from "./PencilLoader";
 import ModalImage from "./ModalImage";
 import {ImageDto} from "./ImageDto";
+import {useTranslation} from "react-i18next";
 
 // TODO: Исправить прыгающий размер и элементы
 const Recommendations: React.FC = () => {
     const navigate = useNavigate();
     const location = useLocation();
+    const {t} = useTranslation();
 
     const searchParams = new URLSearchParams(location.search);
     const inquiryId = searchParams.get("inquiryId");
@@ -86,11 +88,11 @@ const Recommendations: React.FC = () => {
                             {recommendation.details ? (
                                 <>
                                     <p>
-                                        <strong>Почему подходит:</strong>{" "}
+                                        <strong>{t("whyItFits")}</strong>{" "}
                                         {recommendation.details.reasoning}
                                     </p>
                                     <p>
-                                        <strong>Описание:</strong>{" "}
+                                        <strong>{t("description")}</strong>{" "}
                                         {recommendation.details.description}
                                     </p>
                                 </>
@@ -104,8 +106,8 @@ const Recommendations: React.FC = () => {
                                 }
                             >
                                 {recommendation.guideId
-                                    ? "Перейти на гайд"
-                                    : "Сгенерировать гайд"}
+                                    ? t("goToGuide")
+                                    : t("generateGuide")}
                             </button>)}
                         </div>
                     </div>

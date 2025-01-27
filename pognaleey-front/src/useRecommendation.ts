@@ -1,5 +1,6 @@
 import usePolling from "./usePolling";
 import {ImageDto} from "./ImageDto";
+import {useTranslation} from "react-i18next";
 
 interface Recommendation {
     id: number;
@@ -14,6 +15,8 @@ interface Recommendation {
 }
 
 const useRecommendations = (inquiryId: string | null, timeout: number = 30000) => {
+    const {t} = useTranslation();
+
     const mergeRecommendations = (
         prevRecommendations: Recommendation[],
         newRecommendations: Recommendation[]
@@ -29,7 +32,7 @@ const useRecommendations = (inquiryId: string | null, timeout: number = 30000) =
         recommendations: Recommendation[]
     ): void => {
         if (recommendations.length === 0) {
-            throw new Error(`Рекомендации не найдены.`);
+            throw new Error(t("recommendationsNotFound"));
         }
 
         if (recommendations.every((rec) => rec.status === "FAILED")) {

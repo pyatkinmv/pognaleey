@@ -5,6 +5,7 @@ import {AppProvider} from "./AppContext";
 import './index.css';
 import {BrowserRouter as Router} from "react-router-dom"; // Перемещаем сюда Router
 import reportWebVitals from './reportWebVitals';
+import './i18n'; // Импортируем и инициализируем i18next
 
 const root = ReactDOM.createRoot(
     document.getElementById('root') as HTMLElement

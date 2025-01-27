@@ -5,8 +5,11 @@ import Guide from "./Guide";
 import React from "react";
 import Main from "./Main";
 import Inquiry from "./Inquiry";
+import {useTranslation} from "react-i18next";
 
 const AppRouter: React.FC = () => {
+    const {t} = useTranslation();
+
     return (
         <Routes>
             <Route
@@ -48,9 +51,9 @@ const AppRouter: React.FC = () => {
                 element={
                     <div style={{textAlign: "center", marginTop: "20vh"}}>
                         <h1>404</h1>
-                        <p>Страница не найдена</p>
+                        <p>{t("pageNotFound")}</p>
                         <a href="/" style={{color: "#4caf50", textDecoration: "none"}}>
-                            Вернуться на главную
+                            {t("backToHome")}
                         </a>
                     </div>
                 }

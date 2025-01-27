@@ -3,19 +3,21 @@ import {useAppContext} from "./AppContext";
 import DropdownMenu from "./DropdownMenu";
 import "./Header.css";
 import LoginPopup from "./LoginPopup";
+import {useTranslation} from "react-i18next";
 
 const Header: React.FC = () => {
     const {user, language, languages, handleLogout, handleLanguageChange} = useAppContext();
     const [showLoginPopup, setShowLoginPopup] = useState<boolean>(false);
+    const {t} = useTranslation();
 
     const currentLanguage = languages.find((lang) => lang.code === language);
 
     return (
         <header className="header">
-            <img src="/logo-circle192.png" alt="Логотип" className="logo"/>
+            <img src="/logo-circle192.png" alt={t("logoAlt")} className="logo"/>
             <nav className="navbar">
-                <a href="/" className="nav-link">Главная</a>
-                <a href="https://t.me/pyatkinmv" className="nav-link">Контакты</a>
+                <a href="/" className="nav-link">{t("home")}</a>
+                <a href="https://t.me/pyatkinmv" className="nav-link">{t("contacts")}</a>
                 <DropdownMenu
                     label={
                         <>
@@ -50,13 +52,13 @@ const Header: React.FC = () => {
                             }
                             items={[
                                 {
-                                    label: "Выйти",
+                                    label: t("logout"),
                                     onClick: handleLogout,
                                 },
                             ]}
                         />
                     ) : (
-                        <a className="nav-link" onClick={() => setShowLoginPopup(true)}>🔒 Войти</a>
+                        <a className="nav-link" onClick={() => setShowLoginPopup(true)}>{t("loginHeader")}</a>
                     )}
                 </div>
             </nav>

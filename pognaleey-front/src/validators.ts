@@ -1,31 +1,19 @@
-// validators.ts
-
-export const validateUsername = (username: string): string | null => {
+export const validateUsername = (username: string, t: (key: string) => string): string | null => {
     if (!username) {
-        return "Имя пользователя обязательно.";
+        return t("usernameRequired");
     } else if (!/^[a-zA-Z0-9._-]+$/.test(username)) {
-        return "Имя пользователя может содержать только буквы, цифры, точки, дефисы и подчёркивания.";
+        return t("usernameInvalid");
     } else if (username.length < 3 || username.length > 20) {
-        return "Имя пользователя должно быть от 3 до 20 символов.";
+        return t("usernameLength");
     }
     return null; // Если ошибок нет
 };
 
-export const validatePassword = (password: string): string | null => {
+export const validatePassword = (password: string, t: (key: string) => string): string | null => {
     if (!password) {
-        return "Пароль обязателен.";
+        return t("passwordRequired");
     } else if (password.length < 3 || password.length > 20) {
-        return "Пароль должен быть от 3 до 20 символов.";
-    }
-    return null; // Если ошибок нет
-};
-
-export const validateConfirmPassword = (
-    password: string,
-    confirmPassword: string
-): string | null => {
-    if (password !== confirmPassword) {
-        return "Пароли не совпадают.";
+        return t("passwordLength");
     }
     return null; // Если ошибок нет
 };

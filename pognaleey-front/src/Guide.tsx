@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from "react";
-import {useNavigate, useParams} from "react-router-dom";
+import {useParams} from "react-router-dom";
 import ReactMarkdown from "react-markdown";
 import rehypeRaw from "rehype-raw";
 import apiClient from "./apiClient";
@@ -15,6 +15,7 @@ import CircleLoader from "./CircleLoader";
 import ModalImage from "./ModalImage";
 import {ImageDto} from "./ImageDto";
 import ImageCaption from "./ImageCaption";
+import {useTranslation} from "react-i18next";
 
 interface UserDto {
     id: number;
@@ -48,7 +49,7 @@ const Guide: React.FC = () => {
     const [loadingGuide, setLoadingGuide] = useState(true);
     const [errorGuide, setErrorGuide] = useState<string | null>(null);
     const [showLoginPopup, setShowLoginPopup] = useState(false);
-    const navigate = useNavigate();
+    const {t} = useTranslation();
 
     const {contentItems, isLoading: loadingContent, error: errorContent} = useGuideContent(guideId!); // Используем хук
 
@@ -99,11 +100,11 @@ const Guide: React.FC = () => {
     }
 
     if (errorGuide) {
-        return <div className="error">Ошибка: {errorGuide}</div>;
+        return <div className="error">{t("error")} {errorGuide}</div>;
     }
 
     if (!guide) {
-        return <div className="not-found">Гид не найден.</div>;
+        return <div className="not-found">{t("guideNotFound")}</div>;
     }
 
     const handlePdfDownload = async () => {
@@ -150,15 +151,15 @@ const Guide: React.FC = () => {
                             {guide.totalLikes}
                         </div>
                         <button className="download-pdf-button" onClick={() => handlePdfDownload()}>
-                            Скачать PDF 💾
+                            {t("downloadPdf")}
                         </button>
-                        <p className="owner">Владелец: {guide.owner?.username || "Неизвестно"}</p>
-                        <p className="created-at">Дата создания: {formatDate(guide.createdAt)}</p>
+                        {guide.owner && <p className="owner"> {t("owner")} {guide.owner?.username || t("unknown")}</p>}
+                        <p className="created-at">{t("createdAt")}: {formatDate(guide.createdAt)}</p>
                     </div>)}
             </div>
 
             <div className="guide-details">
-                {errorContent && <div className="error">Ошибка: {errorContent}</div>}
+                {errorContent && <div className="error">{t("error")} {errorContent}</div>}
                 {contentItems.map((item) =>
                     <div key={item.id} className="content-item">
                         {item.type === "MARKDOWN" && (
@@ -178,10 +179,7 @@ const Guide: React.FC = () => {
                     alt="AI Logo"
                     className="footer-ai-logo"
                 />
-                <p>
-                    Этот текст сгенерирован с использованием Искусственного Интеллекта. Мы рекомендуем проверять
-                    факты и информацию перед принятием решений на основе прочитанного.
-                </p>
+                <p>{t("aiGeneratedText")}</p>
             </footer>
             {
                 showLoginPopup && (

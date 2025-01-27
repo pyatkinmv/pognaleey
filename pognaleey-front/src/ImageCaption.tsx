@@ -1,5 +1,6 @@
 import React from "react";
 import "./ImageCaption.css";
+import {useTranslation} from "react-i18next";
 
 interface ImageCaptionProps {
     aiGenerated?: boolean;
@@ -16,11 +17,13 @@ const ImageCaption: React.FC<ImageCaptionProps> = ({
                                                        licenceUrl,
                                                        className,
                                                    }) => {
+    const {t} = useTranslation();
+
     return (
         <div className={`${className}`.trim()}>
             {aiGenerated ? (
                 <span>
-                    <>Сгенерировано нейросетью </>
+                    <>{t("aiGenerated")} </>
                     {authorName && authorUrl && (
                         <>
                             <a href={authorUrl}>{authorName}</a>
@@ -31,13 +34,13 @@ const ImageCaption: React.FC<ImageCaptionProps> = ({
                 <>
                     {authorName && authorUrl && (
                         <span>
-                            Автор: <a href={authorUrl}>{authorName}</a>
+                            {t("author")} <a href={authorUrl}>{authorName}</a>
                         </span>
                     )}
                     {licenceUrl && (
                         <>
                             {authorName && authorUrl && "; "}
-                            <a href={licenceUrl}>Лицензия</a>
+                            <a href={licenceUrl}>{t("license")}</a>
                         </>
                     )}
                 </>

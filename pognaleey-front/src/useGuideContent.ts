@@ -1,4 +1,5 @@
 import usePolling from "./usePolling";
+import {useTranslation} from "react-i18next";
 
 interface ContentItem {
     id: number;
@@ -10,6 +11,8 @@ interface ContentItem {
 }
 
 const useGuideContent = (guideId: string | null, timeout: number = 30000) => {
+    const {t} = useTranslation();
+
     const mergeContentItems = (
         prevContentItems: ContentItem[],
         newContentItems: ContentItem[]
@@ -25,7 +28,7 @@ const useGuideContent = (guideId: string | null, timeout: number = 30000) => {
         newContentItems: ContentItem[]
     ): void => {
         if (newContentItems.length === 0) {
-            throw new Error(`Рекомендации не найдены.`);
+            throw new Error(t("recommendationsNotFound"));
         }
 
         if (newContentItems.every((rec) => rec.status === "FAILED")) {

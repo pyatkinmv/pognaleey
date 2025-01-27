@@ -1,4 +1,5 @@
 import apiClient from "./apiClient";
+import {useTranslation} from "react-i18next";
 
 interface LikeResponse {
     guideId: number;
@@ -7,6 +8,8 @@ interface LikeResponse {
 }
 
 export const useLikeHandler = (showLoginPopup: () => void) => {
+    const {t} = useTranslation();
+
     const handleLike = async (
         id: number,
         isCurrentlyLiked: boolean,
@@ -28,7 +31,7 @@ export const useLikeHandler = (showLoginPopup: () => void) => {
             });
 
             if (!response.ok) {
-                throw new Error("Ошибка при обработке лайка");
+                throw new Error(t("likeError"));
             }
 
             const {guideId, isLiked, totalLikes} = await response.json();

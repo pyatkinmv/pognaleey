@@ -1,6 +1,7 @@
 import React, {useState} from "react";
 import {jwtDecode} from "jwt-decode";
 import LoginPopup from "./LoginPopup";
+import {useTranslation} from "react-i18next";
 
 interface PrivateRouteProps {
     children: React.ReactNode;
@@ -24,12 +25,13 @@ const isTokenExpired = (token: string): boolean => {
 const PrivateRoute: React.FC<PrivateRouteProps> = ({children}) => {
     const token = localStorage.getItem("jwtToken");
     const [showLoginPopup, setShowLoginPopup] = useState(false);
+    const {t} = useTranslation();
 
     if (token && isTokenExpired(token)) {
         localStorage.removeItem("jwtToken"); // Удаляем истёкший или отсутствующий токен
 
         if (!showLoginPopup) {
-            alert("Ваша сессия истекла. Пожалуйста, войдите снова.");
+            alert(t("sessionExpired"));
             setShowLoginPopup(true);
         }
     }
