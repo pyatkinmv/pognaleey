@@ -103,7 +103,7 @@ const Main: React.FC = () => {
 
     return (
         <MainContainer>
-            <Header/>
+            <Header onLanguageChange={() => loadTiles(selectedFilter, true)}/>
             <div className="image-container">
                 <img src="/main.webp" alt="Main Banner" className="banner-image"/>
                 <div className="banner-text">{t('bannerText1')}<br/>{t('bannerText2')}</div>

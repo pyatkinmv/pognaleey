@@ -5,12 +5,23 @@ import "./Header.css";
 import LoginPopup from "./LoginPopup";
 import {useTranslation} from "react-i18next";
 
-const Header: React.FC = () => {
+interface HeaderProps {
+    onLanguageChange?: () => void; // Новый пропс для перезагрузки контента
+}
+
+const Header: React.FC<HeaderProps> = ({onLanguageChange}) => {
     const {user, language, languages, handleLogout, handleLanguageChange} = useAppContext();
     const [showLoginPopup, setShowLoginPopup] = useState<boolean>(false);
     const {t} = useTranslation();
 
     const currentLanguage = languages.find((lang) => lang.code === language);
+
+    const handleLanguageSwitch = (langCode: string) => {
+        handleLanguageChange(langCode); // Смена языка в контексте
+        if (onLanguageChange) {
+            onLanguageChange(); // Вызываем перезагрузку контента
+        }
+    };
 
     return (
         <header className="header">
@@ -31,7 +42,7 @@ const Header: React.FC = () => {
                     }
                     items={languages.map((lang) => ({
                         label: lang.label,
-                        onClick: () => handleLanguageChange(lang.code),
+                        onClick: () => handleLanguageSwitch(lang.code),
                         icon: (
                             <img
                                 src={`/flags/${lang.code}.svg`}
