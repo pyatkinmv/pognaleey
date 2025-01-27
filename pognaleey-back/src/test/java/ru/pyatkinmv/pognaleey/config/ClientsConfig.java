@@ -1,5 +1,6 @@
 package ru.pyatkinmv.pognaleey.config;
 
+import org.mockito.ArgumentMatchers;
 import org.mockito.Mockito;
 import org.mockito.stubbing.Answer;
 import org.springframework.context.annotation.Bean;
@@ -50,16 +51,29 @@ public class ClientsConfig {
                 text3
                 {Башня Сююмбике}
                 """;
-//        when(gptHttpClientMock.ask(ArgumentMatchers.contains(QUICK_PROMPT_FORMAT.substring(0, 14))))
-//                .thenReturn(shortRecommendationRaw);
-//        when(gptHttpClientMock.ask(ArgumentMatchers.contains(DETAILED_PROMPT_FORMAT.substring(0, 14))))
-//                .thenReturn(detailedRecommendationRaw);
-//        when(gptHttpClientMock.ask(ArgumentMatchers.contains(GUIDE_IMAGES_PROMPT_FORMAT.substring(0, 14))))
-//                .thenReturn(guideImagesRaw);
-//        when(gptHttpClientMock.ask(ArgumentMatchers.contains(GUIDE_PROMPT_FORMAT.substring(0, 14))))
-//                .thenReturn(guideRaw);
-//        when(gptHttpClientMock.ask(ArgumentMatchers.contains(GUIDE_VISUAL_PROMPT_FORMAT.substring(0, 14))))
-//                .thenReturn(sightseeingRaw);
+        var practicalTopic = "### Практическая тема\n...";
+        var practicalTopics = "Бюджет|Риски|Виза|Как добраться|Отели";
+        String intro = "## Введение\n...";
+        String conclusion = "## Заключение\n...";
+
+        when(gptHttpClientMock.ask(ArgumentMatchers.matches(".*Придумай мне.*вариантов путешествий.*")))
+                .thenReturn(shortRecommendationRaw);
+        when(gptHttpClientMock.ask(ArgumentMatchers.matches(".*Дай мне.*подробное описание в формате JSON.*")))
+                .thenReturn(detailedRecommendationRaw);
+        when(gptHttpClientMock.ask(ArgumentMatchers.matches(".*Предложи мне список.*запросов.*красивые картинки.*")))
+                .thenReturn(guideImagesRaw);
+        when(gptHttpClientMock.ask(ArgumentMatchers.matches(".*Напиши увлекательную, полезную статью.*")))
+                .thenReturn(guideRaw);
+        when(gptHttpClientMock.ask(ArgumentMatchers.matches(".*Напиши часть статьи.*относится к.*достопримечательностям.*")))
+                .thenReturn(sightseeingRaw);
+        when(gptHttpClientMock.ask(ArgumentMatchers.matches(".*заголовки.*к практической части статьи.*")))
+                .thenReturn(practicalTopics);
+        when(gptHttpClientMock.ask(ArgumentMatchers.matches(".*Сгенерируй мне текст по одной из тем.*")))
+                .thenReturn(practicalTopic);
+        when(gptHttpClientMock.ask(ArgumentMatchers.matches(".*Напиши введение.*")))
+                .thenReturn(intro);
+        when(gptHttpClientMock.ask(ArgumentMatchers.matches(".*Напиши заключение.*")))
+                .thenReturn(conclusion);
 
         return gptHttpClientMock;
     }

@@ -24,7 +24,7 @@ public class PromptService {
         return messageSource.getMessage(
                 "prompts.guide_intro",
                 new Object[]{guideTitle, inquiryParams},
-                LanguageContextHolder.getLanguageLocale()
+                LanguageContextHolder.getLanguageLocaleOrDefault()
         );
     }
 
@@ -32,7 +32,7 @@ public class PromptService {
         return messageSource.getMessage(
                 "prompts.guide_practical_topics",
                 new Object[]{guideTitle, inquiryParams, GUIDE_PRACTICAL_TITLES_COUNT},
-                LanguageContextHolder.getLanguageLocale()
+                LanguageContextHolder.getLanguageLocaleOrDefault()
         );
     }
 
@@ -40,7 +40,7 @@ public class PromptService {
         return messageSource.getMessage(
                 "prompts.guide_generate_for_one_topic_from_list",
                 new Object[]{guideTitle, inquiryParams, allTitles, practicalTitle},
-                LanguageContextHolder.getLanguageLocale()
+                LanguageContextHolder.getLanguageLocaleOrDefault()
         );
     }
 
@@ -48,7 +48,7 @@ public class PromptService {
         return messageSource.getMessage(
                 "prompts.guide_generate_attractions_part",
                 new Object[]{guideTitle, inquiryParams, GUIDE_PRACTICAL_TITLES_COUNT, guideVisualTopics},
-                LanguageContextHolder.getLanguageLocale()
+                LanguageContextHolder.getLanguageLocaleOrDefault()
         );
     }
 
@@ -56,7 +56,7 @@ public class PromptService {
         return messageSource.getMessage(
                 "prompts.guide_conclusion",
                 new Object[]{guideTitle, inquiryParams},
-                LanguageContextHolder.getLanguageLocale()
+                LanguageContextHolder.getLanguageLocaleOrDefault()
         );
     }
 
@@ -64,7 +64,7 @@ public class PromptService {
         return messageSource.getMessage(
                 "prompts.generate_ideas",
                 new Object[]{optionsNumber, inquiryParams},
-                LanguageContextHolder.getLanguageLocale()
+                LanguageContextHolder.getLanguageLocaleOrDefault()
         );
     }
 
@@ -74,7 +74,7 @@ public class PromptService {
         return messageSource.getMessage(
                 "prompts.recommendations_details",
                 new Object[]{recommendationsStr, inquiryParams, Utils.toJson(DETAILED_PROMPT_OBJ)},
-                LanguageContextHolder.getLanguageLocale()
+                LanguageContextHolder.getLanguageLocaleOrDefault()
         );
     }
 
@@ -86,7 +86,7 @@ public class PromptService {
         return messageSource.getMessage(
                 "prompts.generate_guide_images",
                 new Object[]{guideTitle, inquiryParams, GUIDE_PRACTICAL_TITLES_COUNT},
-                LanguageContextHolder.getLanguageLocale()
+                LanguageContextHolder.getLanguageLocaleOrDefault()
         );
     }
 
@@ -94,7 +94,7 @@ public class PromptService {
         return messageSource.getMessage(
                 "prompts.generate_full_guide_deprecated",
                 new Object[]{title, inquiryParams, GUIDE_PRACTICAL_TITLES_COUNT, guideTopics, GUIDE_PRACTICAL_TITLES_COUNT},
-                LanguageContextHolder.getLanguageLocale()
+                LanguageContextHolder.getLanguageLocaleOrDefault()
         );
     }
 }

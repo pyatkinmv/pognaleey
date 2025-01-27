@@ -1,9 +1,12 @@
 package ru.pyatkinmv.pognaleey.service;
 
+import lombok.extern.slf4j.Slf4j;
 import ru.pyatkinmv.pognaleey.model.Language;
 
 import java.util.Locale;
+import java.util.Optional;
 
+@Slf4j
 public class LanguageContextHolder {
 
     private static final ThreadLocal<Language> localeThreadLocal = new InheritableThreadLocal<>();
@@ -12,12 +15,13 @@ public class LanguageContextHolder {
         localeThreadLocal.set(language);
     }
 
-    public static Language getLanguage() {
-        return localeThreadLocal.get();
+    public static Language getLanguageOrDefault() {
+        return Optional.ofNullable(localeThreadLocal.get())
+                .orElseGet(Language::getDefault);
     }
 
-    public static Locale getLanguageLocale() {
-        return Locale.forLanguageTag(getLanguage().name());
+    public static Locale getLanguageLocaleOrDefault() {
+        return Locale.forLanguageTag(getLanguageOrDefault().name());
     }
 
     public static void clear() {

@@ -288,7 +288,7 @@ public class TravelGuideContentProviderV2 extends TravelGuideContentProvider {
     @Nullable
     private String initialContent(GuideStructureType type, Object... objects) {
         return Optional.ofNullable(type.initialContentFormat)
-                .map(it -> messageSource.getMessage(it, objects, LanguageContextHolder.getLanguageLocale()))
+                .map(it -> messageSource.getMessage(it, objects, LanguageContextHolder.getLanguageLocaleOrDefault()))
                 .orElse(null);
     }
 
