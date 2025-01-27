@@ -34,6 +34,8 @@ public interface TravelGuideRepository extends CrudRepository<TravelGuide, Long>
 
     List<TravelGuide> findAllByIdIn(Collection<Long> ids);
 
+    long countAllByLanguage(String language);
+
     @Query(value = """
             SELECT g.id AS guideId, COUNT(gl.id) AS likesCount
             FROM travel_guides g

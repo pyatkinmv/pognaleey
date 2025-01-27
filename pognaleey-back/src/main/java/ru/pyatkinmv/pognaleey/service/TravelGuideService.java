@@ -130,10 +130,11 @@ public class TravelGuideService {
 
     public Page<TravelGuideInfoDto> getFeedGuides(Pageable pageable) {
         var offset = pageable.getPageSize() * pageable.getPageNumber();
-        var topGuideIdToLikeCountMap = guideRepository.findTopGuides(null,
-                LanguageContextHolder.getLanguage().name(), pageable.getPageSize(), offset);
+        var language = LanguageContextHolder.getLanguage().name();
+        var topGuideIdToLikeCountMap = guideRepository.findTopGuides(null, language,
+                pageable.getPageSize(), offset);
         var topGuides = guideRepository.findAllByIdIn(topGuideIdToLikeCountMap.keySet());
-        var totalCount = guideRepository.count();
+        var totalCount = guideRepository.countAllByLanguage(language);
         var users = findUsersByGuides(topGuides);
         var currentUserLikedGuidesIds = getCurrentUser()
                 .map(it -> likeService.findGuidesIdsByUserId(it.getId(), Integer.MAX_VALUE, 0))
