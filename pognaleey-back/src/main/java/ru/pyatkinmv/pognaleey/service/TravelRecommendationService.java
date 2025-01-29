@@ -139,6 +139,17 @@ public class TravelRecommendationService {
         );
     }
 
+    void enrichWithImages(List<TravelRecommendation> recommendations,
+                          List<TitleAndImageQuery> titleAndImageQueries) {
+        var titleToImageQuery = titleAndImageQueries.stream()
+                .collect(Collectors.toMap(TitleAndImageQuery::title, TitleAndImageQuery::imageQuery));
+        log.info("begin enrichWithImages for recommendations {}", recommendations);
+        recommendations.forEach(
+                it -> searchAndSaveImageAndUpdateStatus(it, titleToImageQuery.get(it.getTitle())
+                )
+        );
+    }
+
     private void enrichWithDetails(TravelRecommendation recommendation, String inquiryParams) {
         log.info("begin enrichWithDetails for recommendation: {}", recommendation.getId());
 
@@ -166,22 +177,20 @@ public class TravelRecommendationService {
     @SneakyThrows
     private void searchAndSaveImageAndUpdateStatus(TravelRecommendation recommendation, String imageQuery) {
         try {
-            var image = imageService.searchImageAndSave(recommendation.getTitle(), imageQuery);
+            var image = imageService.searchImage(recommendation.getTitle(), imageQuery)
+                    .orElseGet(() -> ImageDto.withoutUrls(recommendation.getTitle(), imageQuery));
 
-            if (image.isPresent()) {
-                log.info("Update image {} for recommendation {}", image.get(), recommendation.getId());
-            } else {
-                log.warn("Not found image url for recommendation {}, searchQuery {}, set failed status",
-                        recommendation.getId(), imageQuery);
+            if (image.isWithoutUrls()) {
+                log.warn("Not found image url for recommendation {}, searchQuery {}", recommendation.getId(), imageQuery);
             }
-            var imageId = image.map(ImageDto::id).orElse(null);
+
+            var imageId = imageService.saveImage(image).id();
             recommendationRepository.updateImageIdAndStatus(recommendation.getId(), imageId);
         } catch (Exception e) {
             log.error("Couldn't searchAndSaveImageAndUpdateStatus for recommendation {}, set failed status",
                     recommendation.getId(), e);
             recommendationRepository.setStatus(recommendation.getId(), ProcessingStatus.FAILED.name());
         }
-
     }
 
     public TravelRecommendation findById(long recommendationId) {

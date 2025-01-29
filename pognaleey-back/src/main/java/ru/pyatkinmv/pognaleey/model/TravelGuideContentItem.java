@@ -19,6 +19,7 @@ public class TravelGuideContentItem {
 
     private Long guideId;
 
+    // TODO: add docs
     @Nullable
     private String content;
 

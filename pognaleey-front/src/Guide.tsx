@@ -167,7 +167,7 @@ const Guide: React.FC = () => {
                                 {item.content || ""}
                             </ReactMarkdown>
                         )}
-                        {item.type === "IMAGE" && renderImage(JSON.parse(item.content))}
+                        {item.type === "IMAGE" && item.content && renderImage(JSON.parse(item.content))}
                         {item.status === "IN_PROGRESS" && <PencilLoader/>}
 
                     </div>

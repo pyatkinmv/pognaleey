@@ -21,7 +21,9 @@ public class Image {
 
     private Instant createdAt;
     private String title;
+    @Nullable
     private String url;
+    @Nullable
     private String thumbnailUrl;
     private String query;
     private Boolean aiGenerated;

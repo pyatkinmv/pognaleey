@@ -21,9 +21,9 @@ public abstract class TravelGuideContentProvider {
                                                                              String initialTitle,
                                                                              Long imageId);
 
-    List<ImageDto> searchAndSaveImages(List<GptAnswerResolveHelper.SearchableItem> searchableItems) {
+    List<ImageDto> searchImages(List<GptAnswerResolveHelper.SearchableItem> searchableItems) {
         return searchableItems.stream()
-                .map(it -> imageService.searchImageAndSave(it.title(), it.imageSearchPhrase()))
+                .map(it -> imageService.searchImage(it.title(), it.imageSearchPhrase()))
                 .filter(Optional::isPresent)
                 .map(Optional::get)
                 .toList();

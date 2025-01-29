@@ -8,6 +8,7 @@ import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
+import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.web.client.RestTemplate;
 import ru.pyatkinmv.pognaleey.client.*;
 import ru.pyatkinmv.pognaleey.dto.FlickrImagesResponseDto;
@@ -20,6 +21,7 @@ import java.util.concurrent.Executors;
 
 @Slf4j
 @Configuration
+@EnableScheduling
 public class AppConfig {
 
     @Bean
@@ -110,5 +112,10 @@ public class AppConfig {
                 folderId,
                 baseUrl
         );
+    }
+
+    @Bean
+    public KandinskyImageGenerateHttpClient kandinskyImageGenerateHttpClient(@Autowired RestTemplate restTemplate) {
+        return new KandinskyImageGenerateHttpClient(restTemplate);
     }
 }

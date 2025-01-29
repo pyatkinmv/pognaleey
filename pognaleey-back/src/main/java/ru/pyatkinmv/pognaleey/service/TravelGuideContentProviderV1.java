@@ -126,7 +126,7 @@ public class TravelGuideContentProviderV1 extends TravelGuideContentProvider {
             var imagesGuideResponseRaw = gptHttpClient.ask(guideImagesPrompt);
             var searchableGuideItems = parseSearchableItems(imagesGuideResponseRaw);
 
-            var result = executorService.submit(() -> searchAndSaveImages(searchableGuideItems));
+            var result = executorService.submit(() -> searchImages(searchableGuideItems));
 
             var createGuidePrompt = generateGuidePrompt(recommendationTitle, inquiry.getParams(), searchableGuideItems);
             var guideContentRaw = gptHttpClient.ask(createGuidePrompt);

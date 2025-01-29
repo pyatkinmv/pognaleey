@@ -7,16 +7,12 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import ru.pyatkinmv.pognaleey.dto.ImageDto;
-import ru.pyatkinmv.pognaleey.dto.TravelGuideContentDto;
-import ru.pyatkinmv.pognaleey.dto.TravelGuideInfoDto;
-import ru.pyatkinmv.pognaleey.dto.TravelGuideLikeDto;
+import ru.pyatkinmv.pognaleey.dto.*;
 import ru.pyatkinmv.pognaleey.mapper.TravelMapper;
-import ru.pyatkinmv.pognaleey.model.TravelGuide;
-import ru.pyatkinmv.pognaleey.model.TravelGuideLike;
-import ru.pyatkinmv.pognaleey.model.User;
+import ru.pyatkinmv.pognaleey.model.*;
 import ru.pyatkinmv.pognaleey.repository.TravelGuideContentItemRepository;
 import ru.pyatkinmv.pognaleey.repository.TravelGuideRepository;
+import ru.pyatkinmv.pognaleey.util.Utils;
 
 import java.time.Instant;
 import java.util.*;
@@ -164,6 +160,10 @@ public class TravelGuideService {
         return userService.findUsersByIds(usersIds);
     }
 
+    private static Long extractImageId(TravelGuideContentItem contentItem) {
+        return Utils.toObject(contentItem.getContent(), ImageIdDto.class).imageId();
+    }
+
     public TravelGuideInfoDto createGuide(long recommendationId) {
         log.info("begin createGuide for recommendation: {}", recommendationId);
         var user = getCurrentUser().orElse(null);
@@ -178,6 +178,7 @@ public class TravelGuideService {
                         .language(LanguageContextHolder.getLanguageOrDefault())
                         .build()
         );
+        // TODO: image везде есть, но на фронт нулевой не передаем
 
         var guideContentItems = guideContentProvider.createBlueprintContentItems(
                 guide.getId(),
@@ -202,6 +203,21 @@ public class TravelGuideService {
 
     @SneakyThrows
     public TravelGuideContentDto getGuideContent(long guideId) {
-        return TravelMapper.toGuideContentDto(guideContentItemRepository.findByGuideId(guideId));
+        List<TravelGuideContentItem> contentItems = guideContentItemRepository.findByGuideId(guideId);
+        var guideIdToImageIdMap = contentItems.stream()
+                .filter(it -> it.getType() == GuideContentItemType.IMAGE)
+                .collect(Collectors.toMap(
+                        TravelGuideContentItem::getId,
+                        TravelGuideService::extractImageId)
+                );
+        var imageIdToImageMap = imageService.findAll(guideIdToImageIdMap.values())
+                .stream()
+                .collect(Collectors.toMap(ImageDto::id, it -> it));
+        var guideIdToImageMap = guideIdToImageIdMap.entrySet().stream()
+                .collect(Collectors.toMap(
+                        Map.Entry::getKey,
+                        it -> imageIdToImageMap.get(it.getValue())));
+
+        return TravelMapper.toGuideContentDto(contentItems, guideIdToImageMap);
     }
 }

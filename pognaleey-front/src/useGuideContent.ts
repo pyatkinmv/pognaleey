@@ -5,7 +5,7 @@ interface ContentItem {
     id: number;
     guideId: number;
     ordinal: number;
-    content: string;
+    content?: string;
     status: "READY" | "IN_PROGRESS" | "FAILED";
     type: "MARKDOWN" | "IMAGE";
 }

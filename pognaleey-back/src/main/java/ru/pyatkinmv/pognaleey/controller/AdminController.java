@@ -7,9 +7,13 @@ import org.springframework.lang.Nullable;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import ru.pyatkinmv.pognaleey.dto.ManualGuidesCreateDtoList;
+import ru.pyatkinmv.pognaleey.dto.TravelGuideInfoDto;
 import ru.pyatkinmv.pognaleey.security.AuthenticatedUserProvider;
 import ru.pyatkinmv.pognaleey.service.AdminService;
 import ru.pyatkinmv.pognaleey.service.AdminService.UploadImageDto;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/admin")
@@ -35,6 +39,21 @@ public class AdminController {
         }
 
         return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @PutMapping("/generateImageResourcesAsync/forNotFound")
+    public ResponseEntity<String> uploadResource() {
+        validateUser();
+        adminService.generateImageResourcesForNotFoundAsync();
+
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @PostMapping("/createGuides")
+    public List<TravelGuideInfoDto> createGuides(@RequestBody ManualGuidesCreateDtoList guideCreateDto) {
+        validateUser();
+
+        return adminService.createGuide(guideCreateDto);
     }
 
     // TODO: Add authorization

@@ -46,6 +46,7 @@ public class TravelMapper {
                 .orElse(null);
         var image = Optional.ofNullable(recommendation.getImageId())
                 .map(idToImageMap::get)
+                .filter(it -> !it.isWithoutUrls())
                 .orElse(null);
         var guideId = recommendationIdToGuideIdMap.get(recommendation.getId());
 
@@ -88,7 +89,7 @@ public class TravelMapper {
         return new TravelGuideInfoDto(
                 it.getId(),
                 it.getTitle(),
-                image,
+                Optional.ofNullable(image).filter(ImageDto::isWithUrls).orElse(null),
                 totalLikes,
                 currentUserLiked,
                 it.getCreatedAt().toEpochMilli(),
@@ -103,16 +104,33 @@ public class TravelMapper {
         return new UserDto(user.getId(), user.getUsername());
     }
 
-    public static TravelGuideContentDto toGuideContentDto(List<TravelGuideContentItem> items) {
+    public static TravelGuideContentDto toGuideContentDto(List<TravelGuideContentItem> items,
+                                                          Map<Long, ImageDto> guideIdToImageMap) {
         return new TravelGuideContentDto(
                 items.stream()
-                        .map(it -> new TravelGuideContentDto.TravelGuideContentItemDto(
-                                it.getId(), it.getGuideId(), it.getOrdinal(), it.getContent(), mapToApi(it.getStatus()),
-                                it.getType().name()
-                        ))
+                        .map(it -> map(it, guideIdToImageMap))
                         .sorted(Comparator.comparing(TravelGuideContentDto.TravelGuideContentItemDto::ordinal))
                         .toList()
         );
+    }
+
+    private static TravelGuideContentDto.TravelGuideContentItemDto map(TravelGuideContentItem item,
+                                                                       Map<Long, ImageDto> guideIdToImageMap) {
+        return new TravelGuideContentDto.TravelGuideContentItemDto(
+                item.getId(), item.getGuideId(), item.getOrdinal(),
+                extractContent(item, guideIdToImageMap.get(item.getId())),
+                mapToApi(item.getStatus()),
+                item.getType().name()
+        );
+    }
+
+    @Nullable
+    private static String extractContent(TravelGuideContentItem item, @Nullable ImageDto image) {
+        if (image != null && item.getType() == GuideContentItemType.IMAGE) {
+            return image.isWithUrls() ? Utils.toJson(image) : null;
+        } else {
+            return item.getContent();
+        }
     }
 
     public static Image toImage(ImageSearchClientImageDto dto, String title) {
@@ -130,6 +148,7 @@ public class TravelMapper {
                 image.getAiGenerated(), image.getLicenceUrl(), image.getAuthorName(), image.getAuthorUrl());
     }
 
+    // TODO: утащить все FAILED с фронта
     public static String mapToApi(ProcessingStatus status) {
         return switch (status) {
             case IN_PROGRESS, CONTENT_GENERATED, IMAGE_SEARCH_FINISHED -> ProcessingStatus.IN_PROGRESS.name();
