@@ -1,7 +1,7 @@
 import React, {useState} from "react";
 import "./LoginPopup.css";
-import {validatePassword, validateUsername} from "./validators";
-import {useAppContext} from "./AppContext";
+import {validatePassword, validateUsername} from "../../utils/validators";
+import {useAppContext} from "../../context/AppContext";
 import {useTranslation} from "react-i18next";
 
 interface LoginPopupProps {

@@ -1,9 +1,9 @@
 import React, {useState} from "react";
 import {useNavigate} from "react-router-dom"; // Для перехода между страницами
 import "./Inquiry.css";
-import apiClient from "./apiClient";
-import Header from "./Header";
-import MainContainer from "./MainContainer";
+import apiClient from "../../services/apiClient";
+import Header from "../../components/Header/Header";
+import MainContainer from "../../components/MainContainer/MainContainer";
 import {useTranslation} from "react-i18next";
 
 

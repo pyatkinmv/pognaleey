@@ -23,25 +23,24 @@ const ImageCaption: React.FC<ImageCaptionProps> = ({
         <div className={`${className}`.trim()}>
             {aiGenerated ? (
                 <span>
-                    {/*TODO: get back!*/}
-                    {/*<>{t("aiGenerated")} </>*/}
-                    {/*{authorName && authorUrl && (*/}
-                    {/*    <>*/}
-                    {/*        <a href={authorUrl}>{authorName}</a>*/}
-                    {/*    </>*/}
-                    {/*)}*/}
+                    <>{t("aiGenerated")} </>
+                    {authorName && authorUrl && (
+                        <>
+                            <a href={authorUrl}>{authorName}</a>
+                        </>
+                    )}
                 </span>
             ) : (
                 <>
                     {authorName && authorUrl && (
                         <span>
-                            {t("author")} {authorUrl}
+                            {t("author")} <a href={authorUrl}>{authorName}</a>
                         </span>
                     )}
                     {licenceUrl && (
                         <>
                             {authorName && authorUrl && "; "}
-                            {t("license")} {licenceUrl}
+                            <a href={licenceUrl}>{t("license")}</a>
                         </>
                     )}
                 </>

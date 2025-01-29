@@ -1,8 +1,8 @@
 import React from "react";
 import "./TileGrid.css";
 import {useNavigate} from "react-router-dom";
-import CircleLoader from "./CircleLoader";
-import {ImageDto} from "./ImageDto";
+import CircleLoader from "../loaders/CircleLoader/CircleLoader";
+import {ImageDto} from "../../types/ImageDto";
 
 interface Tile {
     id: number;
@@ -37,7 +37,7 @@ const TileGrid: React.FC<TileGridProps> = ({tiles, onLike, lastTileRef, isLoadin
                         {tile.image ? <img src={tile.image.thumbnailUrl} alt={tile.title} className="tile-image"/>
                             : (<img
                                 className="tile-image"
-                                src="/not-found512.png"
+                                src="/assets/images/not-found512.png"
                                 alt="Not Found"
                             />)
                         }

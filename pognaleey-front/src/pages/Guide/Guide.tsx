@@ -2,19 +2,19 @@ import React, {useEffect, useState} from "react";
 import {useParams} from "react-router-dom";
 import ReactMarkdown from "react-markdown";
 import rehypeRaw from "rehype-raw";
-import apiClient from "./apiClient";
+import apiClient from "../../services/apiClient";
 import "./Guide.css";
-import "./print.css";
-import Header from "./Header";
-import MainContainer from "./MainContainer";
-import {useLikeHandler} from "./useLikeHandler";
-import useGuideContent from "./useGuideContent"; // Импортируем наш кастомный хук
-import LoginPopup from "./LoginPopup";
-import PencilLoader from "./PencilLoader";
-import CircleLoader from "./CircleLoader";
-import ModalImage from "./ModalImage";
-import {ImageDto} from "./ImageDto";
-import ImageCaption from "./ImageCaption";
+import "../../styles/print.css";
+import Header from "../../components/Header/Header";
+import MainContainer from "../../components/MainContainer/MainContainer";
+import {useLikeHandler} from "../../hooks/useLikeHandler";
+import useGuideContent from "../../hooks/useGuideContent"; // Импортируем наш кастомный хук
+import LoginPopup from "../../components/LoginPopup/LoginPopup";
+import PencilLoader from "../../components/loaders/PencilLoader/PencilLoader";
+import CircleLoader from "../../components/loaders/CircleLoader/CircleLoader";
+import ModalImage from "../../components/ModalImage/ModalImage";
+import {ImageDto} from "../../types/ImageDto";
+import ImageCaption from "../../components/ImageCaption/ImageCaption";
 import {useTranslation} from "react-i18next";
 
 interface UserDto {
@@ -175,7 +175,7 @@ const Guide: React.FC = () => {
             </div>
             <footer className="guide-footer">
                 <img
-                    src="/ai-256x384.png"
+                    src="/assets/images/ai-256x384.png"
                     alt="AI Logo"
                     className="footer-ai-logo"
                 />

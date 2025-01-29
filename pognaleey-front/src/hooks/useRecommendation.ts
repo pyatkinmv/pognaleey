@@ -1,5 +1,5 @@
 import usePolling from "./usePolling";
-import {ImageDto} from "./ImageDto";
+import {ImageDto} from "../types/ImageDto";
 import {useTranslation} from "react-i18next";
 
 interface Recommendation {

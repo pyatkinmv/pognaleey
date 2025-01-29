@@ -1,6 +1,6 @@
 import React, {useState} from "react";
 import {jwtDecode} from "jwt-decode";
-import LoginPopup from "./LoginPopup";
+import LoginPopup from "../components/LoginPopup/LoginPopup";
 import {useTranslation} from "react-i18next";
 
 interface PrivateRouteProps {

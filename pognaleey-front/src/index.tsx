@@ -1,11 +1,11 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import AppRouter from "./AppRouter";
-import {AppProvider} from "./AppContext";
-import './index.css';
+import AppRouter from "./routes/AppRouter";
+import {AppProvider} from "./context/AppContext";
+import './styles/index.css';
 import {BrowserRouter as Router} from "react-router-dom"; // Перемещаем сюда Router
 import reportWebVitals from './reportWebVitals';
-import './i18n'; // Импортируем и инициализируем i18next
+import './i18n/i18n'; // Импортируем и инициализируем i18next
 
 const root = ReactDOM.createRoot(
     document.getElementById('root') as HTMLElement

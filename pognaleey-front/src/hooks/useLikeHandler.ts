@@ -1,4 +1,4 @@
-import apiClient from "./apiClient";
+import apiClient from "../services/apiClient";
 import {useTranslation} from "react-i18next";
 
 interface LikeResponse {

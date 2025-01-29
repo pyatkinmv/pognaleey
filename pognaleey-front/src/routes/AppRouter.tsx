@@ -1,10 +1,10 @@
 import {Route, Routes} from "react-router-dom";
-import Recommendations from "./Recommendations";
+import Recommendations from "../pages/Recommendations/Recommendations";
 import PrivateRoute from "./PrivateRoute";
-import Guide from "./Guide";
+import Guide from "../pages/Guide/Guide";
 import React from "react";
-import Main from "./Main";
-import Inquiry from "./Inquiry";
+import Main from "../pages/Main/Main";
+import Inquiry from "../pages/Inquiry/Inquiry";
 import {useTranslation} from "react-i18next";
 
 const AppRouter: React.FC = () => {
@@ -52,7 +52,7 @@ const AppRouter: React.FC = () => {
                     <div style={{textAlign: "center", marginTop: "20vh"}}>
                         <h1>404</h1>
                         <p>{t("pageNotFound")}</p>
-                        <a href="/" style={{color: "#4caf50", textDecoration: "none"}}>
+                        <a href="/pognaleey-front/public" style={{color: "#4caf50", textDecoration: "none"}}>
                             {t("backToHome")}
                         </a>
                     </div>

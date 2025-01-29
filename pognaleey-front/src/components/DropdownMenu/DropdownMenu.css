@@ -20,8 +20,8 @@
 }
 
 .menu-container .menu-icon {
-    mask: url('../public/profile.svg') center/contain no-repeat;
-    -webkit-mask: url('../public/profile.svg') center/contain no-repeat;
+    mask: url('../../../public/assets/images/profile.svg') center/contain no-repeat;
+    -webkit-mask: url('../../../public/assets/images/profile.svg') center/contain no-repeat;
     background-color: #333;
     transition: background-color 0.2s ease;
     width: 1.5rem;

@@ -1,8 +1,8 @@
 import React, {useState} from "react";
-import {useAppContext} from "./AppContext";
-import DropdownMenu from "./DropdownMenu";
+import {useAppContext} from "../../context/AppContext";
+import DropdownMenu from "../DropdownMenu/DropdownMenu";
 import "./Header.css";
-import LoginPopup from "./LoginPopup";
+import LoginPopup from "../LoginPopup/LoginPopup";
 import {useTranslation} from "react-i18next";
 
 interface HeaderProps {
@@ -25,7 +25,7 @@ const Header: React.FC<HeaderProps> = ({onLanguageChange}) => {
 
     return (
         <header className="header">
-            <img src="/logo-circle192.png" alt={t("logoAlt")} className="logo"/>
+            <img src="/assets/logos/logo-circle192.png" alt={t("logoAlt")} className="logo"/>
             <nav className="navbar">
                 <a href="/" className="nav-link">{t("home")}</a>
                 <a href="https://t.me/pyatkinmv" className="nav-link">{t("contacts")}</a>
@@ -33,7 +33,7 @@ const Header: React.FC<HeaderProps> = ({onLanguageChange}) => {
                     label={
                         <>
                             <img
-                                src={`/flags/${language}.svg`}
+                                src={`/assets/flags/${language}.svg`}
                                 alt={currentLanguage?.label}
                                 className="language-flag"
                             />
@@ -45,7 +45,7 @@ const Header: React.FC<HeaderProps> = ({onLanguageChange}) => {
                         onClick: () => handleLanguageSwitch(lang.code),
                         icon: (
                             <img
-                                src={`/flags/${lang.code}.svg`}
+                                src={`/assets/flags/${lang.code}.svg`}
                                 alt={lang.label}
                                 className="language-flag"
                             />

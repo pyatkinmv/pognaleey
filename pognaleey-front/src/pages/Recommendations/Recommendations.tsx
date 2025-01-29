@@ -1,13 +1,13 @@
 import React, {useState} from "react";
 import {useLocation, useNavigate} from "react-router-dom";
 import "./Recommendations.css";
-import Header from "./Header";
-import MainContainer from "./MainContainer";
-import useRecommendations from "./useRecommendation";
-import apiClient from "./apiClient";
-import PencilLoader from "./PencilLoader";
-import ModalImage from "./ModalImage";
-import {ImageDto} from "./ImageDto";
+import Header from "../../components/Header/Header";
+import MainContainer from "../../components/MainContainer/MainContainer";
+import useRecommendations from "../../hooks/useRecommendation";
+import apiClient from "../../services/apiClient";
+import PencilLoader from "../../components/loaders/PencilLoader/PencilLoader";
+import ModalImage from "../../components/ModalImage/ModalImage";
+import {ImageDto} from "../../types/ImageDto";
 import {useTranslation} from "react-i18next";
 
 // TODO: Исправить прыгающий размер и элементы
@@ -77,7 +77,7 @@ const Recommendations: React.FC = () => {
                             ) : (
                                 <img
                                     className="recommendation-image"
-                                    src="/not-found512.png"
+                                    src="/assets/images/not-found512.png"
                                     alt="Not Found"
                                 />
                             )}

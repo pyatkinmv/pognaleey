@@ -1,7 +1,7 @@
 import React from "react";
 import "./ModalImage.css";
-import {ImageDto} from "./ImageDto";
-import ImageCaption from "./ImageCaption";
+import {ImageDto} from "../../types/ImageDto";
+import ImageCaption from "../ImageCaption/ImageCaption";
 
 interface ModalImageProps {
     image: ImageDto | null;

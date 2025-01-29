@@ -1,13 +1,13 @@
 import React, {useEffect, useRef, useState} from "react";
 import "./Main.css";
 import {useNavigate} from "react-router-dom";
-import Header from "./Header";
-import FilterButtons from "./FilterButtons";
-import TileGrid from "./TileGrid";
-import LoginPopup from "./LoginPopup";
-import apiClient from "./apiClient";
-import MainContainer from "./MainContainer";
-import {useLikeHandler} from "./useLikeHandler";
+import Header from "../../components/Header/Header";
+import FilterButtons from "../../components/FilterButtons/FilterButtons";
+import TileGrid from "../../components/TileGrid/TileGrid";
+import LoginPopup from "../../components/LoginPopup/LoginPopup";
+import apiClient from "../../services/apiClient";
+import MainContainer from "../../components/MainContainer/MainContainer";
+import {useLikeHandler} from "../../hooks/useLikeHandler";
 import {useTranslation} from "react-i18next";
 
 const Main: React.FC = () => {
@@ -105,7 +105,7 @@ const Main: React.FC = () => {
         <MainContainer>
             <Header onLanguageChange={() => loadTiles(selectedFilter, true)}/>
             <div className="image-container">
-                <img src="/main.webp" alt="Main Banner" className="banner-image"/>
+                <img src="/assets/images/main.webp" alt="Main Banner" className="banner-image"/>
                 <div className="banner-text">{t('bannerText1')}<br/>{t('bannerText2')}</div>
                 <button className="action-button" onClick={() => navigate("/travel-inquiries")}>{t("goButton")}</button>
             </div>
