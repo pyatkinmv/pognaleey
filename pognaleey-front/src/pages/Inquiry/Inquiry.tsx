@@ -321,7 +321,7 @@ const Inquiry: React.FC = () => {
                     name="additionalPreferences"
                     value={formData.additionalPreferences}
                     onChange={handleChange}
-                    maxLength={10} // Ограничение на количество символов
+                    maxLength={50} // Ограничение на количество символов
                     placeholder={t("writeAdditionalDetails")}
                     className={styles.textInput}
                 />
