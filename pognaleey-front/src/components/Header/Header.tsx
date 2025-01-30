@@ -1,7 +1,8 @@
+// Header.tsx
 import React, {useState} from "react";
 import {useAppContext} from "../../context/AppContext";
 import DropdownMenu from "../DropdownMenu/DropdownMenu";
-import "./Header.css";
+import styles from "./Header.module.css";
 import LoginPopup from "../LoginPopup/LoginPopup";
 import {useTranslation} from "react-i18next";
 
@@ -24,41 +25,44 @@ const Header: React.FC<HeaderProps> = ({onLanguageChange}) => {
     };
 
     return (
-        <header className="header">
-            <img src="/assets/logos/logo-circle192.png" alt={t("logoAlt")} className="logo"/>
-            <nav className="navbar">
-                <a href="/" className="nav-link">{t("home")}</a>
-                <a href="https://t.me/pyatkinmv" className="nav-link">{t("contacts")}</a>
-                <DropdownMenu
-                    label={
-                        <>
-                            <img
-                                src={`/assets/flags/${language}.svg`}
-                                alt={currentLanguage?.label}
-                                className="language-flag"
-                            />
-                            <span className="menu-label">{currentLanguage?.label}</span>
-                        </>
-                    }
-                    items={languages.map((lang) => ({
-                        label: lang.label,
-                        onClick: () => handleLanguageSwitch(lang.code),
-                        icon: (
-                            <img
-                                src={`/assets/flags/${lang.code}.svg`}
-                                alt={lang.label}
-                                className="language-flag"
-                            />
-                        ),
-                    }))}
-                />
-                <div className="user-menu">
+        <header className={styles.header}>
+            <img src="/assets/logos/logo-circle192.png" alt={t("logoAlt")} className={styles.logo}/>
+            <nav className={styles.navbar}>
+                <a href="/" className={styles.navLink}>{t("home")}</a>
+                <a href="https://t.me/pyatkinmv" className={styles.navLink}>{t("contacts")}</a>
+
+                <div className={styles.dropdownMenu}>
+                    <DropdownMenu
+                        label={
+                            <>
+                                <img
+                                    src={`/assets/flags/${language}.svg`}
+                                    alt={currentLanguage?.label}
+                                    className={styles.languageFlag}
+                                />
+                                <span className={styles.menuLabel}>{currentLanguage?.label}</span>
+                            </>
+                        }
+                        items={languages.map((lang) => ({
+                            label: lang.label,
+                            onClick: () => handleLanguageSwitch(lang.code),
+                            icon: (
+                                <img
+                                    src={`/assets/flags/${lang.code}.svg`}
+                                    alt={lang.label}
+                                    className={styles.languageFlag}
+                                />
+                            ),
+                        }))}
+                    />
+                </div>
+                <div className={styles.dropdownMenu}>
                     {user.username ? (
                         <DropdownMenu
                             label={
                                 <>
-                                    <div className="profile-icon"></div>
-                                    <span className="user-name">{user.username}</span>
+                                    <div className={styles.profileIcon}></div>
+                                    <span className={styles.menuLabel}>{user.username}</span>
                                 </>
                             }
                             items={[
@@ -69,18 +73,16 @@ const Header: React.FC<HeaderProps> = ({onLanguageChange}) => {
                             ]}
                         />
                     ) : (
-                        <a className="nav-link" onClick={() => setShowLoginPopup(true)}>{t("loginHeader")}</a>
+                        <a className={styles.navLink} onClick={() => setShowLoginPopup(true)}>{t("loginHeader")}</a>
                     )}
                 </div>
             </nav>
-            {
-                showLoginPopup && (
-                    <LoginPopup
-                        onClose={() => setShowLoginPopup(false)}
-                        onLoginSuccess={() => setShowLoginPopup(false)}
-                    />
-                )
-            }
+            {showLoginPopup && (
+                <LoginPopup
+                    onClose={() => setShowLoginPopup(false)}
+                    onLoginSuccess={() => setShowLoginPopup(false)}
+                />
+            )}
         </header>
     );
 };

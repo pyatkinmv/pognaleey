@@ -1,12 +1,13 @@
-/* FilterButtons.css */
-.radio-buttons-container {
+/* FilterButtons.module.css */
+
+.radioButtonsContainer {
     display: flex;
     justify-content: center;
     gap: 3rem;
     margin: 1rem 0;
 }
 
-.radio-button {
+.radioButton {
     font-size: 2.2rem;
     font-weight: bold;
     color: #333;
@@ -15,16 +16,16 @@
     transition: color 0.2s, transform 0.2s;
 }
 
-.radio-button input[type="radio"] {
+.radioButton input[type="radio"] {
     display: none;
 }
 
-.radio-button.active {
+.radioButton.active {
     color: #dd746b;
     transform: scale(1.1);
     text-shadow: 0 0.3rem 0.5rem rgba(0, 0, 0, 0.2);
 }
 
-.radio-button:hover {
+.radioButton:hover {
     color: #c66059;
 }

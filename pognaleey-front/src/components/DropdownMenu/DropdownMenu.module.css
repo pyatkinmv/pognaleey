@@ -1,0 +1,90 @@
+/* DropdownMenu.module.css */
+
+/* DropdownMenu.module.css */
+
+.menuContainer {
+    display: flex; /* Используем Flexbox */
+    align-items: center; /* Выравниваем элементы по центру */
+    position: relative;
+    cursor: pointer;
+    padding: 0.25rem;
+}
+
+.dropdownMenu {
+    position: absolute;
+    top: 100%;
+    background-color: white;
+    border: 1px solid #ddd;
+    border-radius: 0.5rem;
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.5);
+    padding: 0.2rem 1.0rem;
+    z-index: 1000;
+    text-align: center;
+    visibility: hidden;
+    opacity: 0;
+    transition: opacity 0.2s ease, visibility 0.2s ease;
+}
+
+.menuContainer:hover .dropdownMenu {
+    visibility: visible;
+    opacity: 1;
+}
+
+.menuIcon {
+    mask: url('../../../public/assets/images/profile.svg') center/contain no-repeat;
+    -webkit-mask: url('../../../public/assets/images/profile.svg') center/contain no-repeat;
+    background-color: #333;
+    transition: background-color 0.2s ease;
+    width: 1.5rem;
+    height: 1.5rem;
+    margin-right: 0.5rem;
+}
+
+.menuContainer:hover .menuIcon {
+    background-color: #dd746b;
+}
+
+.menuContainer:hover .dropdownMenu {
+    visibility: visible;
+    opacity: 1;
+}
+
+.dropdownButton {
+    background-color: transparent;
+    border: none;
+    color: #333;
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: color 0.2s, background-color 0.2s;
+    padding: 0.5rem 0.5rem;
+    text-align: left;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    width: 100%;
+}
+
+.dropdownIcon {
+    display: inline-block;
+    width: 1.2rem;
+    height: 1.2rem;
+}
+
+.dropdownLabel {
+    flex-grow: 1;
+}
+
+.dropdownButton:hover {
+    color: #dd746b;
+    background-color: #f8f8f8;
+}
+
+/* DropdownMenu.module.css */
+
+.languageFlag {
+    width: 1.5rem;
+    height: auto;
+    margin-right: 0.5rem;
+    vertical-align: middle;
+}

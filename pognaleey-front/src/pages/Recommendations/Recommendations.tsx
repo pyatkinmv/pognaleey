@@ -6,6 +6,7 @@ import MainContainer from "../../components/MainContainer/MainContainer";
 import useRecommendations from "../../hooks/useRecommendation";
 import apiClient from "../../services/apiClient";
 import PencilLoader from "../../components/loaders/PencilLoader/PencilLoader";
+import CircleLoader from "../../components/loaders/CircleLoader/CircleLoader";
 import ModalImage from "../../components/ModalImage/ModalImage";
 import {ImageDto} from "../../types/ImageDto";
 import {useTranslation} from "react-i18next";
@@ -73,7 +74,7 @@ const Recommendations: React.FC = () => {
                                     }
                                 />
                             ) : recommendation.status === "IN_PROGRESS" ? (
-                                <div className="circle-loader"/>
+                                <CircleLoader/>
                             ) : (
                                 <img
                                     className="recommendation-image"

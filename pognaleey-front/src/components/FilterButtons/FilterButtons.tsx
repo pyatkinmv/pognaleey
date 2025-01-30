@@ -1,5 +1,6 @@
+// FilterButtons.tsx
 import React from "react";
-import "./FilterButtons.css";
+import styles from "./FilterButtons.module.css";
 import {useTranslation} from "react-i18next";
 
 interface FilterButtonsProps {
@@ -7,12 +8,10 @@ interface FilterButtonsProps {
     onFilterChange: (value: string) => void;
 }
 
-
 const FilterButtons: React.FC<FilterButtonsProps> = ({selectedFilter, onFilterChange}) => {
     const {t} = useTranslation();
-
     return (
-        <div className="radio-buttons-container">
+        <div className={styles.radioButtonsContainer}>
             {[
                 {label: t("best"), value: "feed"},
                 {label: t("liked"), value: "liked"},
@@ -20,7 +19,7 @@ const FilterButtons: React.FC<FilterButtonsProps> = ({selectedFilter, onFilterCh
             ].map(({label, value}) => (
                 <label
                     key={value}
-                    className={`radio-button ${selectedFilter === value ? "active" : ""}`}
+                    className={`${styles.radioButton} ${selectedFilter === value ? styles.active : ""}`}
                 >
                     <input
                         type="radio"

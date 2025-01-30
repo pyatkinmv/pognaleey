@@ -1,10 +1,11 @@
+// CircleLoader.tsx
 import React from "react";
-import "./CircleLoader.css";
+import styles from "./CircleLoader.module.css";
 
 const CircleLoader: React.FC = () => {
     return (
-        <div className="circle-loader-container">
-            <div className="circle-loader"></div>
+        <div className={styles.circleLoaderContainer}>
+            <div className={styles.circleLoader}></div>
         </div>
     );
 };

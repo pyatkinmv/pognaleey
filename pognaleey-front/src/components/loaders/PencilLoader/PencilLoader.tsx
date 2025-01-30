@@ -1,11 +1,12 @@
+// PencilLoader.tsx
 import React from "react";
-import "./PencilLoader.css";
+import styles from "./PencilLoader.module.css";
 
 const PencilLoader: React.FC = () => {
     return (
-        <div className="pencil-loader">
-            <div className="pencil">✏️</div>
-            <div className="writing">
+        <div className={styles.pencilLoader}>
+            <div className={styles.pencil}>✏️</div>
+            <div className={styles.writing}>
                 <span>.</span>
                 <span>.</span>
                 <span>.</span>

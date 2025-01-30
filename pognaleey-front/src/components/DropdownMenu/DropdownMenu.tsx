@@ -1,5 +1,6 @@
+// DropdownMenu.tsx
 import React from "react";
-import "./DropdownMenu.css";
+import styles from "./DropdownMenu.module.css";
 
 interface DropdownMenuProps {
     label: React.ReactNode;
@@ -8,23 +9,22 @@ interface DropdownMenuProps {
 
 const DropdownMenu: React.FC<DropdownMenuProps> = ({label, items}) => {
     return (
-        <div className="menu-container">
-            {label}
-            <div className="dropdown-menu">
-                {items.map((item, index) => (
+        <div className={styles.menuContainer}>
+            {label} {/* Передаем label напрямую */}
+            <div className={styles.dropdownMenu}>
+                {items.map((item) => (
                     <button
-                        key={index}
-                        className="dropdown-button"
+                        key={item.label}
+                        className={styles.dropdownButton}
                         onClick={item.onClick}
                     >
-                        {item.icon && <span className="dropdown-icon">{item.icon}</span>}
-                        <span className="dropdown-label">{item.label}</span>
+                        {item.icon && <span className={styles.dropdownIcon}>{item.icon}</span>}
+                        <span className={styles.dropdownLabel}>{item.label}</span>
                     </button>
                 ))}
             </div>
         </div>
     );
 };
-
 
 export default DropdownMenu;

@@ -1,3 +1,5 @@
+/* Header.module.css */
+
 .header {
     display: flex;
     align-items: center;
@@ -24,7 +26,7 @@
     gap: 8rem;
 }
 
-.nav-link {
+.navLink {
     text-decoration: none;
     color: #333;
     font-weight: bold;
@@ -32,19 +34,31 @@
     transition: color 0.2s;
 }
 
-.nav-link:hover {
+.navLink:hover {
     color: #dd746b;
 }
 
-.user-menu {
+/* Header.module.css */
+
+.dropdownMenu {
+    display: flex; /* Добавляем Flexbox */
+    align-items: center; /* Выравниваем элементы по центру */
     padding: 0.25rem;
     position: relative;
-    display: inline-flex;
-    align-items: center;
     cursor: pointer;
 }
 
-.user-name {
+.profileIcon {
+    mask: url('../../../public/assets/images/profile.svg') center/contain no-repeat;
+    -webkit-mask: url('../../../public/assets/images/profile.svg') center/contain no-repeat;
+    background-color: #333;
+    transition: background-color 0.2s ease;
+    width: 1.5rem;
+    height: 1.5rem;
+    margin-right: 0.5rem; /* Добавляем отступ между иконкой и текстом */
+}
+
+.menuLabel {
     font-size: 1.25rem;
     font-weight: bold;
     color: #333;
@@ -52,25 +66,16 @@
     transition: color 0.2s ease;
 }
 
-.user-menu:hover .user-name {
+.dropdownMenu:hover .menuLabel {
     color: #dd746b;
 }
 
-.user-menu:hover .profile-icon {
+.dropdownMenu:hover .profileIcon {
     background-color: #dd746b;
 }
 
-.profile-icon {
-    mask: url('../../../public/assets/images/profile.svg') center/contain no-repeat;
-    -webkit-mask: url('../../../public/assets/images/profile.svg') center/contain no-repeat;
-    background-color: #333;
-    transition: background-color 0.2s ease;
-    width: 1.5rem;
-    height: 1.5rem;
-    margin-right: 0.5rem;
-}
 
-.language-flag {
+.languageFlag {
     width: 1.5rem;
     height: auto;
     margin-right: 0.5rem;
