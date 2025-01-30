@@ -105,8 +105,10 @@
     "alcohol": "Алкоголь",
     "festivals": "Фестивали",
     "nightLife": "Ночная жизнь",
+    "adventureSports": "Экстремальный спорт",
     "exotic": "Экзотика",
     "smallTowns": "Маленькие города",
+    "walking": "Прогулки",
     "winter": "Зима",
     "spring": "Весна",
     "summer": "Лето",
@@ -116,6 +118,11 @@
     "asia": "Азия",
     "africa": "Африка",
     "america": "Америка",
-    "australiaOceania": "Австралия и Океания"
+    "australiaOceania": "Австралия и Океания",
+    "southeastAsia": "Юго-Восточная Азия",
+    "eastAsia": "Восточная Азия",
+    "northAmerica": "Северная Америка",
+    "caribbean": "Карибский бассейн",
+    "southAmerica": "Южная Америка"
   }
 }

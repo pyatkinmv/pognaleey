@@ -1,4 +1,6 @@
-.guide-header {
+/* Guide.module.css */
+
+.guideHeader {
     margin: 0.5rem 0 0.25rem 4rem;
     font-size: 1.2rem;
     font-weight: bold;
@@ -6,23 +8,18 @@
     min-height: 3.5rem;
 }
 
-.guide-actions .like-button {
-    font-size: 2.5rem;
-}
-
-.guide-header p {
-    margin: 0.3rem 0;
-}
-
-/* Действия в строку */
-.guide-actions {
+.guideActions {
     display: flex;
     justify-content: left; /* Центрируем по горизонтали */
     align-items: center; /* Выравниваем по вертикали */
     gap: 2rem; /* Расстояние между элементами */
 }
 
-.download-pdf-button {
+.guideHeader p {
+    margin: 0.3rem 0;
+}
+
+.downloadPdfButton {
     background-color: #f87f76;
     width: 12rem;
     color: white;
@@ -37,33 +34,53 @@
     transition: all 0.3s ease;
 }
 
-.download-pdf-button:hover {
+.downloadPdfButton:hover {
     background-color: #c66059;
     box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.3);
     transform: translateY(-0.125rem);
 }
 
-.download-pdf-button:active {
+.downloadPdfButton:active {
     background-color: #c15550;
     transform: scale(0.98);
     box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.5);
 }
 
-.guide-header h1 {
-    font-size: 1.8rem;
-    color: #333;
-    margin-bottom: 0.75rem;
+/* Guide.module.css */
+
+@media print {
+    /* Скрыть всё содержимое страницы */
+    body * {
+        visibility: hidden;
+    }
+
+    .printContainer, .printContainer * {
+        visibility: visible;
+    }
+
+    .printContainer {
+        display: block;
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+    }
+
+    .guideDetails {
+        margin: 0 auto;
+        font-size: 1.4rem !important;
+    }
 }
 
-.guide-image {
+.guideImage {
     max-width: 100%;
     height: auto;
     border-radius: 0.5rem;
     margin-top: 0.75rem;
 }
 
-/* Контейнер для контента гида */
-.guide-details {
+.guideDetails {
     font-size: 1rem;
     line-height: 1.6;
     color: #333;
@@ -71,40 +88,42 @@
     padding: 1rem 3rem 1rem 4rem;
     border-radius: 0.5rem;
     min-height: 100vh;
-    /*box-shadow: inset 0px 1px 3px rgba(0, 0, 0, 0.1);*/
 }
 
-.guide-details h2, .guide-details h3, .guide-details h4 {
+.guideDetails h2,
+.guideDetails h3,
+.guideDetails h4 {
     color: #333;
     margin-top: 1.25rem;
     margin-bottom: 0.7rem;
 }
 
-.guide-details p {
+.guideDetails p {
     margin-bottom: 1rem;
 }
 
-.guide-details ul {
+.guideDetails ul {
     padding-left: 1.25rem;
     margin-bottom: 1rem;
 }
 
-.guide-details ul li {
+.guideDetails ul li {
     list-style-type: disc;
     margin-bottom: 0.3rem;
 }
 
-.guide-details a {
+.guideDetails a {
     color: #4caf50;
     text-decoration: none;
 }
 
-.guide-details a:hover {
+.guideDetails a:hover {
     text-decoration: underline;
 }
 
-/* Стили для состояния загрузки и ошибок */
-.loading, .error, .not-found {
+.loading,
+.error,
+.notFound {
     text-align: center;
     font-size: 1.125rem;
     color: #333;
@@ -115,40 +134,37 @@
     color: #e74c3c;
 }
 
-.not-found {
+.notFound {
     color: #888;
 }
 
-
-.guide-details .image-guide-container {
+.imageGuideContainer {
     text-align: center; /* Центрирование контейнера для изображения */
-    /*margin: 20px 0;*/
 }
 
-.guide-details .image {
+.image {
     max-width: 80%; /* Ограничение ширины изображения */
     height: auto; /* Сохраняем пропорции */
     border-radius: 0.333rem; /* 10px */
-
 }
 
-.guide-details .image-caption {
+.imageCaption {
     font-size: 0.85rem; /* Уменьшенный шрифт для подписи */
     color: #333; /* Нейтральный цвет */
     margin-top: 0.5rem; /* Расстояние от изображения до подписи */
 }
 
-.guide-details .image-caption a {
+.imageCaption a {
     color: #007bff; /* Цвет ссылок */
     text-decoration: none; /* Убираем подчёркивание */
 }
 
-.guide-details .image-caption a:hover {
+.imageCaption a:hover {
     text-decoration: underline; /* Подчёркивание при наведении */
     color: #f87f76; /* Цвет при наведении */
 }
 
-.guide-footer {
+.guideFooter {
     display: flex;
     align-items: center;
     background-color: #f1e7dd; /* Светлый фон */
@@ -159,10 +175,9 @@
     line-height: 1.5; /* Высота строки */
 }
 
-.footer-ai-logo {
+.footerAiLogo {
     width: 3rem; /* Ширина логотипа */
     height: 3rem; /* Высота логотипа */
     object-fit: contain; /* Адаптация изображения */
-    /*margin-top: 1rem;*/
     margin: 0.4rem;
 }

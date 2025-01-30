@@ -1,33 +1,11 @@
-/* Подключение шрифта Nunito через Google Fonts */
 @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap');
 
 /* Общие стили */
 body {
-  font-family: 'Nunito', sans-serif;
-  font-size: 1rem;
-  background-color: #b3b9be; /* Мягкий светлый фон */
-  margin: 0;
-  padding: 0;
-  color: #2c3e50; /* Темный текст для хорошей читаемости */
+    font-family: 'Nunito', sans-serif;
+    font-size: 1rem;
+    background-color: #b3b9be; /* Мягкий светлый фон */
+    margin: 0;
+    padding: 0;
+    color: #2c3e50; /* Темный текст для хорошей читаемости */
 }
-
-/* Стили для полей ввода, выпадающих списков и textarea */
-select, input[type="text"], textarea {
-  width: 100%;
-  padding: 12px;
-  margin: 10px 0 20px;
-  /*border: 1px solid grey; !* Цвет рамки — бирюзовый *!*/
-  border-radius: 8px;
-  font-size: 1em;
-  color: #333;
-  background-color: #f9f9f9; /* Нежный фон */
-  transition: box-shadow 0.3s, border 0.3s;
-}
-
-/* При фокусе поля */
-select:focus, input[type="text"]:focus, textarea:focus {
-  outline: none;
-  border: 1px solid #EB6B3B; /* Оранжевый акцент */
-  box-shadow: 0 0 5px rgba(235, 107, 59, 0.5);
-}
-

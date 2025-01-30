@@ -1,4 +1,6 @@
-.tile-container {
+/* TileGrid.module.css */
+
+.tileContainer {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
     gap: 2rem;
@@ -10,7 +12,6 @@
     background-color: #f1e7dd;
     border-radius: 1.2rem;
     box-shadow: 0 0.25rem 2rem rgba(0, 0, 0, 0.5);
-    /*border: 0.1rem solid #c6c0bb; !* Основной цвет границы *!*/
     text-align: center;
     width: 17rem;
     display: flex;
@@ -25,7 +26,7 @@
     box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.3);
 }
 
-.tile-image-wrapper {
+.tileImageWrapper {
     width: 100%;
     padding-top: 66%;
     position: relative;
@@ -33,7 +34,7 @@
     border-radius: 1.2rem 1.2rem 0 0;
 }
 
-.tile-image {
+.tileImage {
     position: absolute;
     top: 0;
     left: 0;
@@ -42,30 +43,8 @@
     object-fit: cover;
 }
 
-.tile-title {
+.tileTitle {
     font-size: 1.05rem;
     font-weight: bold;
     margin: 0.4rem 0.2rem;
-}
-
-.tile-likes {
-    font-size: 1.2rem;
-    font-weight: bold;
-    margin-top: auto;
-}
-
-.like-button {
-    font-size: 1.5rem;
-    cursor: pointer;
-    transition: color 0.2s ease;
-    color: lightcoral;
-}
-
-.like-button.liked {
-    color: red;
-}
-
-.like-button:hover {
-    color: red;
-    text-shadow: 0.125rem 0.125rem 0.5rem rgba(0, 0, 0, 0.5);
 }

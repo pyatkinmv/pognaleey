@@ -1,4 +1,6 @@
-.main-container {
+/* MainContainer.module.css */
+
+.mainContainer {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -6,7 +8,7 @@
     flex-wrap: wrap;
 }
 
-.content-container {
+.contentContainer {
     background-color: #d0c9c7;
     width: 80rem;
     border-radius: 0.625rem;

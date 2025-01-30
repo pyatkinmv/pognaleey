@@ -1,4 +1,6 @@
-.popup-overlay {
+/* LoginPopup.module.css */
+
+.popupOverlay {
     position: fixed;
     top: 0;
     left: 0;
@@ -11,7 +13,7 @@
     z-index: 1000;
 }
 
-.popup-content {
+.popupContent {
     background-color: #fff;
     padding: 2rem;
     border-radius: 1rem;
@@ -25,7 +27,7 @@
     left: 50%;
 }
 
-.login-button-popup {
+.loginButtonPopup {
     background-color: #dd746b;
     width: 94%;
     color: white;
@@ -39,78 +41,92 @@
     transition: background-color 0.2s ease;
 }
 
-.login-button-popup:hover {
+.loginButtonPopup:hover {
     background-color: #c66059;
 }
 
-.login-button-popup:active {
+.loginButtonPopup:active {
     background-color: #c15550;
     transform: scale(0.98);
     box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.7);
 }
 
-.form-group {
+/* LoginPopup.module.css */
+
+/* LoginPopup.module.css */
+
+.formGroup {
     display: flex;
     flex-direction: column;
     align-items: flex-start;
+    /*margin-bottom: 1rem; !* Добавляем отступ между группами полей *!*/
 }
 
-.form-group label {
+.formGroup label {
     font-size: 0.875rem; /* 14px -> 0.875rem */
     font-weight: bold;
     margin-bottom: 0.3125rem; /* 5px -> 0.3125rem */
 }
 
-.popup-content .form-group input {
-    width: 94%;
+.formGroup input {
+    width: 94%; /* Ширина поля */
     padding: 0.5rem; /* 8px -> 0.5rem */
-    font-size: 0.875rem; /* 14px -> 0.875rem */
-    border: 1px solid #ccc;
+    margin: 0.625rem 0 1.25rem; /* 10px 0 20px -> 0.625rem 0 1.25rem */
+    border: 1px solid #ccc; /* Цвет рамки */
     border-radius: 0.25rem; /* 4px -> 0.25rem */
+    font-size: 0.875rem; /* Размер шрифта */
+    color: #333; /* Цвет текста */
+    background-color: #f9f9f9; /* Нежный фон */
+    transition: box-shadow 0.3s, border 0.3s; /* Плавные переходы */
 }
 
-.signup-prompt {
+.formGroup input:focus {
+    outline: none;
+    border: 1px solid #eb6b3b; /* Оранжевый акцент */
+    box-shadow: 0 0 5px rgba(235, 107, 59, 0.5); /* Тень при фокусе */
+}
+
+.signupPrompt {
     margin-top: 1.25rem; /* 20px -> 1.25rem */
     font-size: 0.875rem; /* 14px -> 0.875rem */
 }
 
-.signup-link {
+.signupLink {
     color: #dd746b;
     cursor: pointer;
     font-weight: bold;
     text-decoration: none;
+    transition: text-decoration 0.2s ease;
 }
 
-.signup-link:hover {
+.signupLink:hover {
     text-decoration: underline;
 }
 
-/* Глобальные сообщения */
-.popup-content .global-message {
+.globalMessage {
     font-size: 1rem;
     margin-bottom: 1rem;
 }
 
-.popup-content .global-message.success {
+.globalMessage.success {
     color: green;
     font-weight: bold;
 }
 
-.popup-content .global-message.error {
+.globalMessage.error {
     color: red;
     font-weight: bold;
 }
 
-/* Сообщения для полей */
-.form-group .field-message {
+.fieldMessage {
     font-size: 1rem;
     margin-top: 0.25rem;
 }
 
-.form-group .field-message .success {
+.fieldMessage .success {
     color: green;
 }
 
-.form-group .field-message .error {
+.fieldMessage .error {
     color: red;
 }

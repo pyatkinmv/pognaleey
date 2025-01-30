@@ -1,8 +1,10 @@
+// TileGrid.tsx
 import React from "react";
-import "./TileGrid.css";
-import {useNavigate} from "react-router-dom";
+import styles from "./TileGrid.module.css";
+import sharedStyles from "../../styles/shared.module.css"; // Импортируем общие стили
 import CircleLoader from "../loaders/CircleLoader/CircleLoader";
 import {ImageDto} from "../../types/ImageDto";
+import {useNavigate} from "react-router-dom";
 
 interface Tile {
     id: number;
@@ -24,35 +26,37 @@ const TileGrid: React.FC<TileGridProps> = ({tiles, onLike, lastTileRef, isLoadin
     const navigate = useNavigate();
 
     return (
-        <div className="tile-container">
+        <div className={styles.tileContainer}>
             {error && <div className="error">{error}</div>}
             {tiles.map((tile, index) => (
                 <div
-                    className="tile"
+                    className={styles.tile}
                     key={tile.id}
                     ref={index === tiles.length - 1 ? lastTileRef : null}
                     onClick={() => navigate(`/travel-guides/${tile.id}`)}
                 >
-                    <div className="tile-image-wrapper">
-                        {tile.image ? <img src={tile.image.thumbnailUrl} alt={tile.title} className="tile-image"/>
-                            : (<img
-                                className="tile-image"
+                    <div className={styles.tileImageWrapper}>
+                        {tile.image ? (
+                            <img src={tile.image.thumbnailUrl} alt={tile.title} className={styles.tileImage}/>
+                        ) : (
+                            <img
+                                className={styles.tileImage}
                                 src="/assets/images/not-found512.png"
                                 alt="Not Found"
-                            />)
-                        }
+                            />
+                        )}
                     </div>
-                    <div className="tile-title">{tile.title}</div>
-                    <div className="tile-likes">
-            <span
-                className={`like-button ${tile.isLiked ? "liked" : ""}`}
-                onClick={(e) => {
-                    e.stopPropagation();
-                    onLike(tile.id, tile.isLiked);
-                }}
-            >
-              ❤
-            </span>
+                    <div className={styles.tileTitle}>{tile.title}</div>
+                    <div className={sharedStyles.likeCaption}> {/* Используем общий стиль */}
+                        <span
+                            className={`${sharedStyles.likeButton} ${tile.isLiked ? sharedStyles.liked : ""}`}
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                onLike(tile.id, tile.isLiked);
+                            }}
+                        >
+                            ❤
+                        </span>
                         {tile.totalLikes}
                     </div>
                 </div>

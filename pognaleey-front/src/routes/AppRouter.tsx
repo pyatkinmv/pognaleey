@@ -52,7 +52,7 @@ const AppRouter: React.FC = () => {
                     <div style={{textAlign: "center", marginTop: "20vh"}}>
                         <h1>404</h1>
                         <p>{t("pageNotFound")}</p>
-                        <a href="/pognaleey-front/public" style={{color: "#4caf50", textDecoration: "none"}}>
+                        <a href="/" style={{color: "#4caf50", textDecoration: "none"}}>
                             {t("backToHome")}
                         </a>
                     </div>

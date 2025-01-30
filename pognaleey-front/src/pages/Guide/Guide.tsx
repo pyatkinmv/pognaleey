@@ -1,14 +1,15 @@
+// Guide.tsx
 import React, {useEffect, useState} from "react";
 import {useParams} from "react-router-dom";
 import ReactMarkdown from "react-markdown";
 import rehypeRaw from "rehype-raw";
 import apiClient from "../../services/apiClient";
-import "./Guide.css";
-import "../../styles/print.css";
+import styles from "./Guide.module.css";
+import sharedStyles from "../../styles/shared.module.css"; // Импортируем локальные стили
 import Header from "../../components/Header/Header";
 import MainContainer from "../../components/MainContainer/MainContainer";
 import {useLikeHandler} from "../../hooks/useLikeHandler";
-import useGuideContent from "../../hooks/useGuideContent"; // Импортируем наш кастомный хук
+import useGuideContent from "../../hooks/useGuideContent"; // Используем наш кастомный хук
 import LoginPopup from "../../components/LoginPopup/LoginPopup";
 import PencilLoader from "../../components/loaders/PencilLoader/PencilLoader";
 import CircleLoader from "../../components/loaders/CircleLoader/CircleLoader";
@@ -50,19 +51,15 @@ const Guide: React.FC = () => {
     const [errorGuide, setErrorGuide] = useState<string | null>(null);
     const [showLoginPopup, setShowLoginPopup] = useState(false);
     const {t} = useTranslation();
-
     const {contentItems, isLoading: loadingContent, error: errorContent} = useGuideContent(guideId!); // Используем хук
-
     const {handleLike} = useLikeHandler(() => setShowLoginPopup(true));
 
     useEffect(() => {
         const fetchGuide = async () => {
             if (!guideId) return;
-
             try {
                 setLoadingGuide(true);
                 const response = await apiClient(`${process.env.REACT_APP_API_URL}/travel-guides/${guideId}`);
-
                 if (response.ok) {
                     const data: TravelGuideInfoDto = await response.json();
                     setGuide(data);
@@ -75,7 +72,6 @@ const Guide: React.FC = () => {
                 setLoadingGuide(false);
             }
         };
-
         fetchGuide();
     }, [guideId]);
 
@@ -84,27 +80,23 @@ const Guide: React.FC = () => {
             prevGuide?.id === guideId ? {...prevGuide, isLiked, totalLikes} : prevGuide
         );
     };
-    const [selectedImage, setSelectedImage] = useState<ImageDto | null>(null);
 
+    const [selectedImage, setSelectedImage] = useState<ImageDto | null>(null);
     const handleImageClick = (image: ImageDto) => {
         setSelectedImage(image);
     };
-
     const closeModal = () => {
         setSelectedImage(null);
     };
 
-
     if (loadingGuide) {
         return <CircleLoader/>;
     }
-
     if (errorGuide) {
-        return <div className="error">{t("error")} {errorGuide}</div>;
+        return <div className={styles.error}>{t("error")} {errorGuide}</div>;
     }
-
     if (!guide) {
-        return <div className="not-found">{t("guideNotFound")}</div>;
+        return <div className={styles.notFound}>{t("guideNotFound")}</div>;
     }
 
     const handlePdfDownload = async () => {
@@ -112,15 +104,13 @@ const Guide: React.FC = () => {
     };
 
     const renderImage = (image: ImageDto) => (
-        <div className="image-guide-container">
+        <div className={styles.imageGuideContainer}>
             <img
-                className="image"
+                className={styles.image}
                 src={image.url}
                 alt={image.title}
                 style={{maxWidth: "80%", margin: "0 auto", display: "block"}}
-                onClick={() =>
-                    handleImageClick(image)
-                }
+                onClick={() => handleImageClick(image)}
             />
             <div className="image-wrapper">
                 <ImageCaption
@@ -128,7 +118,7 @@ const Guide: React.FC = () => {
                     authorName={image.authorName}
                     authorUrl={image.authorUrl}
                     licenceUrl={image.licenceUrl}
-                    className={"image-caption"}
+                    className={styles.imageCaption}
                 />
             </div>
         </div>
@@ -137,62 +127,66 @@ const Guide: React.FC = () => {
     return (
         <MainContainer>
             <Header/>
-
-            <div className="guide-header">
+            <div className={styles.guideHeader}>
                 {!loadingContent && !errorContent && (
-                    <div className="guide-actions">
-                        <div className="tile-likes">
+                    <div className={styles.guideActions}>
+                        <div className={sharedStyles.likeCaption}>
                         <span
-                            className={`like-button ${guide.isLiked ? "liked" : ""}`}
+                            className={`${sharedStyles.likeButton} ${sharedStyles.large} ${guide.isLiked ? sharedStyles.liked : ""}`}
                             onClick={() => handleLike(guide.id, guide.isLiked, handleLikeUpdate)}
                         >
                             ❤
                         </span>
                             {guide.totalLikes}
                         </div>
-                        <button className="download-pdf-button" onClick={() => handlePdfDownload()}>
+                        <button className={styles.downloadPdfButton} onClick={() => handlePdfDownload()}>
                             {t("downloadPdf")}
                         </button>
-                        {guide.owner && <p className="owner"> {t("owner")} {guide.owner?.username || t("unknown")}</p>}
-                        <p className="created-at">{t("createdAt")}: {formatDate(guide.createdAt)}</p>
-                    </div>)}
-            </div>
-
-            <div className="guide-details">
-                {errorContent && <div className="error">{t("error")} {errorContent}</div>}
-                {contentItems.map((item) =>
-                    <div key={item.id} className="content-item">
-                        {item.type === "MARKDOWN" && (
-                            <ReactMarkdown rehypePlugins={[rehypeRaw]}>
-                                {item.content || ""}
-                            </ReactMarkdown>
+                        {guide.owner && (
+                            <p className={styles.owner}>
+                                {t("owner")} {guide.owner?.username || t("unknown")}
+                            </p>
                         )}
-                        {item.type === "IMAGE" && item.content && renderImage(JSON.parse(item.content))}
-                        {item.status === "IN_PROGRESS" && <PencilLoader/>}
-
+                        <p className={styles.createdAt}>
+                            {t("createdAt")}: {formatDate(guide.createdAt)}
+                        </p>
                     </div>
                 )}
             </div>
-            <footer className="guide-footer">
+            <div className={styles.printContainer}>
+                <div className={styles.guideDetails}>
+                    {errorContent && <div className={styles.error}>{t("error")} {errorContent}</div>}
+                    {contentItems.map((item) => (
+                        <div key={item.id} className={styles.contentItem}>
+                            {item.type === "MARKDOWN" && (
+                                <ReactMarkdown rehypePlugins={[rehypeRaw]}>
+                                    {item.content || ""}
+                                </ReactMarkdown>
+                            )}
+                            {item.type === "IMAGE" && item.content && renderImage(JSON.parse(item.content))}
+                            {item.status === "IN_PROGRESS" && <PencilLoader/>}
+                        </div>
+                    ))}
+                </div>
+            </div>
+            <footer className={styles.guideFooter}>
                 <img
                     src="/assets/images/ai-256x384.png"
                     alt="AI Logo"
-                    className="footer-ai-logo"
+                    className={styles.footerAiLogo}
                 />
                 <p>{t("aiGeneratedText")}</p>
             </footer>
-            {
-                showLoginPopup && (
-                    <LoginPopup
-                        onClose={() => setShowLoginPopup(false)}
-                        onLoginSuccess={() => setShowLoginPopup(false)}
-                    />
-                )
-            }
+            {showLoginPopup && (
+                <LoginPopup
+                    onClose={() => setShowLoginPopup(false)}
+                    onLoginSuccess={() => setShowLoginPopup(false)}
+                />
+            )}
             {/* Модальное окно */}
             <ModalImage image={selectedImage} onClose={closeModal}/>
         </MainContainer>
-    )
+    );
 };
 
 export default Guide;

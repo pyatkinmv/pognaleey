@@ -105,8 +105,10 @@
     "alcohol": "Alcohol",
     "festivals": "Festivals",
     "nightLife": "Nightlife",
+    "adventureSports": "Adventure sports",
     "exotic": "Exotic",
     "smallTowns": "Small towns",
+    "walking": "Walking",
     "winter": "Winter",
     "spring": "Spring",
     "summer": "Summer",
@@ -116,6 +118,11 @@
     "asia": "Asia",
     "africa": "Africa",
     "america": "America",
-    "australiaOceania": "Australia and Oceania"
+    "australiaOceania": "Australia and Oceania",
+    "southeastAsia": "Southeast Asia",
+    "eastAsia": "East Asia",
+    "northAmerica": "North America",
+    "caribbean": "Caribbean",
+    "southAmerica": "South America"
   }
 }

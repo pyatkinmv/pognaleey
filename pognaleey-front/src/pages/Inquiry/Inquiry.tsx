@@ -1,6 +1,6 @@
 import React, {useState} from "react";
 import {useNavigate} from "react-router-dom"; // Для перехода между страницами
-import "./Inquiry.css";
+import styles from "./Inquiry.module.css";
 import apiClient from "../../services/apiClient";
 import Header from "../../components/Header/Header";
 import MainContainer from "../../components/MainContainer/MainContainer";
@@ -115,7 +115,9 @@ const Inquiry: React.FC = () => {
         {value: t("inquiry.festivals"), label: t("inquiry.festivals"), icon: "🎉"},
         {value: t("inquiry.nightLife"), label: t("inquiry.nightLife"), icon: "🌃"},
         {value: t("inquiry.exotic"), label: t("inquiry.exotic"), icon: "🐪"},
-        {value: t("inquiry.smallTowns"), label: t("inquiry.smallTowns"), icon: "🏡"}
+        {value: t("inquiry.smallTowns"), label: t("inquiry.smallTowns"), icon: "🏡"},
+        {value: t("inquiry.walking"), label: t("inquiry.walking"), icon: "🚶‍♂️"},
+        {value: t("inquiry.adventureSports"), label: t("inquiry.adventureSports"), icon: "🪂"}
     ];
 
     const seasonOptions = [
@@ -126,12 +128,15 @@ const Inquiry: React.FC = () => {
     ];
 
     const regionOptions = [
-        {value: t("inquiry.russia"), label: t("inquiry.russia"), icon: "🪆"},
         {value: t("inquiry.europe"), label: t("inquiry.europe"), icon: "🗼"},
-        {value: t("inquiry.asia"), label: t("inquiry.asia"), icon: "🐉"},
-        {value: t("inquiry.africa"), label: t("inquiry.africa"), icon: "🌴"},
-        {value: t("inquiry.america"), label: t("inquiry.america"), icon: "🌵"},
-        {value: t("inquiry.australiaOceania"), label: t("inquiry.australiaOceania"), icon: "🌊"}
+        {value: t("inquiry.southeastAsia"), label: t("inquiry.southeastAsia"), icon: "🌴"}, // Юго-Восточная Азия
+        {value: t("inquiry.eastAsia"), label: t("inquiry.eastAsia"), icon: "🐉"}, // Восточная Азия
+        {value: t("inquiry.africa"), label: t("inquiry.africa"), icon: "🌍"}, // Африка
+        {value: t("inquiry.northAmerica"), label: t("inquiry.northAmerica"), icon: "🗽"}, // Северная Америка
+        {value: t("inquiry.caribbean"), label: t("inquiry.caribbean"), icon: "🏝️"}, // Карибский бассейн
+        {value: t("inquiry.southAmerica"), label: t("inquiry.southAmerica"), icon: "🌵"}, // Южная Америка
+        {value: t("inquiry.russia"), label: t("inquiry.russia"), icon: "🪆"}, // Россия
+        {value: t("inquiry.australiaOceania"), label: t("inquiry.australiaOceania"), icon: "🦘"} // Австралия и Океания
     ];
 
     const handleCardMultiSelect = (field: keyof typeof formData, value: string) => {
@@ -164,54 +169,54 @@ const Inquiry: React.FC = () => {
     return (
         <MainContainer>
             <Header/>
-            <div className="form-heading">
+            {/* Заголовок формы */}
+            <div className={styles.formHeading}>
                 {t("answerQuestions")}
             </div>
 
             {/* Цель поездки */}
             <QuestionContainer label={t("purposeOfTravel")}>
-                <div className="card-grid">
+                <div className={styles.cardGrid}>
                     {purposeOptions.map((option) => (
                         <div
                             key={option.value}
-                            className={`card ${formData.purpose.includes(option.value) ? "selected" : ""}`}
+                            className={`${styles.card} ${formData.purpose.includes(option.value) ? styles.cardSelected : ""}`}
                             onClick={() => handleCardMultiSelect("purpose", option.value)}
                         >
-                            <div className="card-icon">{option.icon}</div>
-                            <div className="card-label">{option.label}</div>
+                            <div className={styles.cardIcon}>{option.icon}</div>
+                            <div className={styles.cardLabel}>{option.label}</div>
                         </div>
                     ))}
                 </div>
             </QuestionContainer>
 
-
             {/* Вопрос о компаньонах */}
-            {/* Цель поездки */}
             <QuestionContainer label={t("travelCompanions")}>
-                <div className="card-grid">
+                <div className={styles.cardGrid}>
                     {companionOptions.map((option) => (
                         <div
                             key={option.value}
-                            className={`card ${formData.companions === option.value ? "selected" : ""}`}
+                            className={`${styles.card} ${formData.companions === option.value ? styles.cardSelected : ""}`}
                             onClick={() => handleCardSingleSelect("companions", option.value)}
                         >
-                            <div className="card-icon">{option.icon}</div>
-                            <div className="card-label">{option.label}</div>
+                            <div className={styles.cardIcon}>{option.icon}</div>
+                            <div className={styles.cardLabel}>{option.label}</div>
                         </div>
                     ))}
                 </div>
             </QuestionContainer>
 
+            {/* Предпочтительный транспорт */}
             <QuestionContainer label={t("preferredTransport")}>
-                <div className="card-grid">
+                <div className={styles.cardGrid}>
                     {transportOptions.map((option) => (
                         <div
                             key={option.value}
-                            className={`card ${formData.transport.includes(option.value) ? "selected" : ""}`}
+                            className={`${styles.card} ${formData.transport.includes(option.value) ? styles.cardSelected : ""}`}
                             onClick={() => handleCardMultiSelect("transport", option.value)}
                         >
-                            <div className="card-icon">{option.icon}</div>
-                            <div className="card-label">{option.label}</div>
+                            <div className={styles.cardIcon}>{option.icon}</div>
+                            <div className={styles.cardLabel}>{option.label}</div>
                         </div>
                     ))}
                 </div>
@@ -219,15 +224,15 @@ const Inquiry: React.FC = () => {
 
             {/* Бюджет */}
             <QuestionContainer label={t("budget")}>
-                <div className="card-grid">
+                <div className={styles.cardGrid}>
                     {budgetOptions.map((option) => (
                         <div
                             key={option.value}
-                            className={`card ${formData.budget === option.value ? "selected" : ""}`}
+                            className={`${styles.card} ${formData.budget === option.value ? styles.cardSelected : ""}`}
                             onClick={() => handleCardSingleSelect("budget", option.value)}
                         >
-                            <div className="card-icon">{option.icon}</div>
-                            <div className="card-label">{option.label}</div>
+                            <div className={styles.cardIcon}>{option.icon}</div>
+                            <div className={styles.cardLabel}>{option.label}</div>
                         </div>
                     ))}
                 </div>
@@ -235,31 +240,31 @@ const Inquiry: React.FC = () => {
 
             {/* Куда */}
             <QuestionContainer label={t("destination")}>
-                <div className="card-grid">
+                <div className={styles.cardGrid}>
                     {regionOptions.map((option) => (
                         <div
                             key={option.value}
-                            className={`card ${formData.locationTo === option.value ? "selected" : ""} card-narrow`}
+                            className={`${styles.card} ${formData.locationTo === option.value ? styles.cardSelected : ""} ${styles.cardSmall}`}
                             onClick={() => handleCardSingleSelect("locationTo", option.value)}
                         >
-                            <div className="card-icon">{option.icon}</div>
-                            <div className="card-label">{option.label}</div>
+                            <div className={styles.cardIcon}>{option.icon}</div>
+                            <div className={styles.cardLabel}>{option.label}</div>
                         </div>
                     ))}
                 </div>
             </QuestionContainer>
 
-            {/* Вопрос о предпочтениях */}
+            {/* Предпочтения */}
             <QuestionContainer label={t("preferences")}>
-                <div className="card-grid">
+                <div className={styles.cardGrid}>
                     {preferencesOptions.map((option) => (
                         <div
                             key={option.value}
-                            className={`card ${formData.preferences.includes(option.value) ? "selected" : ""} card-small`}
+                            className={`${styles.card} ${formData.preferences.includes(option.value) ? styles.cardSelected : ""} ${styles.cardSmall}`}
                             onClick={() => handleCardMultiSelect("preferences", option.value)}
                         >
-                            <div className="card-icon">{option.icon}</div>
-                            <div className="card-label">{option.label}</div>
+                            <div className={styles.cardIcon}>{option.icon}</div>
+                            <div className={styles.cardLabel}>{option.label}</div>
                         </div>
                     ))}
                 </div>
@@ -267,45 +272,45 @@ const Inquiry: React.FC = () => {
 
             {/* Сезон */}
             <QuestionContainer label={t("travelSeason")}>
-                <div className="card-grid">
+                <div className={styles.cardGrid}>
                     {seasonOptions.map((option) => (
                         <div
                             key={option.value}
-                            className={`card ${formData.season === option.value ? "selected" : ""}`}
+                            className={`${styles.card} ${formData.season === option.value ? styles.cardSelected : ""}`}
                             onClick={() => handleCardSingleSelect("season", option.value)}
                         >
-                            <div className="card-icon">{option.icon}</div>
-                            <div className="card-label">{option.label}</div>
+                            <div className={styles.cardIcon}>{option.icon}</div>
+                            <div className={styles.cardLabel}>{option.label}</div>
                         </div>
                     ))}
                 </div>
             </QuestionContainer>
 
-            {/* Вопрос о продолжительности */}
+            {/* Продолжительность */}
             <QuestionContainer label={t("travelDuration")}>
-                <div className="card-grid">
+                <div className={styles.cardGrid}>
                     {durationOptions.map((option) => (
                         <div
                             key={option.value}
-                            className={`card ${formData.duration === option.value ? "selected" : ""} card-short`}
+                            className={`${styles.card} ${formData.duration === option.value ? styles.cardSelected : ""}`}
                             onClick={() => handleCardSingleSelect("duration", option.value)}
                         >
-                            <div className="card-label">{option.label}</div>
+                            <div className={styles.cardLabel}>{option.label}</div>
                         </div>
                     ))}
                 </div>
             </QuestionContainer>
 
-            {/* Вопрос: Откуда вы начнете путешествие? */}
+            {/* Откуда начнется путешествие */}
             <QuestionContainer label={t("departureLocation")}>
                 <input
                     type="text"
                     name="locationFrom"
                     value={formData.locationFrom}
                     onChange={handleChange}
-                    maxLength={25} // Ограничение на количество символов
+                    maxLength={35} // Ограничение на количество символов
                     placeholder={t("enterYourCity")}
-                    className="text-input"
+                    className={styles.textInput}
                 />
             </QuestionContainer>
 
@@ -316,14 +321,14 @@ const Inquiry: React.FC = () => {
                     name="additionalPreferences"
                     value={formData.additionalPreferences}
                     onChange={handleChange}
-                    maxLength={50} // Ограничение на количество символов
+                    maxLength={10} // Ограничение на количество символов
                     placeholder={t("writeAdditionalDetails")}
-                    className="text-input"
+                    className={styles.textInput}
                 />
             </QuestionContainer>
 
             {/* Кнопка отправки */}
-            <button className="button" type="submit" onClick={handleSubmit}>
+            <button className={styles.button} type="submit" onClick={handleSubmit}>
                 {t("submit")}
             </button>
         </MainContainer>
@@ -336,7 +341,7 @@ interface QuestionContainerProps {
 }
 
 const QuestionContainer: React.FC<QuestionContainerProps> = ({label, children}) => (
-    <div className="question-container">
+    <div className={styles.questionContainer}>
         <label>{label}</label>
         {children}
     </div>

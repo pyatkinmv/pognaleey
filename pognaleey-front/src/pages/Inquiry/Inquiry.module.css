@@ -1,4 +1,6 @@
-.card-grid {
+/* Inquiry.module.css */
+
+.cardGrid {
     display: grid; /* Используем CSS Grid */
     grid-template-columns: repeat(auto-fit, minmax(6rem, 1fr)); /* Автоматическое распределение колонок */
     gap: 0.9375rem; /* Расстояние между плитками */
@@ -32,27 +34,26 @@
     transform: translateY(-0.2rem); /* Лёгкое поднятие плитки */
 }
 
-.card.selected {
+.cardSelected {
     transform: translateY(-0.2rem); /* Лёгкое поднятие плитки */
     border-color: darkseagreen; /* Цвет выделения */
     background-color: #dfebcc; /* Цвет выделенной карточки */
     box-shadow: 0 0.375rem 0.625rem rgba(0, 0, 0, 0.3); /* Увеличенная тень */
 }
 
-.card-icon {
+.cardIcon {
     font-size: 2.25rem; /* 36px */
     margin-bottom: 0.4rem; /* 10px */
 }
 
-.card-label {
+.cardLabel {
     text-align: center;
     font-weight: bold;
     font-size: 0.875rem; /* 14px */
     color: #333; /* Основной цвет текста */
 }
 
-/* Заголовок формы */
-.form-heading {
+.formHeading {
     text-align: center;
     font-size: 2em;
     font-weight: bold;
@@ -60,7 +61,7 @@
     margin-bottom: 1rem;
 }
 
-.question-container {
+.questionContainer {
     margin-top: 1rem;
     display: flex;
     flex-direction: column;
@@ -69,47 +70,27 @@
     text-align: center;
 }
 
-.question-container label {
+.questionContainer label {
     font-size: 1.25rem; /* 20px */
     font-weight: bold;
     color: #2c3e50; /* Основной цвет текста */
 }
 
-.text-input {
-    width: 100%;
-    max-width: 25rem; /* Ограничиваем ширину текстового поля */
-    padding: 0.5rem;
-    border: 1px solid #ccc;
-    border-radius: 0.5rem;
-    font-size: 1rem;
-    margin-top: 0.5rem;
-    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.1);
-    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+.cardSmall {
+    width: 5.75rem; /* 80px */
+    height: 4.75rem; /* 70px */
 }
 
-.text-input:focus {
-    outline: none;
-    border-color: #f87f76; /* Цвет выделения */
-    box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.2);
-}
-
-/* Дополнительные стили для уменьшенных карточек */
-.card-small {
-    width: 5rem; /* 80px */
-    height: 4.375rem; /* 70px */
-}
-
-.card-small .card-icon {
+.cardSmall .cardIcon {
     font-size: 1.5rem; /* 24px */
     color: #333;
 }
 
-.card-small .card-label {
+.cardSmall .cardLabel {
     font-size: 0.75rem; /* 12px */
     color: #333;
 }
 
-/*Стили кнопки*/
 .button {
     background-color: #f87f76;
     display: block;
@@ -139,3 +120,21 @@
     box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.7);
 }
 
+.textInput {
+    width: 100%;
+    max-width: 25rem; /* Ограничиваем ширину текстового поля */
+    padding: 0.75rem; /* Увеличиваем внутренние отступы */
+    border: 1px solid #ccc; /* Цвет границы */
+    border-radius: 0.5rem; /* Закругление углов */
+    font-size: 1rem; /* Размер шрифта */
+    margin-top: 0.75rem; /* Отступ сверху */
+    margin-bottom: 1rem; /* Отступ снизу */
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.1); /* Легкая тень */
+    transition: border-color 0.3s ease, box-shadow 0.3s ease; /* Плавные переходы */
+}
+
+.textInput:focus {
+    outline: none;
+    border-color: #f87f76; /* Цвет выделения */
+    box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.2); /* Увеличенная тень при фокусе */
+}

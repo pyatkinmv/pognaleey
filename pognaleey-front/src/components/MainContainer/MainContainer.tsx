@@ -1,5 +1,6 @@
+// MainContainer.tsx
 import React from "react";
-import "./MainContainer.css";
+import styles from "./MainContainer.module.css";
 
 interface MainContainerProps {
     children: React.ReactNode;
@@ -7,8 +8,8 @@ interface MainContainerProps {
 
 const MainContainer: React.FC<MainContainerProps> = ({children}) => {
     return (
-        <div className="main-container">
-            <div className="content-container">{children}</div>
+        <div className={styles.mainContainer}>
+            <div className={styles.contentContainer}>{children}</div>
         </div>
     );
 };

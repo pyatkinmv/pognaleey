@@ -1,5 +1,6 @@
-/* Модальное окно */
-.modal-overlay {
+/* ModalImage.module.css */
+
+.modalOverlay {
     position: fixed;
     top: 0;
     left: 0;
@@ -12,7 +13,7 @@
     z-index: 1000;
 }
 
-.modal-content {
+.modalContent {
     position: relative;
     background: transparent;
     border-radius: 0.625rem; /* 10px */
@@ -25,14 +26,14 @@
     overflow: hidden;
 }
 
-.modal-image {
+.modalImage {
     max-width: 100%;
     max-height: 100%;
     border-radius: 0.625rem; /* 10px */
     box-shadow: 0 0.25rem 0.625rem rgba(0, 0, 0, 0.3);
 }
 
-.modal-close {
+.modalClose {
     position: absolute;
     top: 1rem; /* 10px */
     right: 1.625rem; /* 10px */
@@ -47,25 +48,24 @@
     transition: transform 0.3s ease;
 }
 
-.modal-close:hover {
+.modalClose:hover {
     transform: scale(1.2);
     color: #f87f76;
 }
 
-.modal-image-caption {
+.modalImageCaption {
     font-size: 0.85rem; /* Размер шрифта подписи */
     color: #fff; /* Белый цвет для контраста */
     margin-top: 0.5rem; /* Отступ от изображения */
     text-align: center; /* Центрирование текста */
 }
 
-.modal-image-caption a {
+.modalImageCaption a {
     color: #f1f1f1; /* Цвет ссылок */
     text-decoration: none; /* Убираем подчёркивание */
 }
 
-.modal-image-caption a:hover {
+.modalImageCaption a:hover {
     text-decoration: underline; /* Подчёркивание при наведении */
     color: #f87f76; /* Цвет при наведении */
 }
-

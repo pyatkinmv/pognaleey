@@ -1,5 +1,6 @@
+// ModalImage.tsx
 import React from "react";
-import "./ModalImage.css";
+import styles from "./ModalImage.module.css";
 import {ImageDto} from "../../types/ImageDto";
 import ImageCaption from "../ImageCaption/ImageCaption";
 
@@ -14,19 +15,19 @@ const ModalImage: React.FC<ModalImageProps> = ({image, onClose}) => {
     }
 
     return (
-        <div className="modal-overlay" onClick={onClose}>
-            <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-                <img className="modal-image" src={image.url} alt={image.url || "Enlarged"}/>
+        <div className={styles.modalOverlay} onClick={onClose}>
+            <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
+                <img className={styles.modalImage} src={image.url} alt={image.url || "Enlarged"}/>
                 <div className="image-wrapper">
                     <ImageCaption
                         aiGenerated={image.aiGenerated}
                         authorName={image.authorName}
                         authorUrl={image.authorUrl}
                         licenceUrl={image.licenceUrl}
-                        className="modal-image-caption"
+                        className={styles.modalImageCaption}
                     />
                 </div>
-                <button className="modal-close" onClick={onClose}>
+                <button className={styles.modalClose} onClick={onClose}>
                     &times;
                 </button>
             </div>
