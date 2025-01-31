@@ -20,19 +20,17 @@
    POSTGRES_USER=
    POSTGRES_PASSWORD=
    POSTGRES_DB=
-   YANDEX_GPT_FOLDER_ID=
-   YANDEX_GPT_API_KEY=
    CHAT_GPT_API_KEY=
-   IMAGE_SEARCH_API_KEY=
-   IMAGE_SEARCH_FOLDER_ID=
-   CURRENT_GPT_CLIENT=
    JWT_SECRET=
+   APP_DOMAIN_NAME=
+   KANDINSKY_API_KEY=
+   KANDINSKY_API_SECRET=
    ```
 
 3. Add a `.env` file in the `pognaleey-front/` directory with the following content:
 
    ```properties
-   REACT_APP_API_URL=http://localhost:8080/api/v1
+   REACT_APP_API_URL=
    ```
 
 4. Set up the run configuration for `pognaleey-back` in IntelliJ IDEA:
