@@ -15,17 +15,17 @@ import ru.pyatkinmv.pognaleey.service.AuthService;
 @RequiredArgsConstructor
 @RequestMapping("/auth")
 public class AuthController {
-    private final AuthService authService;
+  private final AuthService authService;
 
-    @PostMapping("/login")
-    public ResponseEntity<String> login(@RequestBody AuthRequestDto request) {
-        return ResponseEntity.ok(authService.authenticateUser(request));
-    }
+  @PostMapping("/login")
+  public ResponseEntity<String> login(@RequestBody AuthRequestDto request) {
+    return ResponseEntity.ok(authService.authenticateUser(request));
+  }
 
-    @PostMapping("/register")
-    public ResponseEntity<UserDto> registerUser(@RequestBody AuthRequestDto request) {
-        var user = authService.registerUser(request);
+  @PostMapping("/register")
+  public ResponseEntity<UserDto> registerUser(@RequestBody AuthRequestDto request) {
+    var user = authService.registerUser(request);
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(user);
-    }
+    return ResponseEntity.status(HttpStatus.CREATED).body(user);
+  }
 }

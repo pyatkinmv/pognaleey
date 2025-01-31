@@ -8,8 +8,7 @@ import org.springframework.scheduling.annotation.EnableAsync;
 @SpringBootApplication
 public class PognaleeyApp {
 
-    public static void main(String[] args) {
-        SpringApplication.run(PognaleeyApp.class, args);
-    }
-
+  public static void main(String[] args) {
+    SpringApplication.run(PognaleeyApp.class, args);
+  }
 }

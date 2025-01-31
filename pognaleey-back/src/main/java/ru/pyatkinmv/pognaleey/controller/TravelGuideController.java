@@ -15,46 +15,45 @@ import ru.pyatkinmv.pognaleey.service.TravelGuideService;
 @RequiredArgsConstructor
 @Slf4j
 public class TravelGuideController {
-    private final TravelGuideService travelGuideService;
+  private final TravelGuideService travelGuideService;
 
-    @PostMapping
-    public TravelGuideInfoDto createGuide(@RequestParam("recommendationId") long recommendationId) {
-        return travelGuideService.createGuide(recommendationId);
-    }
+  @PostMapping
+  public TravelGuideInfoDto createGuide(@RequestParam("recommendationId") long recommendationId) {
+    return travelGuideService.createGuide(recommendationId);
+  }
 
-    @PutMapping("/{guideId}/like")
-    public TravelGuideLikeDto likeGuide(@PathVariable("guideId") long guideId) {
-        return travelGuideService.likeGuide(guideId);
-    }
+  @PutMapping("/{guideId}/like")
+  public TravelGuideLikeDto likeGuide(@PathVariable("guideId") long guideId) {
+    return travelGuideService.likeGuide(guideId);
+  }
 
-    @DeleteMapping("/{guideId}/unlike")
-    public TravelGuideLikeDto unlikeGuide(@PathVariable("guideId") long guideId) {
-        return travelGuideService.unlikeGuide(guideId);
-    }
+  @DeleteMapping("/{guideId}/unlike")
+  public TravelGuideLikeDto unlikeGuide(@PathVariable("guideId") long guideId) {
+    return travelGuideService.unlikeGuide(guideId);
+  }
 
-    @GetMapping("/{guideId}")
-    public TravelGuideInfoDto getGuide(@PathVariable("guideId") long guideId) {
-        return travelGuideService.getGuideInfo(guideId);
-    }
+  @GetMapping("/{guideId}")
+  public TravelGuideInfoDto getGuide(@PathVariable("guideId") long guideId) {
+    return travelGuideService.getGuideInfo(guideId);
+  }
 
-    @GetMapping("/{guideId}/content")
-    public TravelGuideContentDto getGuideContent(@PathVariable("guideId") long guideId) {
-        return travelGuideService.getGuideContent(guideId);
-    }
+  @GetMapping("/{guideId}/content")
+  public TravelGuideContentDto getGuideContent(@PathVariable("guideId") long guideId) {
+    return travelGuideService.getGuideContent(guideId);
+  }
 
-    @GetMapping("/liked")
-    public Page<TravelGuideInfoDto> getLikedGuides(Pageable pageable) {
-        return travelGuideService.getLikedGuides(pageable);
-    }
+  @GetMapping("/liked")
+  public Page<TravelGuideInfoDto> getLikedGuides(Pageable pageable) {
+    return travelGuideService.getLikedGuides(pageable);
+  }
 
-    @GetMapping("/my")
-    public Page<TravelGuideInfoDto> getMyGuides(Pageable pageable) {
-        return travelGuideService.getMyGuides(pageable);
-    }
+  @GetMapping("/my")
+  public Page<TravelGuideInfoDto> getMyGuides(Pageable pageable) {
+    return travelGuideService.getMyGuides(pageable);
+  }
 
-    @GetMapping("/feed")
-    public Page<TravelGuideInfoDto> getFeedGuides(Pageable pageable) {
-        return travelGuideService.getFeedGuides(pageable);
-    }
-
+  @GetMapping("/feed")
+  public Page<TravelGuideInfoDto> getFeedGuides(Pageable pageable) {
+    return travelGuideService.getFeedGuides(pageable);
+  }
 }

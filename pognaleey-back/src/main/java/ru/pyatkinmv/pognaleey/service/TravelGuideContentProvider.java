@@ -1,31 +1,32 @@
 package ru.pyatkinmv.pognaleey.service;
 
+import java.util.List;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import ru.pyatkinmv.pognaleey.dto.ImageDto;
 import ru.pyatkinmv.pognaleey.model.TravelGuide;
 import ru.pyatkinmv.pognaleey.model.TravelGuideContentItem;
 
-import java.util.List;
-import java.util.Optional;
-
 @Slf4j
 @RequiredArgsConstructor
 public abstract class TravelGuideContentProvider {
-    final ImageService imageService;
+  final ImageService imageService;
 
-    abstract void enrichGuideWithContent(TravelGuide guide, List<TravelGuideContentItem> guideContentItems, long inquiryId,
-                                         String recommendationTitle);
+  abstract void enrichGuideWithContent(
+      TravelGuide guide,
+      List<TravelGuideContentItem> guideContentItems,
+      long inquiryId,
+      String recommendationTitle);
 
-    public abstract List<TravelGuideContentItem> createBlueprintContentItems(long guideId,
-                                                                             String initialTitle,
-                                                                             Long imageId);
+  public abstract List<TravelGuideContentItem> createBlueprintContentItems(
+      long guideId, String initialTitle, Long imageId);
 
-    List<ImageDto> searchImages(List<GptAnswerResolveHelper.SearchableItem> searchableItems) {
-        return searchableItems.stream()
-                .map(it -> imageService.searchImage(it.title(), it.imageSearchPhrase()))
-                .filter(Optional::isPresent)
-                .map(Optional::get)
-                .toList();
-    }
+  List<ImageDto> searchImages(List<GptAnswerResolveHelper.SearchableItem> searchableItems) {
+    return searchableItems.stream()
+        .map(it -> imageService.searchImage(it.title(), it.imageSearchPhrase()))
+        .filter(Optional::isPresent)
+        .map(Optional::get)
+        .toList();
+  }
 }

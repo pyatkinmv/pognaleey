@@ -14,18 +14,16 @@ import org.springframework.lang.Nullable;
 @Builder
 @Table("travel_guide_content_items")
 public class TravelGuideContentItem {
-    @Id
-    private Long id;
+  @Id private Long id;
 
-    private Long guideId;
+  private Long guideId;
 
-    // TODO: add docs
-    @Nullable
-    private String content;
+  // TODO: add docs
+  @Nullable private String content;
 
-    private Integer ordinal;
+  private Integer ordinal;
 
-    private ProcessingStatus status;
+  private ProcessingStatus status;
 
-    private GuideContentItemType type;
+  private GuideContentItemType type;
 }

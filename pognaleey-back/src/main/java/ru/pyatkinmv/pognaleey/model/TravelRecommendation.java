@@ -1,12 +1,11 @@
 package ru.pyatkinmv.pognaleey.model;
 
+import java.time.Instant;
 import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Table;
 import org.springframework.lang.Nullable;
 import ru.pyatkinmv.pognaleey.dto.GptResponseRecommendationDetailsDto;
-
-import java.time.Instant;
 
 @Data
 @NoArgsConstructor
@@ -15,27 +14,19 @@ import java.time.Instant;
 @Table("travel_recommendations")
 @ToString(onlyExplicitlyIncluded = true)
 public class TravelRecommendation {
-    @ToString.Include
-    @Id
-    private Long id;
+  @ToString.Include @Id private Long id;
 
-    private Instant createdAt;
+  private Instant createdAt;
 
-    @ToString.Include
-    private Long inquiryId;
+  @ToString.Include private Long inquiryId;
 
-    @ToString.Include
-    private String title;
+  @ToString.Include private String title;
 
-    @Nullable
-    private Long imageId;
+  @Nullable private Long imageId;
 
-    /**
-     * {@link GptResponseRecommendationDetailsDto} stored here
-     */
-    @Nullable
-    private String details;
+  /** {@link GptResponseRecommendationDetailsDto} stored here */
+  @Nullable private String details;
 
-    // TODO: Подумать насчет статуса Inquiry вместо этого
-    private ProcessingStatus status;
+  // TODO: Подумать насчет статуса Inquiry вместо этого
+  private ProcessingStatus status;
 }

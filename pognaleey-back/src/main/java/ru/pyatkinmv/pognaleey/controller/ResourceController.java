@@ -15,19 +15,21 @@ import ru.pyatkinmv.pognaleey.repository.ResourceRepository;
 @RequiredArgsConstructor
 public class ResourceController {
 
-    private final ResourceRepository resourceRepository;
+  private final ResourceRepository resourceRepository;
 
-    @GetMapping("/{id}")
-    public ResponseEntity<InputStreamResource> getResourceById(@PathVariable Long id) {
-        try {
-            ResourceRepository.ResourceData resource = resourceRepository.findById(id);
+  @GetMapping("/{id}")
+  public ResponseEntity<InputStreamResource> getResourceById(@PathVariable Long id) {
+    try {
+      ResourceRepository.ResourceData resource = resourceRepository.findById(id);
 
-            return ResponseEntity.ok()
-                    .header(HttpHeaders.CONTENT_DISPOSITION, String.format("attachment; filename=\"%s\"", resource.name()))
-                    .header(HttpHeaders.CONTENT_TYPE, "application/octet-stream")
-                    .body(new InputStreamResource(resource.data()));
-        } catch (Exception e) {
-            return ResponseEntity.notFound().build();
-        }
+      return ResponseEntity.ok()
+          .header(
+              HttpHeaders.CONTENT_DISPOSITION,
+              String.format("attachment; filename=\"%s\"", resource.name()))
+          .header(HttpHeaders.CONTENT_TYPE, "application/octet-stream")
+          .body(new InputStreamResource(resource.data()));
+    } catch (Exception e) {
+      return ResponseEntity.notFound().build();
     }
+  }
 }

@@ -1,6 +1,10 @@
 package ru.pyatkinmv.pognaleey.security;
 
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 import jakarta.annotation.Nullable;
+import java.util.List;
 import lombok.SneakyThrows;
 import org.flywaydb.core.internal.util.JsonUtils;
 import org.junit.jupiter.api.Test;
@@ -18,117 +22,118 @@ import ru.pyatkinmv.pognaleey.model.UserRole;
 import ru.pyatkinmv.pognaleey.repository.UserRepository;
 import ru.pyatkinmv.pognaleey.util.Utils;
 
-import java.util.List;
-
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
 @SpringBootTest
 @AutoConfigureMockMvc
 public class JwtSecurityTest extends DatabaseCleaningTest {
-    private static final String PASSWORD = "password123";
+  private static final String PASSWORD = "password123";
 
-    @Autowired
-    private MockMvc mockMvc;
-    @Autowired
-    private UserRepository userRepository;
+  @Autowired private MockMvc mockMvc;
+  @Autowired private UserRepository userRepository;
 
-    @Test
-    public void accessSecuredEndpointWithValidToken() throws Exception {
-        var user = registerUser();
-        var token = loginAndReturnToken(user.username(), PASSWORD);
-        accessSecuredEndpoint(token).andExpect(status().isOk());
+  @Test
+  public void accessSecuredEndpointWithValidToken() throws Exception {
+    var user = registerUser();
+    var token = loginAndReturnToken(user.username(), PASSWORD);
+    accessSecuredEndpoint(token).andExpect(status().isOk());
+  }
+
+  @Test
+  public void accessSecuredEndpointWithoutToken() throws Exception {
+    accessSecuredEndpoint(null).andExpect(status().isOk());
+  }
+
+  @Test
+  public void accessSecuredEndpointWithInvalidToken() throws Exception {
+    accessSecuredEndpoint("invalid-header.payload.signature").andExpect(status().isForbidden());
+  }
+
+  @SneakyThrows
+  private String loginAndReturnToken(String username, String password) {
+    String loginRequestJson =
+        "{\"username\": \"" + username + "\", \"password\": \"" + password + "\"}";
+
+    return mockMvc
+        .perform(
+            post("/auth/login").contentType(MediaType.APPLICATION_JSON).content(loginRequestJson))
+        .andExpect(status().isOk())
+        .andReturn()
+        .getResponse()
+        .getContentAsString();
+  }
+
+  @Test
+  public void accessAdminEndpointWithAdminToken() throws Exception {
+    var admin =
+        userRepository
+            .findByUsername(registerUser().username())
+            .map(
+                it -> {
+                  it.setRole(UserRole.ADMIN);
+                  return userRepository.save(it);
+                })
+            .orElseThrow();
+    var adminToken = loginAndReturnToken(admin.getUsername(), PASSWORD);
+    accessAdminEndpoint(adminToken).andExpect(status().isOk());
+  }
+
+  @Test
+  public void accessAdminEndpointWithRegularUserToken() throws Exception {
+    var user = registerUser();
+    var token = loginAndReturnToken(user.username(), PASSWORD);
+    accessAdminEndpoint(token).andExpect(status().isForbidden());
+  }
+
+  @Test
+  public void accessAdminEndpointWithoutToken() throws Exception {
+    accessAdminEndpoint(null).andExpect(status().isForbidden());
+  }
+
+  @SneakyThrows
+  private UserDto registerUser() {
+    String registerRequest = "{\"username\": \"test-user\", \"password\": \"password123\"}";
+
+    var responseString =
+        mockMvc
+            .perform(
+                post("/auth/register")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(registerRequest))
+            .andExpect(status().isCreated())
+            .andReturn()
+            .getResponse()
+            .getContentAsString();
+
+    return JsonUtils.parseJson(responseString, UserDto.class);
+  }
+
+  @SneakyThrows
+  private ResultActions accessSecuredEndpoint(@Nullable String token) {
+    var headers = new HttpHeaders();
+    headers.setContentType(MediaType.APPLICATION_JSON);
+
+    if (token != null) {
+      headers.setBearerAuth(token);
     }
 
-    @Test
-    public void accessSecuredEndpointWithoutToken() throws Exception {
-        accessSecuredEndpoint(null).andExpect(status().isOk());
+    return mockMvc.perform(
+        post("/travel-inquiries")
+            .headers(headers)
+            .content("{\"preferences\": \"food\", \"to\": \"asia\"}"));
+  }
+
+  @SneakyThrows
+  private ResultActions accessAdminEndpoint(@Nullable String token) {
+    var headers = new HttpHeaders();
+    headers.setContentType(MediaType.APPLICATION_JSON);
+    if (token != null) {
+      headers.setBearerAuth(token);
     }
+    var content = new ManualGuidesCreateDtoList(List.of());
 
-    @Test
-    public void accessSecuredEndpointWithInvalidToken() throws Exception {
-        accessSecuredEndpoint("invalid-header.payload.signature").andExpect(status().isForbidden());
-    }
-
-    @SneakyThrows
-    private String loginAndReturnToken(String username, String password) {
-        String loginRequestJson = "{\"username\": \"" + username + "\", \"password\": \"" + password + "\"}";
-
-        return mockMvc.perform(post("/auth/login")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(loginRequestJson))
-                .andExpect(status().isOk())
-                .andReturn()
-                .getResponse()
-                .getContentAsString();
-    }
-
-    @Test
-    public void accessAdminEndpointWithAdminToken() throws Exception {
-        var admin = userRepository.findByUsername(registerUser().username())
-                .map(it -> {
-                    it.setRole(UserRole.ADMIN);
-                    return userRepository.save(it);
-                }).orElseThrow();
-        var adminToken = loginAndReturnToken(admin.getUsername(), PASSWORD);
-        accessAdminEndpoint(adminToken).andExpect(status().isOk());
-    }
-
-    @Test
-    public void accessAdminEndpointWithRegularUserToken() throws Exception {
-        var user = registerUser();
-        var token = loginAndReturnToken(user.username(), PASSWORD);
-        accessAdminEndpoint(token).andExpect(status().isForbidden());
-    }
-
-    @Test
-    public void accessAdminEndpointWithoutToken() throws Exception {
-        accessAdminEndpoint(null).andExpect(status().isForbidden());
-    }
-
-    @SneakyThrows
-    private UserDto registerUser() {
-        String registerRequest = "{\"username\": \"test-user\", \"password\": \"password123\"}";
-
-        var responseString = mockMvc.perform(post("/auth/register")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(registerRequest))
-                .andExpect(status().isCreated())
-                .andReturn()
-                .getResponse()
-                .getContentAsString();
-
-        return JsonUtils.parseJson(responseString, UserDto.class);
-    }
-
-    @SneakyThrows
-    private ResultActions accessSecuredEndpoint(@Nullable String token) {
-        var headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-
-        if (token != null) {
-            headers.setBearerAuth(token);
-        }
-
-        return mockMvc.perform(post("/travel-inquiries")
-                .headers(headers)
-                .content("{\"preferences\": \"food\", \"to\": \"asia\"}"));
-    }
-
-    @SneakyThrows
-    private ResultActions accessAdminEndpoint(@Nullable String token) {
-        var headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        if (token != null) {
-            headers.setBearerAuth(token);
-        }
-        var content = new ManualGuidesCreateDtoList(List.of());
-
-        return mockMvc.perform(post("/admin/createGuides")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(Utils.toJson(content))
-                .headers(headers));
-    }
+    return mockMvc.perform(
+        post("/admin/createGuides")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(Utils.toJson(content))
+            .headers(headers));
+  }
 }
-
-

@@ -11,21 +11,21 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @Configuration
 public class DevCorsConfig {
 
-    @Value("${cors.allowed-origins}")
-    private String[] corsAllowedOrigins;
+  @Value("${cors.allowed-origins}")
+  private String[] corsAllowedOrigins;
 
-    @Bean
-    public WebMvcConfigurer corsConfigurer() {
-        return new WebMvcConfigurer() {
-            @Override
-            public void addCorsMappings(@SuppressWarnings("NullableProblems") CorsRegistry registry) {
-                registry.addMapping("/**")
-                        .allowedOrigins(corsAllowedOrigins)
-                        .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
-                        .allowedHeaders("*")
-                        .allowCredentials(true);
-            }
-        };
-    }
+  @Bean
+  public WebMvcConfigurer corsConfigurer() {
+    return new WebMvcConfigurer() {
+      @Override
+      public void addCorsMappings(@SuppressWarnings("NullableProblems") CorsRegistry registry) {
+        registry
+            .addMapping("/**")
+            .allowedOrigins(corsAllowedOrigins)
+            .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
+            .allowedHeaders("*")
+            .allowCredentials(true);
+      }
+    };
+  }
 }
-

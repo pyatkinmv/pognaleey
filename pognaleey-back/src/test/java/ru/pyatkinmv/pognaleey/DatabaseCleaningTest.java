@@ -10,31 +10,31 @@ import org.springframework.jdbc.core.JdbcTemplate;
 @SpringBootTest
 public abstract class DatabaseCleaningTest {
 
-    @Autowired
-    private JdbcTemplate jdbcTemplate;
+  @Autowired private JdbcTemplate jdbcTemplate;
 
-    @BeforeEach
-    public void beforeEach() {
-        cleanDatabase();
-    }
+  @BeforeEach
+  public void beforeEach() {
+    cleanDatabase();
+  }
 
-    private void cleanDatabase() {
-        log.info("Cleaning database...");
-        var truncateQuery = """
-                DO $$
-                DECLARE
-                    table_name text;
-                BEGIN
-                    FOR table_name IN
-                        SELECT tablename
-                        FROM pg_tables
-                        WHERE schemaname = 'public' AND tablename != 'flyway_schema_history'
-                    LOOP
-                        EXECUTE format('TRUNCATE TABLE %I CASCADE', table_name);
-                    END LOOP;
-                END $$;
-                """;
-        jdbcTemplate.execute(truncateQuery);
-        log.info("Database has been cleaned");
-    }
+  private void cleanDatabase() {
+    log.info("Cleaning database...");
+    var truncateQuery =
+        """
+        DO $$
+        DECLARE
+            table_name text;
+        BEGIN
+            FOR table_name IN
+                SELECT tablename
+                FROM pg_tables
+                WHERE schemaname = 'public' AND tablename != 'flyway_schema_history'
+            LOOP
+                EXECUTE format('TRUNCATE TABLE %I CASCADE', table_name);
+            END LOOP;
+        END $$;
+        """;
+    jdbcTemplate.execute(truncateQuery);
+    log.info("Database has been cleaned");
+  }
 }

@@ -1,5 +1,6 @@
 package ru.pyatkinmv.pognaleey.model;
 
+import java.time.Instant;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -8,29 +9,23 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Table;
 import org.springframework.lang.Nullable;
 
-import java.time.Instant;
-
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 @Table("travel_guides")
 public class TravelGuide {
-    @Id
-    private Long id;
+  @Id private Long id;
 
-    private Long recommendationId;
+  private Long recommendationId;
 
-    @Nullable
-    private Long userId;
+  @Nullable private Long userId;
 
-    private Instant createdAt;
+  private Instant createdAt;
 
-    @Nullable
-    private String title;
+  @Nullable private String title;
 
-    @Nullable
-    private Long imageId;
+  @Nullable private Long imageId;
 
-    private Language language;
+  private Language language;
 }

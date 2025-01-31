@@ -1,135 +1,132 @@
 package ru.pyatkinmv.pognaleey.service;
 
-import lombok.extern.slf4j.Slf4j;
+import static ru.pyatkinmv.pognaleey.service.TravelRecommendationService.RECOMMENDATIONS_NUMBER;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import static ru.pyatkinmv.pognaleey.service.TravelRecommendationService.RECOMMENDATIONS_NUMBER;
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class GptAnswerResolveHelper {
-    public static <T> List<T> resolveInCaseGeneratedMoreOrLessThanExpected(
-            List<T> recommendations) {
-        if (recommendations.size() != RECOMMENDATIONS_NUMBER) {
-            log.warn("Number of recommendations {} is not equal to the number of expected {}",
-                    recommendations.size(), RECOMMENDATIONS_NUMBER);
+  public static <T> List<T> resolveInCaseGeneratedMoreOrLessThanExpected(List<T> recommendations) {
+    if (recommendations.size() != RECOMMENDATIONS_NUMBER) {
+      log.warn(
+          "Number of recommendations {} is not equal to the number of expected {}",
+          recommendations.size(),
+          RECOMMENDATIONS_NUMBER);
 
-            if (recommendations.size() < RECOMMENDATIONS_NUMBER) {
-                return recommendations;
-            } else {
-                return recommendations.subList(0, RECOMMENDATIONS_NUMBER);
-            }
-        }
-
+      if (recommendations.size() < RECOMMENDATIONS_NUMBER) {
         return recommendations;
+      } else {
+        return recommendations.subList(0, RECOMMENDATIONS_NUMBER);
+      }
     }
 
-    public static String removeJsonTagsIfPresent(String json) {
-        return json.trim().replace("\\(json\\)", "").replace("json", "");
+    return recommendations;
+  }
+
+  public static String removeJsonTagsIfPresent(String json) {
+    return json.trim().replace("\\(json\\)", "").replace("json", "");
+  }
+
+  public static String stripCurlyBraces(String input) {
+    var regex = "\\{.*?\\}";
+    var pattern = Pattern.compile(regex);
+    var matcher = pattern.matcher(input);
+
+    var result = input;
+
+    while (matcher.find()) {
+      var toRemove = matcher.group();
+      log.info("Remove {}", toRemove);
+      result = result.replace(toRemove, "");
     }
 
-    public static String stripCurlyBraces(String input) {
-        var regex = "\\{.*?\\}";
-        var pattern = Pattern.compile(regex);
-        var matcher = pattern.matcher(input);
+    return result;
+  }
 
-        var result = input;
+  public static Optional<String> findFirstByRegex(String text, String regex) {
+    Pattern pattern = Pattern.compile(regex);
+    Matcher matcher = pattern.matcher(text);
 
-        while (matcher.find()) {
-            var toRemove = matcher.group();
-            log.info("Remove {}", toRemove);
-            result = result.replace(toRemove, "");
-        }
+    if (matcher.find()) {
+      return Optional.of(matcher.group());
+    } else {
+      return Optional.empty();
+    }
+  }
 
-        return result;
+  // TODO: doc
+  static List<SearchableItem> parseSearchableItems(String searchableItemsRaw) {
+    // {title1}(searchPhrase1)|{title2}(searchPhrase1)|...
+    var regex = "([^|]+)";
+    var pattern = Pattern.compile(regex);
+    var matcher = pattern.matcher(searchableItemsRaw);
+    var result = new ArrayList<SearchableItem>();
+
+    while (matcher.find()) {
+      var searchableItemRaw = matcher.group().trim().replaceAll("\\.", "");
+      parseSearchableItem(searchableItemRaw)
+          .ifPresentOrElse(
+              result::add,
+              () -> log.warn("Wrong format for recommendation: {}", searchableItemRaw));
     }
 
-    public static Optional<String> findFirstByRegex(String text, String regex) {
-        Pattern pattern = Pattern.compile(regex);
-        Matcher matcher = pattern.matcher(text);
+    return result;
+  }
 
-        if (matcher.find()) {
-            return Optional.of(matcher.group());
-        } else {
-            return Optional.empty();
-        }
+  static List<String> splitWithPipe(String input) {
+    var regex = "([^|]+)";
+    var pattern = Pattern.compile(regex);
+    var matcher = pattern.matcher(input);
+    var result = new ArrayList<String>();
+
+    while (matcher.find()) {
+      var item = matcher.group().trim().replaceAll("\\.", "");
+
+      if (!item.isEmpty()) {
+        result.add(item);
+      }
     }
 
-    // TODO: doc
-    static List<SearchableItem> parseSearchableItems(String searchableItemsRaw) {
-        // {title1}(searchPhrase1)|{title2}(searchPhrase1)|...
-        var regex = "([^|]+)";
-        var pattern = Pattern.compile(regex);
-        var matcher = pattern.matcher(searchableItemsRaw);
-        var result = new ArrayList<SearchableItem>();
+    return result;
+  }
 
-        while (matcher.find()) {
-            var searchableItemRaw = matcher.group().trim().replaceAll("\\.", "");
-            parseSearchableItem(searchableItemRaw)
-                    .ifPresentOrElse(
-                            result::add,
-                            () -> log.warn("Wrong format for recommendation: {}", searchableItemRaw)
-                    );
-        }
+  static Optional<SearchableItem> parseSearchableItem(String searchableItemRaw) {
+    // {title}(searchPhrase)
+    //noinspection RegExpRedundantEscape
+    var regex = "\\{([^\\]]+)\\}\\(([^\\)]+)\\)";
+    var pattern = Pattern.compile(regex);
+    var matcher = pattern.matcher(searchableItemRaw);
 
-        return result;
+    if (matcher.matches()) {
+      var title = matcher.group(1);
+      var imageSearchPhrase = matcher.group(2);
+
+      return Optional.of(new SearchableItem(title, imageSearchPhrase));
+    } else {
+      return Optional.empty();
+    }
+  }
+
+  public static String replaceQuotes(String text) {
+    var result = new StringBuilder();
+    var openQuote = true;
+
+    for (char c : text.toCharArray()) {
+      if (c == '\"') {
+        result.append(openQuote ? "«" : "»");
+        openQuote = !openQuote;
+      } else {
+        result.append(c);
+      }
     }
 
-    static List<String> splitWithPipe(String input) {
-        var regex = "([^|]+)";
-        var pattern = Pattern.compile(regex);
-        var matcher = pattern.matcher(input);
-        var result = new ArrayList<String>();
+    return result.toString();
+  }
 
-        while (matcher.find()) {
-            var item = matcher.group().trim().replaceAll("\\.", "");
-
-            if (!item.isEmpty()) {
-                result.add(item);
-            }
-        }
-
-        return result;
-    }
-
-    static Optional<SearchableItem> parseSearchableItem(String searchableItemRaw) {
-        // {title}(searchPhrase)
-        //noinspection RegExpRedundantEscape
-        var regex = "\\{([^\\]]+)\\}\\(([^\\)]+)\\)";
-        var pattern = Pattern.compile(regex);
-        var matcher = pattern.matcher(searchableItemRaw);
-
-        if (matcher.matches()) {
-            var title = matcher.group(1);
-            var imageSearchPhrase = matcher.group(2);
-
-            return Optional.of(new SearchableItem(title, imageSearchPhrase));
-        } else {
-            return Optional.empty();
-        }
-    }
-
-    public static String replaceQuotes(String text) {
-        var result = new StringBuilder();
-        var openQuote = true;
-
-        for (char c : text.toCharArray()) {
-            if (c == '\"') {
-                result.append(openQuote ? "«" : "»");
-                openQuote = !openQuote;
-            } else {
-                result.append(c);
-            }
-        }
-
-        return result.toString();
-    }
-
-    record SearchableItem(String title, String imageSearchPhrase) {
-
-    }
+  record SearchableItem(String title, String imageSearchPhrase) {}
 }

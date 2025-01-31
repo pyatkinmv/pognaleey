@@ -1,92 +1,91 @@
 package ru.pyatkinmv.pognaleey.client;
 
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import ru.pyatkinmv.pognaleey.dto.ImageSearchClientImageDto;
-
 import java.net.URI;
 import java.util.Arrays;
 import java.util.Optional;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import ru.pyatkinmv.pognaleey.dto.ImageSearchClientImageDto;
 
 @RequiredArgsConstructor
 @Slf4j
 public abstract class ImageSearchHttpClient<T> {
 
-    private static boolean hasMoreThanTwoWords(String searchQuery) {
-        var queryWords = Arrays.stream(searchQuery.split(" ")).toList();
+  private static boolean hasMoreThanTwoWords(String searchQuery) {
+    var queryWords = Arrays.stream(searchQuery.split(" ")).toList();
 
-        return queryWords.size() > 2;
+    return queryWords.size() > 2;
+  }
+
+  private static String shortenSearchQuery(String searchQuery) {
+    var queryWords = Arrays.stream(searchQuery.split(" ")).toList();
+    var newQueryWords = queryWords.subList(0, queryWords.size() - 1);
+
+    return String.join(" ", newQueryWords);
+  }
+
+  Optional<T> makeRequest(URI uri) {
+    T response = null;
+
+    try {
+      // TODO: Retry?
+      response = doMakeRequest(uri);
+    } catch (Exception e) {
+      log.error("could not get response", e);
     }
 
-    private static String shortenSearchQuery(String searchQuery) {
-        var queryWords = Arrays.stream(searchQuery.split(" ")).toList();
-        var newQueryWords = queryWords.subList(0, queryWords.size() - 1);
+    return Optional.ofNullable(response);
+  }
 
-        return String.join(" ", newQueryWords);
+  abstract T doMakeRequest(URI uri);
+
+  public Optional<ImageSearchClientImageDto> searchImage(String searchQuery) {
+    log.info("searchImage for searchQuery {}", searchQuery);
+
+    if (searchQuery.isEmpty()) {
+      log.info("searchQuery is empty");
+
+      return Optional.empty();
     }
 
-    Optional<T> makeRequest(URI uri) {
-        T response = null;
+    var uri = buildUri(searchQuery);
+    log.info("searchImage uri {}", withoutSecret(uri));
 
-        try {
-            // TODO: Retry?
-            response = doMakeRequest(uri);
-        } catch (Exception e) {
-            log.error("could not get response", e);
-        }
+    var response = makeRequest(uri);
 
-        return Optional.ofNullable(response);
+    if (response.isEmpty()) {
+      return Optional.empty();
     }
 
-    abstract T doMakeRequest(URI uri);
+    var image = response.flatMap(it -> retrieveTargetImages(it, searchQuery));
 
-    public Optional<ImageSearchClientImageDto> searchImage(String searchQuery) {
-        log.info("searchImage for searchQuery {}", searchQuery);
+    if (image.isEmpty()) {
+      log.info("Couldn't find image for searchQuery {}", searchQuery);
 
-        if (searchQuery.isEmpty()) {
-            log.info("searchQuery is empty");
+      if (enableShorteningSearchQueryHack() && hasMoreThanTwoWords(searchQuery)) {
+        log.info("Try to shorten searchQuery and search again");
 
-            return Optional.empty();
-        }
-
-        var uri = buildUri(searchQuery);
-        log.info("searchImage uri {}", withoutSecret(uri));
-
-        var response = makeRequest(uri);
-
-        if (response.isEmpty()) {
-            return Optional.empty();
-        }
-
-        var image = response.flatMap(it -> retrieveTargetImages(it, searchQuery));
-
-        if (image.isEmpty()) {
-            log.info("Couldn't find image for searchQuery {}", searchQuery);
-
-            if (enableShorteningSearchQueryHack() && hasMoreThanTwoWords(searchQuery)) {
-                log.info("Try to shorten searchQuery and search again");
-
-                return searchImage(shortenSearchQuery(searchQuery));
-            }
-        }
-
-        log.info("searchImage result {}", image);
-
-        return image;
+        return searchImage(shortenSearchQuery(searchQuery));
+      }
     }
 
-    abstract URI buildUri(String searchQuery);
+    log.info("searchImage result {}", image);
 
-    protected boolean enableShorteningSearchQueryHack() {
-        // By default false
-        return false;
-    }
+    return image;
+  }
 
-    private String withoutSecret(URI uri) {
-        return uri.toString().replace(getApiKey(), "SECRET");
-    }
+  abstract URI buildUri(String searchQuery);
 
-    abstract Optional<ImageSearchClientImageDto> retrieveTargetImages(T response, String searchQuery);
+  protected boolean enableShorteningSearchQueryHack() {
+    // By default false
+    return false;
+  }
 
-    abstract String getApiKey();
+  private String withoutSecret(URI uri) {
+    return uri.toString().replace(getApiKey(), "SECRET");
+  }
+
+  abstract Optional<ImageSearchClientImageDto> retrieveTargetImages(T response, String searchQuery);
+
+  abstract String getApiKey();
 }
