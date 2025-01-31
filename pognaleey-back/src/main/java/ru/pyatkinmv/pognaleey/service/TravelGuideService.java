@@ -34,7 +34,7 @@ public class TravelGuideService {
   private final TravelRecommendationService recommendationService;
   private final UserService userService;
   private final ExecutorService executorService;
-  private final TravelGuideContentProviderV2 guideContentProvider;
+  private final TravelGuideContentProvider guideContentProvider;
   private final TravelGuideContentItemRepository guideContentItemRepository;
   private final ImageService imageService;
 

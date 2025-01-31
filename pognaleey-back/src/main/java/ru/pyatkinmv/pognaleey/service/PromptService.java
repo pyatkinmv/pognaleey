@@ -79,17 +79,4 @@ public class PromptService {
         new Object[] {guideTitle, inquiryParams, GUIDE_PRACTICAL_TITLES_COUNT},
         LanguageContextHolder.getLanguageLocaleOrDefault());
   }
-
-  public String generateCreateGuidePrompt(String title, String inquiryParams, String guideTopics) {
-    return messageSource.getMessage(
-        "prompts.generate_full_guide_deprecated",
-        new Object[] {
-          title,
-          inquiryParams,
-          GUIDE_PRACTICAL_TITLES_COUNT,
-          guideTopics,
-          GUIDE_PRACTICAL_TITLES_COUNT
-        },
-        LanguageContextHolder.getLanguageLocaleOrDefault());
-  }
 }

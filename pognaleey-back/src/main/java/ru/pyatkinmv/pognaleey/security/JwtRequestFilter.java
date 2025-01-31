@@ -15,14 +15,12 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
-import ru.pyatkinmv.pognaleey.service.UserService;
 
 @RequiredArgsConstructor
 @Component
 public class JwtRequestFilter extends OncePerRequestFilter {
 
   private final JwtProvider jwtProvider;
-  private final UserService userService;
 
   @SuppressWarnings("NullableProblems")
   @Override

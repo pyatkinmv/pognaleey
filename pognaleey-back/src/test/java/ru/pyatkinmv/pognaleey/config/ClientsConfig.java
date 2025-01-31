@@ -10,7 +10,7 @@ import org.mockito.stubbing.Answer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import ru.pyatkinmv.pognaleey.client.GptHttpClient;
-import ru.pyatkinmv.pognaleey.client.PixabayImageSearchHttpClient;
+import ru.pyatkinmv.pognaleey.client.OpenverseImageSearchHttpClient;
 import ru.pyatkinmv.pognaleey.dto.ImageSearchClientImageDto;
 
 @Configuration
@@ -93,8 +93,8 @@ public class ClientsConfig {
   }
 
   @Bean
-  public PixabayImageSearchHttpClient imagesSearchHttpClient() {
-    var imageSearchHttpClientMock = Mockito.mock(PixabayImageSearchHttpClient.class);
+  public OpenverseImageSearchHttpClient imagesSearchHttpClient() {
+    var imageSearchHttpClientMock = Mockito.mock(OpenverseImageSearchHttpClient.class);
     when(imageSearchHttpClientMock.searchImage(any()))
         .thenAnswer(
             (Answer<Optional<ImageSearchClientImageDto>>)

@@ -225,9 +225,6 @@ public class AdminService {
                       new TravelRecommendationService.TitleAndImageQuery(
                           recommendation.getTitle(), it.imageQuery())));
               return guideService.createGuide(recommendation.getId());
-              //
-              // recommendationService.enrichRecommendationsAsync(List.of(recommendation),
-              // inquiry.getParams());
             })
         .toList();
   }

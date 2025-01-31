@@ -4,11 +4,6 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.time.Instant;
 import java.util.*;
 import java.util.concurrent.Future;
@@ -49,38 +44,6 @@ public final class Utils {
     log.info("end at {}, total ms {}", end, end - start);
 
     return result;
-  }
-
-  public static void writeFile(String content, long guide) {
-    var uuid = UUID.randomUUID();
-    var fileName = String.format("guide-for-guide-%d-%s.md", guide, uuid);
-
-    try {
-      // Путь к папке resources
-      Path resourcePath = Paths.get("pognaleey-back/ignorable");
-      // Создаем объект файла
-      File file = new File(resourcePath.toFile(), fileName);
-
-      // Проверяем, существует ли папка resources
-      if (!resourcePath.toFile().exists()) {
-        throw new IllegalStateException(
-            "Папка resources не найдена: " + resourcePath.toAbsolutePath());
-      }
-
-      // Создаем файл (если он не существует)
-      if (!file.exists()) {
-        file.createNewFile();
-      }
-
-      // Записываем содержимое в файл
-      try (FileWriter writer = new FileWriter(file)) {
-        writer.write(content);
-        System.out.println("Файл успешно создан и записан: " + file.getAbsolutePath());
-      }
-
-    } catch (IOException | RuntimeException e) {
-      System.err.println("Ошибка при записи файла: " + e.getMessage());
-    }
   }
 
   public static <T> Optional<T> getOrEmpty(Collection<T> collection, int i) {

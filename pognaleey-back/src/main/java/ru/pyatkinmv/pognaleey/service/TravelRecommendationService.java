@@ -51,7 +51,7 @@ public class TravelRecommendationService {
   @SneakyThrows
   static GptResponseRecommendationDetailsDto parseDetailed(String gptRecommendationsAnswerRaw) {
     gptRecommendationsAnswerRaw = removeJsonTagsIfPresent(gptRecommendationsAnswerRaw);
-    var regex = "\\{[\\s\\S]*\"description\":[\\s\\S]*\\}";
+    var regex = "\\{[\\s\\S]*\"description\":[\\s\\S]*}";
     var pattern = Pattern.compile(regex);
     var matcher = pattern.matcher(gptRecommendationsAnswerRaw);
 

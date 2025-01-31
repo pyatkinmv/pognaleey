@@ -24,27 +24,11 @@ logging:
 image-search-client:
   # noinspection SpringBootApplicationYaml
   current: ${CURRENT_IMAGE_SEARCH_CLIENT}
-  yandex:
-    base-url: https://yandex.ru/images-xml
-    api-key: ${YANDEX_IMAGE_SEARCH_API_KEY}
-    folder-id: ${YANDEX_IMAGE_SEARCH_FOLDER_ID}
-    permits-per-second: 0.5
-  pixabay:
-    base-url: https://pixabay.com/api/
-    api-key: ${PIXABAY_IMAGE_SEARCH_API_KEY}
-  flickr:
-    base-url: https://www.flickr.com/services/rest/
-    api-key: ${FLICKR_IMAGE_SEARCH_API_KEY}
   openverse:
     base-url: https://api.openverse.org/v1/images/
 gpt-client:
   # noinspection SpringBootApplicationYaml
   current: ${CURRENT_GPT_CLIENT}
-  yandex:
-    base-url: https://llm.api.cloud.yandex.net/foundationModels/v1/completion
-    model-uri: gpt://b1g4e7108ae9pp9j7tn7/yandexgpt/rc
-    folder-id: ${YANDEX_GPT_FOLDER_ID}
-    api-key: ${YANDEX_GPT_API_KEY}
   openai:
     base-url: https://api.openai.com/v1/chat/completions
     model: gpt-4o-mini

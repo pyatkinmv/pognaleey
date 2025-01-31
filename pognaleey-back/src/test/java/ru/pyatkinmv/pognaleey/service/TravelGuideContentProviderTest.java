@@ -4,14 +4,14 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static ru.pyatkinmv.pognaleey.model.GuideContentItemType.IMAGE;
 import static ru.pyatkinmv.pognaleey.model.GuideContentItemType.MARKDOWN;
 import static ru.pyatkinmv.pognaleey.model.ProcessingStatus.IN_PROGRESS;
-import static ru.pyatkinmv.pognaleey.service.TravelGuideContentProviderV2.GuideStructureType.ATTRACTIONS;
+import static ru.pyatkinmv.pognaleey.service.TravelGuideContentProvider.GuideStructureType.ATTRACTIONS;
 
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 import ru.pyatkinmv.pognaleey.dto.ImageDto;
 import ru.pyatkinmv.pognaleey.model.TravelGuideContentItem;
 
-class TravelGuideContentProviderV2Test {
+class TravelGuideContentProviderTest {
 
   @Test
   void extractItems() {
@@ -41,7 +41,7 @@ class TravelGuideContentProviderV2Test {
     var sightseeingFirst =
         new TravelGuideContentItem(null, guideId, null, firstOrdinal, IN_PROGRESS, MARKDOWN);
     var contentItems =
-        TravelGuideContentProviderV2.extractItems(
+        TravelGuideContentProvider.extractItems(
             sightseeingContentResponse, sightseeingFirst, titleToImageMap);
 
     assertThat(contentItems)
@@ -50,24 +50,12 @@ class TravelGuideContentProviderV2Test {
             new TravelGuideContentItem(null, guideId, "## Main header\n", 3, IN_PROGRESS, MARKDOWN),
             new TravelGuideContentItem(
                 null, guideId, "### topic1\ntext1\n\n", 4, IN_PROGRESS, MARKDOWN),
-            new TravelGuideContentItem(
-                null,
-                guideId,
-                "{\"id\":null,\"title\":\"url1\",\"url\":\"title1\",\"thumbnailUrl\":\"thumb1\",\"query\":\"q1\",\"aiGenerated\":false,\"licenceUrl\":null,\"authorName\":null,\"authorUrl\":null}",
-                5,
-                IN_PROGRESS,
-                IMAGE),
+            new TravelGuideContentItem(null, guideId, "{\"imageId\":null}", 5, IN_PROGRESS, IMAGE),
             new TravelGuideContentItem(
                 null, guideId, "### topic2\ntext2\n\n", 6, IN_PROGRESS, MARKDOWN),
             new TravelGuideContentItem(
                 null, guideId, "### topic3\ntext3\n\n", 7, IN_PROGRESS, MARKDOWN),
-            new TravelGuideContentItem(
-                null,
-                guideId,
-                "{\"id\":null,\"title\":\"url3\",\"url\":\"title3\",\"thumbnailUrl\":\"thumb3\",\"query\":\"q3\",\"aiGenerated\":false,\"licenceUrl\":null,\"authorName\":null,\"authorUrl\":null}",
-                8,
-                IN_PROGRESS,
-                IMAGE),
+            new TravelGuideContentItem(null, guideId, "{\"imageId\":null}", 8, IN_PROGRESS, IMAGE),
             new TravelGuideContentItem(
                 null, guideId, "### topic4\ntext4\n\n", 9, IN_PROGRESS, MARKDOWN));
   }

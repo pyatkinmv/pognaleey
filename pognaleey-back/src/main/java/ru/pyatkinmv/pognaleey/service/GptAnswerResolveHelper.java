@@ -32,22 +32,6 @@ public class GptAnswerResolveHelper {
     return json.trim().replace("\\(json\\)", "").replace("json", "");
   }
 
-  public static String stripCurlyBraces(String input) {
-    var regex = "\\{.*?\\}";
-    var pattern = Pattern.compile(regex);
-    var matcher = pattern.matcher(input);
-
-    var result = input;
-
-    while (matcher.find()) {
-      var toRemove = matcher.group();
-      log.info("Remove {}", toRemove);
-      result = result.replace(toRemove, "");
-    }
-
-    return result;
-  }
-
   public static Optional<String> findFirstByRegex(String text, String regex) {
     Pattern pattern = Pattern.compile(regex);
     Matcher matcher = pattern.matcher(text);
@@ -110,22 +94,6 @@ public class GptAnswerResolveHelper {
     } else {
       return Optional.empty();
     }
-  }
-
-  public static String replaceQuotes(String text) {
-    var result = new StringBuilder();
-    var openQuote = true;
-
-    for (char c : text.toCharArray()) {
-      if (c == '\"') {
-        result.append(openQuote ? "«" : "»");
-        openQuote = !openQuote;
-      } else {
-        result.append(c);
-      }
-    }
-
-    return result.toString();
   }
 
   record SearchableItem(String title, String imageSearchPhrase) {}
