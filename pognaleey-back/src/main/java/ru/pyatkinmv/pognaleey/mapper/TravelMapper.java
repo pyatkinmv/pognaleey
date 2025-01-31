@@ -169,7 +169,6 @@ public class TravelMapper {
         image.getAuthorUrl());
   }
 
-  // TODO: утащить все FAILED с фронта
   public static String mapToApi(ProcessingStatus status) {
     return switch (status) {
       case IN_PROGRESS, CONTENT_GENERATED, IMAGE_SEARCH_FINISHED ->

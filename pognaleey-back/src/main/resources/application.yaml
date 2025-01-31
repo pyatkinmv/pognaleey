@@ -21,14 +21,18 @@ spring:
 logging:
   level:
     root: INFO
-image-search-client:
-  # noinspection SpringBootApplicationYaml
-  current: ${CURRENT_IMAGE_SEARCH_CLIENT}
-  openverse:
-    base-url: https://api.openverse.org/v1/images/
+image-client:
+  search:
+    openverse:
+      base-url: https://api.openverse.org/v1/images/
+  generate:
+    kandinsky:
+      base-url-get: https://api-key.fusionbrain.ai/key/api/v1/text2image/status
+      base-url-post: https://api-key.fusionbrain.ai/key/api/v1/text2image/run
+      api-key: ${KANDINSKY_API_KEY}
+      api-secret: ${KANDINSKY_API_SECRET}
 gpt-client:
   # noinspection SpringBootApplicationYaml
-  current: ${CURRENT_GPT_CLIENT}
   openai:
     base-url: https://api.openai.com/v1/chat/completions
     model: gpt-4o-mini

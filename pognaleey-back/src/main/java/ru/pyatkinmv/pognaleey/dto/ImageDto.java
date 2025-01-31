@@ -3,7 +3,6 @@ package ru.pyatkinmv.pognaleey.dto;
 import org.springframework.lang.Nullable;
 
 // NOTE: Maintain backward compatibility
-// TODO: implement test
 public record ImageDto(
     @Nullable Long id,
     String title,

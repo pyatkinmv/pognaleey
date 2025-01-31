@@ -27,6 +27,5 @@ public class TravelRecommendation {
   /** {@link GptResponseRecommendationDetailsDto} stored here */
   @Nullable private String details;
 
-  // TODO: Подумать насчет статуса Inquiry вместо этого
   private ProcessingStatus status;
 }

@@ -3,19 +3,17 @@ spring:
     url: jdbc:tc:postgresql:17-alpine:///pognaleey
   profiles:
     active: test
-image-search-client:
-  # noinspection SpringBootApplicationYaml
-  current: null
-  pixabay:
-    base-url: url
+image-client:
+  search:
+    openverse:
+      base-url: url
+  generate:
+    kandinsky:
+      base-url-get: get-url
+      base-url-post: post-url
+      api-key: apiKey
+      api-secret: apiSecret
 gpt-client:
-  # noinspection SpringBootApplicationYaml
-  current: null
-  yandex:
-    base-url: url
-    model-uri: uri
-    folder-id: folderId
-    api-key: apiKey
   openai:
     base-url: url
     model: model

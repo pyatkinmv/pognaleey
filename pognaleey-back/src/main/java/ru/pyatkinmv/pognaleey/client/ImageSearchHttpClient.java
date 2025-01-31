@@ -28,7 +28,6 @@ public abstract class ImageSearchHttpClient<T> {
     T response = null;
 
     try {
-      // TODO: Retry?
       response = doMakeRequest(uri);
     } catch (Exception e) {
       log.error("could not get response", e);
@@ -77,7 +76,6 @@ public abstract class ImageSearchHttpClient<T> {
   abstract URI buildUri(String searchQuery);
 
   protected boolean enableShorteningSearchQueryHack() {
-    // By default false
     return false;
   }
 

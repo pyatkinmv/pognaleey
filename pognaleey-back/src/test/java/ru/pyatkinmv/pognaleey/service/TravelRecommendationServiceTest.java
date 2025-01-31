@@ -1,7 +1,6 @@
 package ru.pyatkinmv.pognaleey.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static ru.pyatkinmv.pognaleey.service.PromptService.DETAILED_PROMPT_OBJ;
 
 import java.time.Instant;
 import java.util.List;
@@ -9,6 +8,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import ru.pyatkinmv.pognaleey.DatabaseCleaningTest;
+import ru.pyatkinmv.pognaleey.dto.GptResponseRecommendationDetailsDto;
 import ru.pyatkinmv.pognaleey.dto.ImageDto;
 import ru.pyatkinmv.pognaleey.dto.TravelRecommendationDto;
 import ru.pyatkinmv.pognaleey.model.ProcessingStatus;
@@ -22,6 +22,7 @@ class TravelRecommendationServiceTest extends DatabaseCleaningTest {
   @Autowired private TravelRecommendationService recommendationService;
   @Autowired private TravelRecommendationRepository recommendationRepository;
   @Autowired private TravelInquiryRepository travelInquiryRepository;
+  @Autowired private PromptService promptService;
 
   @Test
   void enrichRecommendationsAsync() {
@@ -95,9 +96,10 @@ class TravelRecommendationServiceTest extends DatabaseCleaningTest {
 
   @Test
   void parseDetailed() {
-    var recommendationsRaw = Utils.toJson(DETAILED_PROMPT_OBJ);
+    var recommendationsRaw = promptService.buildExampleResponseRecommendationDetailsDto();
     var parsed = TravelRecommendationService.parseDetailed(recommendationsRaw);
-    assertThat(parsed).isEqualTo(DETAILED_PROMPT_OBJ);
+    assertThat(parsed)
+        .isEqualTo(Utils.toObject(recommendationsRaw, GptResponseRecommendationDetailsDto.class));
   }
 
   @Test

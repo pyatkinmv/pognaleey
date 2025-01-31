@@ -30,7 +30,7 @@ import ru.pyatkinmv.pognaleey.util.Utils;
 @Service
 @RequiredArgsConstructor
 public class TravelRecommendationService {
-  public static final int RECOMMENDATIONS_NUMBER = 5;
+  static final int RECOMMENDATIONS_IDEAS_NUMBER = 5;
 
   private final GptHttpClient gptHttpClient;
   private final ImageService imageService;
@@ -44,7 +44,7 @@ public class TravelRecommendationService {
     var parsed = parseSearchableItems(quickRecommendationsAnswer);
 
     return parsed.stream()
-        .map(it -> new TitleAndImageQuery(it.title().trim(), it.imageSearchPhrase().trim()))
+        .map(it -> new TitleAndImageQuery(it.title().trim(), it.imageQuery().trim()))
         .toList();
   }
 
@@ -93,7 +93,7 @@ public class TravelRecommendationService {
     List<TitleAndImageQuery> titleAndImageQueries;
 
     try {
-      var prompt = promptService.generateQuickPrompt(RECOMMENDATIONS_NUMBER, inquiryParams);
+      var prompt = promptService.generateQuickPrompt(RECOMMENDATIONS_IDEAS_NUMBER, inquiryParams);
       var answer = gptHttpClient.ask(prompt);
       var titleAndImageQueriesParsed = parseQuick(answer);
       titleAndImageQueries =
@@ -118,7 +118,6 @@ public class TravelRecommendationService {
       return;
     }
 
-    // TODO: Нет гарантий, что imageQuery != null
     var withShortInfo =
         updated.stream().filter(it -> it.getStatus() != ProcessingStatus.FAILED).toList();
 
@@ -264,7 +263,7 @@ public class TravelRecommendationService {
 
   public List<TravelRecommendation> createBlueprintRecommendations(Long inquiryId) {
     var recommendations =
-        IntStream.range(0, RECOMMENDATIONS_NUMBER)
+        IntStream.range(0, RECOMMENDATIONS_IDEAS_NUMBER)
             .mapToObj(
                 i ->
                     TravelRecommendation.builder()

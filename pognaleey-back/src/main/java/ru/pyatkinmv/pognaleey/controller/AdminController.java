@@ -7,10 +7,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.lang.Nullable;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import ru.pyatkinmv.pognaleey.dto.ManualGuidesCreateDtoList;
+import ru.pyatkinmv.pognaleey.dto.AdminGuidesCreateDtoList;
+import ru.pyatkinmv.pognaleey.dto.AdminUploadImageDto;
 import ru.pyatkinmv.pognaleey.dto.TravelGuideInfoDto;
 import ru.pyatkinmv.pognaleey.service.AdminService;
-import ru.pyatkinmv.pognaleey.service.AdminService.UploadImageDto;
 
 @RestController
 @RequestMapping("/admin")
@@ -19,17 +19,9 @@ public class AdminController {
 
   private final AdminService adminService;
 
-  @PostMapping("/uploadTitleImage")
-  public ResponseEntity<String> uploadResource(
-      @RequestParam(required = false, defaultValue = "true") boolean aiGenerated,
-      @RequestParam(required = false, defaultValue = "false") boolean keepOriginal,
-      @RequestParam(required = false) @Nullable String authorName,
-      @RequestParam(required = false) @Nullable String authorUrl,
-      @RequestParam Long guideId,
-      @RequestBody MultipartFile file) {
+  private static ResponseEntity<String> wrapWithResponse(Runnable runnable) {
     try {
-      adminService.uploadTitleImage(
-          new UploadImageDto(file, guideId, aiGenerated, keepOriginal, authorName, authorUrl));
+      runnable.run();
     } catch (RuntimeException e) {
       return ResponseEntity.badRequest().body(e.getMessage());
     } catch (Exception e) {
@@ -39,15 +31,28 @@ public class AdminController {
     return new ResponseEntity<>(HttpStatus.OK);
   }
 
+  @PostMapping("/uploadTitleImage")
+  public ResponseEntity<String> uploadResource(
+      @RequestParam(required = false, defaultValue = "true") boolean aiGenerated,
+      @RequestParam(required = false, defaultValue = "false") boolean keepOriginal,
+      @RequestParam(required = false) @Nullable String authorName,
+      @RequestParam(required = false) @Nullable String authorUrl,
+      @RequestParam Long guideId,
+      @RequestBody MultipartFile file) {
+    return wrapWithResponse(
+        () ->
+            adminService.uploadTitleImage(
+                new AdminUploadImageDto(
+                    file, guideId, aiGenerated, keepOriginal, authorName, authorUrl)));
+  }
+
   @PutMapping("/generateImageResourcesAsync/forNotFound")
   public ResponseEntity<String> uploadResource() {
-    adminService.generateImageResourcesForNotFoundAsync();
-
-    return new ResponseEntity<>(HttpStatus.OK);
+    return wrapWithResponse(adminService::generateImageResourcesForNotFoundAsync);
   }
 
   @PostMapping("/createGuides")
-  public List<TravelGuideInfoDto> createGuides(@RequestBody ManualGuidesCreateDtoList create) {
-    return adminService.createGuide(create);
+  public List<TravelGuideInfoDto> createGuides(@RequestBody AdminGuidesCreateDtoList dto) {
+    return adminService.createGuide(dto);
   }
 }

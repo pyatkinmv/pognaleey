@@ -1,35 +1,33 @@
 package ru.pyatkinmv.pognaleey.service;
 
-import java.awt.image.BufferedImage;
 import java.io.*;
 import java.time.Instant;
 import java.time.ZonedDateTime;
 import java.util.*;
-import javax.imageio.ImageIO;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import net.coobird.thumbnailator.Thumbnails;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.lang.Nullable;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.support.TransactionTemplate;
-import org.springframework.web.multipart.MultipartFile;
 import ru.pyatkinmv.pognaleey.client.KandinskyImageGenerateHttpClient;
+import ru.pyatkinmv.pognaleey.dto.AdminGuidesCreateDtoList;
+import ru.pyatkinmv.pognaleey.dto.AdminUploadImageDto;
 import ru.pyatkinmv.pognaleey.dto.ImageDto;
-import ru.pyatkinmv.pognaleey.dto.ManualGuidesCreateDtoList;
 import ru.pyatkinmv.pognaleey.dto.TravelGuideInfoDto;
 import ru.pyatkinmv.pognaleey.model.*;
 import ru.pyatkinmv.pognaleey.repository.*;
 import ru.pyatkinmv.pognaleey.util.Utils;
+import ru.pyatkinmv.pognaleey.util.converter.Converters;
+import ru.pyatkinmv.pognaleey.util.converter.ResourceConverter;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class AdminService {
-  public static final String JPG = "jpg";
   private static final int MAX_FILE_SIZE_BYTES_TO_STORE_AS_IS = 512 * 1000;
+
   private final ResourceRepository resourceRepository;
   private final TravelGuideRepository guideRepository;
   private final TravelGuideContentItemRepository contentItemRepository;
@@ -51,10 +49,9 @@ public class AdminService {
   @Value("${server.servlet.context-path}")
   private String contextPath;
 
-  // TODO: add test
-  public void uploadTitleImage(UploadImageDto upload) {
-    try (InputStream inputStream = upload.file.getInputStream()) {
-      var guide = guideRepository.findById(upload.guideId).orElseThrow();
+  public void uploadTitleImage(AdminUploadImageDto upload) {
+    try (InputStream inputStream = upload.file().getInputStream()) {
+      var guide = guideRepository.findById(upload.guideId()).orElseThrow();
       var recommendation = recommendationService.findById(guide.getRecommendationId());
 
       transactionTemplate.executeWithoutResult(
@@ -75,10 +72,10 @@ public class AdminService {
                     buildUrl(largeImageResourceId),
                     buildUrl(thumbnailImageResourceId),
                     recommendation.getTitle(),
-                    upload.aiGenerated,
+                    upload.aiGenerated(),
                     null,
-                    upload.authorName,
-                    upload.authorUrl);
+                    upload.authorName(),
+                    upload.authorUrl());
             var savedImage = imageService.saveImage(imageDto);
 
             saveTitleContentItemForImage(guide.getId(), savedImage);
@@ -91,8 +88,9 @@ public class AdminService {
             guideRepository.save(guide);
             log.info("Saved guide {}", guide);
           });
-    } catch (Exception e) {
+    } catch (IOException e) {
       log.error("Failed to upload title image", e);
+      throw new RuntimeException(e);
     }
   }
 
@@ -190,17 +188,17 @@ public class AdminService {
     return String.format("%s%s/resources/%d", domainName, contextPath, resourceId);
   }
 
-  private Long saveResourceConvertingLarge(InputStream inputStream, UploadImageDto upload) {
+  private Long saveResourceConvertingLarge(InputStream inputStream, AdminUploadImageDto upload) {
     if (upload.file().getSize() <= MAX_FILE_SIZE_BYTES_TO_STORE_AS_IS || upload.keepOriginal()) {
       return saveResourceConverting(
-          inputStream, Converters.AS_IS.get(), upload.file.getOriginalFilename());
+          inputStream, Converters.AS_IS.get(), upload.file().getOriginalFilename());
     } else {
       return saveResourceConverting(
           inputStream, Converters.JPG_1024.get(), upload.file().getOriginalFilename());
     }
   }
 
-  public List<TravelGuideInfoDto> createGuide(ManualGuidesCreateDtoList guidesCreateDtoList) {
+  public List<TravelGuideInfoDto> createGuide(AdminGuidesCreateDtoList guidesCreateDtoList) {
     return guidesCreateDtoList.guides().stream()
         .map(
             it -> {
@@ -229,7 +227,21 @@ public class AdminService {
         .toList();
   }
 
-  // NOTE: All this magic is necessary to avoid load file in host memory
+  /**
+   * Saves a resource after converting it from its original format to another format.
+   *
+   * <p>This method takes an input of any type T, converts it using a provided converter, and then
+   * saves the resulting InputStream using a resource repository. The entire process avoids loading
+   * the full input data into memory, making it suitable for large files or streams.
+   *
+   * @param <T> the type of the input data
+   * @param input the input data to convert and save
+   * @param converter the converter responsible for transforming the input data into the desired
+   *     format
+   * @param originalFileName the original file name to use when building the resource name
+   * @return the identifier of the saved resource
+   * @throws RuntimeException if an I/O error occurs during conversion or saving
+   */
   private <T> Long saveResourceConverting(
       T input, ResourceConverter<T> converter, String originalFileName) {
     try (InputStream stream = converter.convert(input)) {
@@ -239,115 +251,7 @@ public class AdminService {
 
       return saved;
     } catch (IOException e) {
-      throw new RuntimeException("Ошибка при сохранении изображения", e);
+      throw new RuntimeException("Error saving the image", e);
     }
   }
-
-  @RequiredArgsConstructor
-  enum Converters {
-    JPG_1024(new ThumbnailsConverter(1024, JPG, 1.0)),
-    JPG_512(new ThumbnailsConverter(512, JPG, 1.0)),
-    AS_IS(new AsIsConverter()),
-    BASE64(new Base64Converter());
-
-    private final ResourceConverter<?> converter;
-
-    private <T> ResourceConverter<T> get() {
-      //noinspection unchecked
-      return (ResourceConverter<T>) converter;
-    }
-  }
-
-  private interface ResourceConverter<T> {
-    InputStream convert(T t) throws IOException;
-
-    String buildResourceName(String originalFileName);
-  }
-
-  private static class AsIsConverter implements ResourceConverter<InputStream> {
-
-    @Override
-    public InputStream convert(InputStream inputStream) {
-      return inputStream;
-    }
-
-    @Override
-    public String buildResourceName(@Nullable String originalFileName) {
-      return Optional.ofNullable(originalFileName).orElseGet(() -> UUID.randomUUID().toString());
-    }
-  }
-
-  private abstract static class PipedResourceConverter<T> implements ResourceConverter<T> {
-    @Override
-    public InputStream convert(T input) throws IOException {
-      var pipedOutputStream = new PipedOutputStream();
-      var pipedInputStream = new PipedInputStream(pipedOutputStream);
-
-      // TODO: Replace with executorService call
-      new Thread(
-              () -> {
-                try (pipedOutputStream) {
-                  doConvert(input, pipedOutputStream);
-                } catch (IOException e) {
-                  throw new RuntimeException("Ошибка обработки изображения", e);
-                }
-              })
-          .start();
-
-      return pipedInputStream;
-    }
-
-    abstract void doConvert(T input, PipedOutputStream outputStream) throws IOException;
-  }
-
-  @RequiredArgsConstructor
-  private static class ThumbnailsConverter extends PipedResourceConverter<InputStream> {
-    private static final String FILENAME_FORMAT = "%s-%d.%s";
-
-    private final Integer width;
-    private final String extension;
-    private final Double quality;
-
-    @SneakyThrows
-    void doConvert(InputStream input, PipedOutputStream outputStream) {
-      Thumbnails.of(input)
-          .width(Objects.requireNonNull(width))
-          .outputFormat(extension)
-          .outputQuality(Objects.requireNonNull(quality))
-          .toOutputStream(outputStream);
-    }
-
-    @Override
-    public String buildResourceName(String base) {
-      return String.format(FILENAME_FORMAT, base, width, extension);
-    }
-  }
-
-  private static class Base64Converter extends PipedResourceConverter<String> {
-    private final String extension = JPG;
-
-    @Override
-    void doConvert(String imageBase64, PipedOutputStream outputStream) throws IOException {
-      byte[] imageBytes = Base64.getDecoder().decode(imageBase64);
-
-      try (ByteArrayInputStream bis = new ByteArrayInputStream(imageBytes)) {
-        BufferedImage image = ImageIO.read(bis);
-        // Сохраняем изображение в указанный формат
-        ImageIO.write(image, extension, outputStream);
-      }
-    }
-
-    @Override
-    public String buildResourceName(String baseName) {
-      return String.format("%s.%s", baseName, extension);
-    }
-  }
-
-  public record UploadImageDto(
-      MultipartFile file,
-      Long guideId,
-      boolean aiGenerated,
-      boolean keepOriginal,
-      @Nullable String authorName,
-      @Nullable String authorUrl) {}
 }

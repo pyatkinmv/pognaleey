@@ -10,14 +10,26 @@ import ru.pyatkinmv.pognaleey.util.Utils;
 @Service
 @RequiredArgsConstructor
 public class PromptService {
-  // TODO: разобраться с этими каунтами
-  public static final int GUIDE_PRACTICAL_TITLES_COUNT = 5;
-  static final GptResponseRecommendationDetailsDto DETAILED_PROMPT_OBJ =
-      new GptResponseRecommendationDetailsDto("ПОЧЕМУ ЭТОТ ВАРИАНТ ПОДХОДИТ", "ОПИСАНИЕ ВАРИАНТА");
+  static final int GUIDE_PRACTICAL_TITLES_COUNT = 5;
+  static final int GUIDE_ATTRACTIONS_COUNT = 5;
+
   private final MessageSource messageSource;
 
   private static String toPromtString(TravelRecommendation recommendation) {
     return recommendation.getTitle();
+  }
+
+  String buildExampleResponseRecommendationDetailsDto() {
+    return Utils.toJson(
+        new GptResponseRecommendationDetailsDto(
+            messageSource.getMessage(
+                "prompts.detailed_recommendations_example.reason",
+                null,
+                LanguageContextHolder.getLanguageLocaleOrDefault()),
+            messageSource.getMessage(
+                "prompts.detailed_recommendations_example.description",
+                null,
+                LanguageContextHolder.getLanguageLocaleOrDefault())));
   }
 
   public String generateGuideIntroPrompt(String guideTitle, String inquiryParams) {
@@ -46,7 +58,7 @@ public class PromptService {
       String guideTitle, String inquiryParams, String guideVisualTopics) {
     return messageSource.getMessage(
         "prompts.guide_generate_attractions_part",
-        new Object[] {guideTitle, inquiryParams, GUIDE_PRACTICAL_TITLES_COUNT, guideVisualTopics},
+        new Object[] {guideTitle, inquiryParams, GUIDE_ATTRACTIONS_COUNT, guideVisualTopics},
         LanguageContextHolder.getLanguageLocaleOrDefault());
   }
 
@@ -69,14 +81,16 @@ public class PromptService {
 
     return messageSource.getMessage(
         "prompts.recommendations_details",
-        new Object[] {recommendationsStr, inquiryParams, Utils.toJson(DETAILED_PROMPT_OBJ)},
+        new Object[] {
+          recommendationsStr, inquiryParams, buildExampleResponseRecommendationDetailsDto()
+        },
         LanguageContextHolder.getLanguageLocaleOrDefault());
   }
 
   public String generateGuideImagesPrompt(String guideTitle, String inquiryParams) {
     return messageSource.getMessage(
         "prompts.generate_guide_images",
-        new Object[] {guideTitle, inquiryParams, GUIDE_PRACTICAL_TITLES_COUNT},
+        new Object[] {guideTitle, inquiryParams, GUIDE_ATTRACTIONS_COUNT},
         LanguageContextHolder.getLanguageLocaleOrDefault());
   }
 }

@@ -21,19 +21,16 @@ public class AuthService {
   private final JwtProvider jwtProvider;
   private final PasswordEncoder passwordEncoder;
 
-  // TODO: implement tests
   private static void validateUsername(String username) {
     String errorMessage = null;
-
     if (username == null || username.isBlank()) {
-      errorMessage = "Имя пользователя обязательно.";
+      errorMessage = "Username is required.";
     } else if (!USERNAME_PATTERN.matcher(username).matches()) {
       errorMessage =
-          "Имя пользователя может содержать только буквы, цифры, точки, дефисы и подчёркивания.";
+          "Username can only contain letters, digits, periods, hyphens, and underscores.";
     } else if (username.length() < 3 || username.length() > 20) {
-      errorMessage = "Имя пользователя должно быть от 3 до 20 символов.";
+      errorMessage = "Username must be between 3 and 20 characters long.";
     }
-
     if (errorMessage != null) {
       throw new IllegalArgumentException(errorMessage);
     }
@@ -41,13 +38,11 @@ public class AuthService {
 
   private static void validatePassword(String password) {
     String errorMessage = null;
-
     if (password == null || password.isBlank()) {
-      errorMessage = "Пароль обязателен.";
+      errorMessage = "Password is required.";
     } else if (password.length() < 3 || password.length() > 20) {
-      errorMessage = "Пароль должен быть от 3 до 20 символов.";
+      errorMessage = "Password must be between 3 and 20 characters long.";
     }
-
     if (errorMessage != null) {
       throw new IllegalArgumentException(errorMessage);
     }

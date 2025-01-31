@@ -22,7 +22,6 @@ public class ResourceRepository {
     return jdbcTemplate.execute(
         (PreparedStatementCreator)
             connection -> {
-              // Указываем, что нужно возвращать сгенерированный ключ (ID)
               PreparedStatement ps =
                   connection.prepareStatement(INSERT, PreparedStatement.RETURN_GENERATED_KEYS);
               ps.setString(1, name);
@@ -31,10 +30,9 @@ public class ResourceRepository {
             },
         preparedStatement -> {
           preparedStatement.executeUpdate();
-          // Получаем сгенерированный ключ
           try (ResultSet keys = preparedStatement.getGeneratedKeys()) {
             if (keys.next()) {
-              return keys.getLong(1); // Возвращаем сгенерированный ID
+              return keys.getLong(1);
             }
           }
           throw new RuntimeException("Failed to retrieve generated ID");

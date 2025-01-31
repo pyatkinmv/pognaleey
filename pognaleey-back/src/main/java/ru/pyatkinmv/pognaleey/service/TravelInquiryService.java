@@ -22,7 +22,7 @@ public class TravelInquiryService {
   private static String toStringFilteringNonEmpty(Map<String, Object> params) {
     var filteredMap =
         params.entrySet().stream()
-            .filter(entry -> !isEmpty(entry.getValue())) // Удаляем пустые значения
+            .filter(entry -> !isEmpty(entry.getValue()))
             .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 
     return filteredMap.entrySet().stream()

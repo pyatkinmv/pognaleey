@@ -1,6 +1,6 @@
 package ru.pyatkinmv.pognaleey.service;
 
-import static ru.pyatkinmv.pognaleey.service.TravelRecommendationService.RECOMMENDATIONS_NUMBER;
+import static ru.pyatkinmv.pognaleey.service.TravelRecommendationService.RECOMMENDATIONS_IDEAS_NUMBER;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -8,20 +8,21 @@ import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import lombok.extern.slf4j.Slf4j;
+import ru.pyatkinmv.pognaleey.dto.SearchableItemDto;
 
 @Slf4j
 public class GptAnswerResolveHelper {
   public static <T> List<T> resolveInCaseGeneratedMoreOrLessThanExpected(List<T> recommendations) {
-    if (recommendations.size() != RECOMMENDATIONS_NUMBER) {
+    if (recommendations.size() != RECOMMENDATIONS_IDEAS_NUMBER) {
       log.warn(
           "Number of recommendations {} is not equal to the number of expected {}",
           recommendations.size(),
-          RECOMMENDATIONS_NUMBER);
+          RECOMMENDATIONS_IDEAS_NUMBER);
 
-      if (recommendations.size() < RECOMMENDATIONS_NUMBER) {
+      if (recommendations.size() < RECOMMENDATIONS_IDEAS_NUMBER) {
         return recommendations;
       } else {
-        return recommendations.subList(0, RECOMMENDATIONS_NUMBER);
+        return recommendations.subList(0, RECOMMENDATIONS_IDEAS_NUMBER);
       }
     }
 
@@ -43,13 +44,25 @@ public class GptAnswerResolveHelper {
     }
   }
 
-  // TODO: doc
-  static List<SearchableItem> parseSearchableItems(String searchableItemsRaw) {
-    // {title1}(searchPhrase1)|{title2}(searchPhrase1)|...
+  /**
+   * Parses a string containing searchable items and returns a list of {@link SearchableItemDto}
+   * objects.
+   *
+   * <p>The input string should be in the format
+   * "{title1}(searchPhrase1)|{title2}(searchPhrase2)|...". This method uses a regular expression to
+   * extract individual items and then parses each item using the method {@link
+   * #parseSearchableItem(String)}.
+   *
+   * @param searchableItemsRaw the raw string containing searchable items, formatted as
+   *     "{title1}(searchPhrase1)|{title2}(searchPhrase2)|..."
+   * @return a list of parsed {@link SearchableItemDto} objects
+   * @see #parseSearchableItem(String)
+   */
+  static List<SearchableItemDto> parseSearchableItems(String searchableItemsRaw) {
     var regex = "([^|]+)";
     var pattern = Pattern.compile(regex);
     var matcher = pattern.matcher(searchableItemsRaw);
-    var result = new ArrayList<SearchableItem>();
+    var result = new ArrayList<SearchableItemDto>();
 
     while (matcher.find()) {
       var searchableItemRaw = matcher.group().trim().replaceAll("\\.", "");
@@ -79,8 +92,7 @@ public class GptAnswerResolveHelper {
     return result;
   }
 
-  static Optional<SearchableItem> parseSearchableItem(String searchableItemRaw) {
-    // {title}(searchPhrase)
+  static Optional<SearchableItemDto> parseSearchableItem(String searchableItemRaw) {
     //noinspection RegExpRedundantEscape
     var regex = "\\{([^\\]]+)\\}\\(([^\\)]+)\\)";
     var pattern = Pattern.compile(regex);
@@ -90,11 +102,9 @@ public class GptAnswerResolveHelper {
       var title = matcher.group(1);
       var imageSearchPhrase = matcher.group(2);
 
-      return Optional.of(new SearchableItem(title, imageSearchPhrase));
+      return Optional.of(new SearchableItemDto(title, imageSearchPhrase));
     } else {
       return Optional.empty();
     }
   }
-
-  record SearchableItem(String title, String imageSearchPhrase) {}
 }

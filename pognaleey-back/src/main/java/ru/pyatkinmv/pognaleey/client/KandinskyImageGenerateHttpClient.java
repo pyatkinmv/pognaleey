@@ -4,10 +4,7 @@ import io.jsonwebtoken.lang.Collections;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.MediaType;
+import org.springframework.http.*;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.web.client.RestTemplate;
 import ru.pyatkinmv.pognaleey.dto.KandinskyGetImagesResponseDto;
@@ -19,48 +16,53 @@ import ru.pyatkinmv.pognaleey.util.Utils;
 public class KandinskyImageGenerateHttpClient {
   private final RestTemplate restTemplate;
 
-  private final String getUrlFormat =
-      "https://api-key.fusionbrain.ai/key/api/v1/text2image/status/%s";
-  private final String postUrl = "https://api-key.fusionbrain.ai/key/api/v1/text2image/run";
+  private final String baseUrlGet;
+  private final String baseUrlPost;
+  private final String apiKey;
+  private final String apiSecret;
 
   public Optional<KandinskyPostImagesResponseDto> generateImage(String query) {
     log.info("generateImage for query {}", query);
 
     if (query.isEmpty()) {
-      log.info("generateImage is empty");
+      log.info("query is empty");
 
       return Optional.empty();
     }
 
-    var formData = new LinkedMultiValueMap<String, Object>();
-    formData.add("model_id", "4");
-    HttpHeaders jsonPartHeaders = new HttpHeaders();
-    jsonPartHeaders.setContentType(MediaType.APPLICATION_JSON);
-    formData.add("params", new HttpEntity<>(ParamsPost.toStr(query), jsonPartHeaders));
-    // Устанавливаем заголовки
-    HttpHeaders headers = buildHeaders();
-    headers.setContentType(MediaType.MULTIPART_FORM_DATA);
-
-    // Создаем HttpEntity для отправки запроса
-    var requestEntity = new HttpEntity<>(formData, headers);
+    var requestEntity = buildRequest(query);
 
     var response =
         restTemplate.exchange(
-            postUrl, HttpMethod.POST, requestEntity, KandinskyPostImagesResponseDto.class);
+            baseUrlPost, HttpMethod.POST, requestEntity, KandinskyPostImagesResponseDto.class);
 
     if (!response.getStatusCode().is2xxSuccessful()) {
       log.error("failed to generate image, client status code={}", response.getStatusCode());
       return Optional.empty();
     }
+
     log.info("generate image successful {}", response.getBody());
 
     return Optional.ofNullable(response.getBody());
   }
 
+  private HttpEntity<LinkedMultiValueMap<String, Object>> buildRequest(String query) {
+    var formData = new LinkedMultiValueMap<String, Object>();
+    formData.add("model_id", "4");
+    HttpHeaders jsonPartHeaders = new HttpHeaders();
+    jsonPartHeaders.setContentType(MediaType.APPLICATION_JSON);
+    formData.add("params", new HttpEntity<>(ParamsPost.toStr(query), jsonPartHeaders));
+    var headers = buildHeaders();
+    headers.setContentType(MediaType.MULTIPART_FORM_DATA);
+
+    return new HttpEntity<>(formData, headers);
+  }
+
+  @SuppressWarnings("UastIncorrectHttpHeaderInspection")
   private HttpHeaders buildHeaders() {
     var headers = new HttpHeaders();
-    headers.add("X-Key", "Key 41D9E0C2E1037CE580D100366DD78373");
-    headers.add("X-Secret", "Secret 0F786529FB63032A36A9460B80DAB8CF");
+    headers.add("X-Key", String.format("Key %s", apiKey));
+    headers.add("X-Secret", String.format("Secret %s", apiSecret));
 
     return headers;
   }
@@ -76,12 +78,11 @@ public class KandinskyImageGenerateHttpClient {
   public KandinskyGetImagesResponseDto getImage(String uuid) {
     HttpHeaders headers = buildHeaders();
 
-    // Создаем HttpEntity для отправки запроса
     var requestEntity = new HttpEntity<>(headers);
 
     var response =
         restTemplate.exchange(
-            String.format(getUrlFormat, uuid),
+            String.format("%s/%s", baseUrlGet, uuid),
             HttpMethod.GET,
             requestEntity,
             KandinskyGetImagesResponseDto.class);

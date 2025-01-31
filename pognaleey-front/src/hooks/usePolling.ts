@@ -11,8 +11,6 @@ interface PollingOptions<T> {
     dataPath?: string; // Путь к данным в ответе API
 }
 
-// TODO: Replace with WebSockets!!!
-// TODO: Add status specific logic (too much methods here)
 const usePolling = <T>(
     options: PollingOptions<T>
 ): { data: T[]; isLoading: boolean; error: string | null } => {

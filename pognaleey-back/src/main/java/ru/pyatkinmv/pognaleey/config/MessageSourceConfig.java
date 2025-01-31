@@ -12,7 +12,7 @@ public class MessageSourceConfig {
   public MessageSource messageSource() {
     ReloadableResourceBundleMessageSource messageSource =
         new ReloadableResourceBundleMessageSource();
-    messageSource.setBasename("classpath:messages"); // Указываем базовое имя файла
+    messageSource.setBasename("classpath:messages");
     messageSource.setDefaultEncoding("UTF-8");
     messageSource.setUseCodeAsDefaultMessage(false);
 

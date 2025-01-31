@@ -201,7 +201,6 @@ public class TravelGuideService {
                 .createdAt(Instant.now())
                 .language(LanguageContextHolder.getLanguageOrDefault())
                 .build());
-    // TODO: image везде есть, но на фронт нулевой не передаем
 
     var guideContentItems =
         guideContentProvider.createBlueprintContentItems(

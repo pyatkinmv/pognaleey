@@ -6,7 +6,6 @@ import java.util.concurrent.Executors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -43,7 +42,6 @@ public class AppConfig {
   }
 
   @Bean
-  @ConditionalOnProperty(prefix = "gpt-client", name = "current", havingValue = "openai")
   public GptHttpClient chatGptHttpClient(
       @Autowired RestTemplate restTemplate,
       @Value("${gpt-client.openai.base-url}") String gptBaseUrl,
@@ -52,20 +50,22 @@ public class AppConfig {
     return new ChatGptHttpClient(restTemplate, gptBaseUrl, model, gptApiKey);
   }
 
+  @Profile("!test")
   @Bean
-  @ConditionalOnProperty(
-      prefix = "image-search-client",
-      name = "current",
-      havingValue = "openverse")
   public ImageSearchHttpClient<OpenverseImagesResponseDto> openverseImageSearchHttpClient(
       @Autowired RestTemplate restTemplate,
-      @Value("${image-search-client.openverse.base-url}") String baseUrl) {
+      @Value("${image-client.search.openverse.base-url}") String baseUrl) {
     return new OpenverseImageSearchHttpClient(restTemplate, baseUrl);
   }
 
   @Bean
   public KandinskyImageGenerateHttpClient kandinskyImageGenerateHttpClient(
-      @Autowired RestTemplate restTemplate) {
-    return new KandinskyImageGenerateHttpClient(restTemplate);
+      @Autowired RestTemplate restTemplate,
+      @Value("${image-client.generate.kandinsky.base-url-get}") String baseUrlGet,
+      @Value("${image-client.generate.kandinsky.base-url-post}") String baseUrlPost,
+      @Value("${image-client.generate.kandinsky.api-key}") String apiKey,
+      @Value("${image-client.generate.kandinsky.api-secret}") String apiSecret) {
+    return new KandinskyImageGenerateHttpClient(
+        restTemplate, baseUrlGet, baseUrlPost, apiKey, apiSecret);
   }
 }
