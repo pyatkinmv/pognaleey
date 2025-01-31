@@ -3,9 +3,9 @@ package ru.pyatkinmv.pognaleey.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.pyatkinmv.pognaleey.dto.TravelInquiryDto;
+import ru.pyatkinmv.pognaleey.dto.UserDto;
 import ru.pyatkinmv.pognaleey.mapper.TravelMapper;
 import ru.pyatkinmv.pognaleey.model.TravelInquiry;
-import ru.pyatkinmv.pognaleey.model.User;
 import ru.pyatkinmv.pognaleey.repository.TravelInquiryRepository;
 import ru.pyatkinmv.pognaleey.security.AuthenticatedUserProvider;
 
@@ -49,7 +49,7 @@ public class TravelInquiryService {
 
     public TravelInquiryDto createInquiry(Map<String, Object> inquiryParams) {
         var inquiryPayload = toStringFilteringNonEmpty(inquiryParams);
-        var userId = AuthenticatedUserProvider.getCurrentUser().map(User::getId).orElse(null);
+        var userId = AuthenticatedUserProvider.getCurrentUser().map(UserDto::id).orElse(null);
         var inquiry = TravelInquiry.builder()
                 .params(inquiryPayload)
                 .createdAt(Instant.now())

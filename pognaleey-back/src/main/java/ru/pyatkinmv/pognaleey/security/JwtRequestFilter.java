@@ -7,6 +7,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
@@ -14,6 +15,8 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import ru.pyatkinmv.pognaleey.service.UserService;
 
 import java.io.IOException;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Component
@@ -28,7 +31,6 @@ public class JwtRequestFilter extends OncePerRequestFilter {
             throws ServletException, IOException {
         try {
             var authorizationHeader = request.getHeader("Authorization");
-
             String username = null;
             String jwt = null;
 
@@ -38,8 +40,16 @@ public class JwtRequestFilter extends OncePerRequestFilter {
             }
 
             if (username != null && jwtProvider.isTokenValid(jwt)) {
-                var user = userService.loadUserByUsername(username.toLowerCase());
-                var authenticationToken = new JwtAuthenticationToken(user);
+                List<String> roles = jwtProvider.extractRoles(jwt);
+                Long userId = jwtProvider.extractId(jwt);
+
+                var authenticationToken = new JwtAuthenticationToken(
+                        userId,
+                        username,
+                        roles.stream()
+                                .map(SimpleGrantedAuthority::new)
+                                .collect(Collectors.toList())
+                );
                 authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 SecurityContextHolder.getContext().setAuthentication(authenticationToken);
             }

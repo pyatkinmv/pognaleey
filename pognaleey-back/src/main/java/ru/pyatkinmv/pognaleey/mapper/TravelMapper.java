@@ -61,11 +61,11 @@ public class TravelMapper {
     }
 
     public static List<TravelGuideInfoDto> toShortGuideListDto(List<TravelGuide> userGuides,
-                                                               List<User> users,
+                                                               List<UserDto> users,
                                                                Map<Long, ImageDto> idToImageMap,
                                                                Map<Long, Integer> guideIdToLikesCountMap,
                                                                Set<Long> currentUserLikedGuidesIds) {
-        var userIdToUser = users.stream().collect(Collectors.toMap(User::getId, it -> it));
+        var userIdToUser = users.stream().collect(Collectors.toMap(UserDto::id, it -> it));
 
         return userGuides.stream()
                 .map(guide -> toGuideInfoDto(
@@ -84,7 +84,7 @@ public class TravelMapper {
                 .toList();
     }
 
-    public static TravelGuideInfoDto toGuideInfoDto(TravelGuide it, @Nullable User user, @Nullable ImageDto image,
+    public static TravelGuideInfoDto toGuideInfoDto(TravelGuide it, @Nullable UserDto user, @Nullable ImageDto image,
                                                     int totalLikes, boolean currentUserLiked) {
         return new TravelGuideInfoDto(
                 it.getId(),
@@ -93,9 +93,7 @@ public class TravelMapper {
                 totalLikes,
                 currentUserLiked,
                 it.getCreatedAt().toEpochMilli(),
-                Optional.ofNullable(user)
-                        .map(TravelMapper::toUserDto)
-                        .orElse(null),
+                user,
                 it.getRecommendationId()
         );
     }

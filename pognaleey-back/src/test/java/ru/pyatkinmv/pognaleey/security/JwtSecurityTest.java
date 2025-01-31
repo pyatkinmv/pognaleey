@@ -12,7 +12,13 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import ru.pyatkinmv.pognaleey.DatabaseCleaningTest;
+import ru.pyatkinmv.pognaleey.dto.ManualGuidesCreateDtoList;
 import ru.pyatkinmv.pognaleey.dto.UserDto;
+import ru.pyatkinmv.pognaleey.model.UserRole;
+import ru.pyatkinmv.pognaleey.repository.UserRepository;
+import ru.pyatkinmv.pognaleey.util.Utils;
+
+import java.util.List;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -24,6 +30,8 @@ public class JwtSecurityTest extends DatabaseCleaningTest {
 
     @Autowired
     private MockMvc mockMvc;
+    @Autowired
+    private UserRepository userRepository;
 
     @Test
     public void accessSecuredEndpointWithValidToken() throws Exception {
@@ -55,6 +63,29 @@ public class JwtSecurityTest extends DatabaseCleaningTest {
                 .getContentAsString();
     }
 
+    @Test
+    public void accessAdminEndpointWithAdminToken() throws Exception {
+        var admin = userRepository.findByUsername(registerUser().username())
+                .map(it -> {
+                    it.setRole(UserRole.ADMIN);
+                    return userRepository.save(it);
+                }).orElseThrow();
+        var adminToken = loginAndReturnToken(admin.getUsername(), PASSWORD);
+        accessAdminEndpoint(adminToken).andExpect(status().isOk());
+    }
+
+    @Test
+    public void accessAdminEndpointWithRegularUserToken() throws Exception {
+        var user = registerUser();
+        var token = loginAndReturnToken(user.username(), PASSWORD);
+        accessAdminEndpoint(token).andExpect(status().isForbidden());
+    }
+
+    @Test
+    public void accessAdminEndpointWithoutToken() throws Exception {
+        accessAdminEndpoint(null).andExpect(status().isForbidden());
+    }
+
     @SneakyThrows
     private UserDto registerUser() {
         String registerRequest = "{\"username\": \"test-user\", \"password\": \"password123\"}";
@@ -82,6 +113,21 @@ public class JwtSecurityTest extends DatabaseCleaningTest {
         return mockMvc.perform(post("/travel-inquiries")
                 .headers(headers)
                 .content("{\"preferences\": \"food\", \"to\": \"asia\"}"));
+    }
+
+    @SneakyThrows
+    private ResultActions accessAdminEndpoint(@Nullable String token) {
+        var headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        if (token != null) {
+            headers.setBearerAuth(token);
+        }
+        var content = new ManualGuidesCreateDtoList(List.of());
+
+        return mockMvc.perform(post("/admin/createGuides")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(Utils.toJson(content))
+                .headers(headers));
     }
 }
 

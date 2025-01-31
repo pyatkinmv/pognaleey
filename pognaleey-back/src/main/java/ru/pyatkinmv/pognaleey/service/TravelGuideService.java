@@ -9,7 +9,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import ru.pyatkinmv.pognaleey.dto.*;
 import ru.pyatkinmv.pognaleey.mapper.TravelMapper;
-import ru.pyatkinmv.pognaleey.model.*;
+import ru.pyatkinmv.pognaleey.model.GuideContentItemType;
+import ru.pyatkinmv.pognaleey.model.TravelGuide;
+import ru.pyatkinmv.pognaleey.model.TravelGuideContentItem;
+import ru.pyatkinmv.pognaleey.model.TravelGuideLike;
 import ru.pyatkinmv.pognaleey.repository.TravelGuideContentItemRepository;
 import ru.pyatkinmv.pognaleey.repository.TravelGuideRepository;
 import ru.pyatkinmv.pognaleey.util.Utils;
@@ -41,12 +44,12 @@ public class TravelGuideService {
                 .orElseThrow(() -> new IllegalArgumentException(String.format("Guide %d not found", guideId)));
 
         var user = getCurrentUserOrThrow();
-        var doesntExist = likeService.findIdByUserIdAndGuideId(user.getId(), guideId).isEmpty();
+        var doesntExist = likeService.findIdByUserIdAndGuideId(user.id(), guideId).isEmpty();
 
         if (doesntExist) {
             likeService.save(
                     TravelGuideLike.builder()
-                            .userId(user.getId())
+                            .userId(user.id())
                             .createdAt(Instant.now())
                             .guideId(guide.getId()).build()
             );
@@ -58,7 +61,7 @@ public class TravelGuideService {
     }
 
     public TravelGuideLikeDto unlikeGuide(long guideId) {
-        likeService.findIdByUserIdAndGuideId(getCurrentUserOrThrow().getId(), guideId)
+        likeService.findIdByUserIdAndGuideId(getCurrentUserOrThrow().id(), guideId)
                 .ifPresent(likeService::deleteById);
         int totalLikes = likeService.countByGuideId(guideId);
 
@@ -72,7 +75,7 @@ public class TravelGuideService {
                 .flatMap(userService::findUserById)
                 .orElse(null);
         var isCurrentUserLiked = getCurrentUser()
-                .map(it -> likeService.findGuidesIdsByUserId(it.getId(), Integer.MAX_VALUE, 0))
+                .map(it -> likeService.findGuidesIdsByUserId(it.id(), Integer.MAX_VALUE, 0))
                 .map(it -> it.contains(guideId))
                 .orElse(false);
         var image = Optional.ofNullable(guide.getImageId())
@@ -89,13 +92,13 @@ public class TravelGuideService {
 
     public Page<TravelGuideInfoDto> getMyGuides(Pageable pageable) {
         var user = getCurrentUserOrThrow();
-        var totalCount = guideRepository.countAllByUserId(user.getId());
+        var totalCount = guideRepository.countAllByUserId(user.id());
         var offset = pageable.getPageSize() * pageable.getPageNumber();
-        var guideIdToLikesCountMap = guideRepository.findTopGuides(user.getId(),
+        var guideIdToLikesCountMap = guideRepository.findTopGuides(user.id(),
                 LanguageContextHolder.getLanguageOrDefault().name(), pageable.getPageSize(), offset);
         var userGuides = guideRepository.findAllByIdIn(guideIdToLikesCountMap.keySet());
         var currentUserLikedGuidesIds = getCurrentUser()
-                .map(it -> likeService.findGuidesIdsByUserId(it.getId(), Integer.MAX_VALUE, 0))
+                .map(it -> likeService.findGuidesIdsByUserId(it.id(), Integer.MAX_VALUE, 0))
                 .orElseGet(Set::of);
         var idToImageMap = getIdToImageMap(userGuides);
         var guides = TravelMapper.toShortGuideListDto(userGuides, List.of(user), idToImageMap,
@@ -107,7 +110,7 @@ public class TravelGuideService {
     public Page<TravelGuideInfoDto> getLikedGuides(Pageable pageable) {
         var user = getCurrentUserOrThrow();
         var offset = pageable.getPageSize() * pageable.getPageNumber();
-        var likedGuidesIds = likeService.findGuidesIdsByUserId(user.getId(), pageable.getPageSize(), offset);
+        var likedGuidesIds = likeService.findGuidesIdsByUserId(user.id(), pageable.getPageSize(), offset);
 
         if (likedGuidesIds.isEmpty()) {
             return Page.empty(pageable);
@@ -115,7 +118,7 @@ public class TravelGuideService {
 
         var userGuides = guideRepository.findAllByIdIn(likedGuidesIds);
         var guideIdToLikesCountMap = guideRepository.countLikesByGuideId(likedGuidesIds);
-        var totalCount = likeService.countByUserId(user.getId());
+        var totalCount = likeService.countByUserId(user.id());
         var users = findUsersByGuides(userGuides);
         var idToImageMap = getIdToImageMap(userGuides);
         var guides = TravelMapper.toShortGuideListDto(userGuides, users, idToImageMap,
@@ -133,7 +136,7 @@ public class TravelGuideService {
         var totalCount = guideRepository.countAllByLanguage(language);
         var users = findUsersByGuides(topGuides);
         var currentUserLikedGuidesIds = getCurrentUser()
-                .map(it -> likeService.findGuidesIdsByUserId(it.getId(), Integer.MAX_VALUE, 0))
+                .map(it -> likeService.findGuidesIdsByUserId(it.id(), Integer.MAX_VALUE, 0))
                 .orElseGet(Set::of);
         var idToImageMap = getIdToImageMap(topGuides);
         var guides = TravelMapper.toShortGuideListDto(topGuides, users, idToImageMap,
@@ -151,7 +154,7 @@ public class TravelGuideService {
         return imageService.getIdToImageMap(imageIds);
     }
 
-    private List<User> findUsersByGuides(List<TravelGuide> guides) {
+    private List<UserDto> findUsersByGuides(List<TravelGuide> guides) {
         var usersIds = guides.stream()
                 .map(TravelGuide::getUserId)
                 .filter(Objects::nonNull)
@@ -173,7 +176,7 @@ public class TravelGuideService {
                         .title(null)
                         .imageId(recommendation.getImageId())
                         .recommendationId(recommendationId)
-                        .userId(Optional.ofNullable(user).map(User::getId).orElse(null))
+                        .userId(Optional.ofNullable(user).map(UserDto::id).orElse(null))
                         .createdAt(Instant.now())
                         .language(LanguageContextHolder.getLanguageOrDefault())
                         .build()

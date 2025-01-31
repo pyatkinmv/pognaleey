@@ -27,6 +27,8 @@ class TravelGuideServiceTest extends DatabaseCleaningTest {
     @Autowired
     private UserService userService;
     @Autowired
+    private AuthService authService;
+    @Autowired
     private UserRepository userRepository;
     @Autowired
     private TravelInquiryRepository travelInquiryRepository;
@@ -198,10 +200,10 @@ class TravelGuideServiceTest extends DatabaseCleaningTest {
     private <T> T withUser(String username, Supplier<T> supplier) {
         var user = userRepository.findByUsername(username)
                 .orElseGet(() -> {
-                    userService.registerUser(new AuthRequestDto(username, username + "-password"));
+                    authService.registerUser(new AuthRequestDto(username, username + "-password"));
                     return userService.loadUserByUsername(username);
                 });
-        var authentication = new JwtAuthenticationToken(user);
+        var authentication = new JwtAuthenticationToken(user.getId(), user.getUsername(), user.getAuthorities());
         SecurityContextHolder.getContext().setAuthentication(authentication);
         var result = supplier.get();
         SecurityContextHolder.getContext().setAuthentication(null);

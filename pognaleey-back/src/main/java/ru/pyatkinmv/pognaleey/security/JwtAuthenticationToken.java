@@ -2,14 +2,17 @@ package ru.pyatkinmv.pognaleey.security;
 
 import jakarta.annotation.Nullable;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
-import ru.pyatkinmv.pognaleey.model.User;
+import org.springframework.security.core.GrantedAuthority;
+import ru.pyatkinmv.pognaleey.dto.UserDto;
+
+import java.util.Collection;
 
 public class JwtAuthenticationToken extends AbstractAuthenticationToken {
-    private final User principal;
+    private final UserDto principal;
 
-    public JwtAuthenticationToken(User principal) {
-        super(null);
-        this.principal = principal;
+    public JwtAuthenticationToken(Long userId, String username, Collection<? extends GrantedAuthority> authorities) {
+        super(authorities);
+        this.principal = new UserDto(userId, username);
         this.setAuthenticated(true);
     }
 
@@ -23,4 +26,5 @@ public class JwtAuthenticationToken extends AbstractAuthenticationToken {
     public Object getCredentials() {
         return null;
     }
+
 }
