@@ -29,7 +29,7 @@ const Header: React.FC<HeaderProps> = ({onLanguageChange}) => {
             <img src="/assets/logos/logo-circle192.png" alt={t("logoAlt")} className={styles.logo}/>
             <nav className={styles.navbar}>
                 <a href="/" className={styles.navLink}>{t("home")}</a>
-                <a href="https://t.me/pyatkinmv" className={styles.navLink}>{t("contacts")}</a>
+                <a href="https://www.linkedin.com/in/pyatkinmv" className={styles.navLink}>{t("contacts")}</a>
 
                 <div className={styles.dropdownMenu}>
                     <DropdownMenu

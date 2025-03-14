@@ -1,6 +1,6 @@
 {
-  "short_name": "Pognaleey!",
-  "name": "Pognaleey!",
+  "short_name": "__APP_SHORT_NAME__",
+  "name": "__APP_NAME__",
   "icons": [
     {
       "src": "favicon.ico",
