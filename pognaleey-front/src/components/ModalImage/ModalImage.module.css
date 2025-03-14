@@ -55,7 +55,7 @@
 
 .modalImageCaption {
     font-size: 0.85rem; /* Размер шрифта подписи */
-    color: #fff; /* Белый цвет для контраста */
+    color: #fff !important; /* Белый цвет для контраста */
     margin-top: 0.5rem; /* Отступ от изображения */
     text-align: center; /* Центрирование текста */
 }

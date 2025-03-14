@@ -79,7 +79,7 @@ public class TravelRecommendationService {
     return recommendation;
   }
 
-  @Async
+  @Async("asyncExecutor")
   public void enrichRecommendationsAsync(
       List<TravelRecommendation> blueprintRecommendations, String inquiryParams) {
     var inquiryId =

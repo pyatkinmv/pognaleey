@@ -94,13 +94,13 @@ public class AdminService {
     }
   }
 
-  @Async
+  @Async("asyncExecutor")
   public void generateImageResourcesAsync(Long imageId) {
     var image = imageService.findByIdOrThrow(imageId);
     generateImageResourcesAndEnrichScheduling(image);
   }
 
-  @Async
+  @Async("asyncExecutor")
   public void generateImageResourcesForNotFoundAsync() {
     var images = imageRepository.findAllByUrlIsNull();
     images.forEach(image -> generateImageResourcesAsync(image.getId()));

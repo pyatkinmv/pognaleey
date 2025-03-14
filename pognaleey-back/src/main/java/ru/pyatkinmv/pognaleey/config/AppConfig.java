@@ -1,6 +1,7 @@
 package ru.pyatkinmv.pognaleey.config;
 
 import java.time.Duration;
+import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import lombok.extern.slf4j.Slf4j;
@@ -10,6 +11,8 @@ import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
+import org.springframework.core.task.SimpleAsyncTaskExecutor;
+import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.web.client.RestTemplate;
 import ru.pyatkinmv.pognaleey.client.*;
@@ -18,6 +21,7 @@ import ru.pyatkinmv.pognaleey.dto.OpenverseImagesResponseDto;
 @Slf4j
 @Configuration
 @EnableScheduling
+@EnableAsync
 public class AppConfig {
 
   @Bean
@@ -39,6 +43,13 @@ public class AppConfig {
     log.info("using cachedThreadPoolExecutor");
 
     return Executors.newCachedThreadPool();
+  }
+
+  @Profile("!test")
+  @Bean
+  public Executor asyncExecutor() {
+    // TODO: Replace with pool but fix Language issue
+    return new SimpleAsyncTaskExecutor();
   }
 
   @Bean
@@ -68,4 +79,5 @@ public class AppConfig {
     return new KandinskyImageGenerateHttpClient(
         restTemplate, baseUrlGet, baseUrlPost, apiKey, apiSecret);
   }
+
 }

@@ -21,7 +21,7 @@ const ImageCaption: React.FC<ImageCaptionProps> = ({
     const {t} = useTranslation();
 
     return (
-        <div className={`${className} ${styles.imageCaption}`.trim()}>
+        <div className={`${styles.imageCaption} ${className}`.trim()}>
             {aiGenerated ? (
                 <span>
                     <>{t("aiGenerated")} </>

@@ -11,7 +11,7 @@ import org.springframework.scheduling.annotation.AsyncConfigurer;
 @Configuration
 public class TestAsyncConfig implements AsyncConfigurer {
 
-  @Bean(name = "taskExecutor")
+  @Bean
   public Executor taskExecutor() {
     return Runnable::run;
   }
@@ -21,9 +21,8 @@ public class TestAsyncConfig implements AsyncConfigurer {
     return new ExecutorServiceAdapter(new SyncTaskExecutor());
   }
 
-  @Override
   @Bean
-  public Executor getAsyncExecutor() {
+  public Executor asyncExecutor() {
     return Runnable::run;
   }
 }
