@@ -5,20 +5,23 @@ services:
     ports:
       - "80:80"
       - "443:443"
+    environment:
+      - DOMAIN=${DOMAIN}  # Pass only the DOMAIN variable
     volumes:
-      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf:ro        # Конфигурация Nginx
-      - ./certs:/etc/letsencrypt:ro                                   # Сертификаты Let's Encrypt
-      - ./certbot/webroot:/var/www/html                               # Временная папка для Certbot
-      - ./pognaleey-front/build:/usr/share/nginx/html:ro             # Статические файлы фронтенда
+      - ./nginx/default.conf:/etc/nginx/templates/default.conf.template:ro
+      - ./certs:/etc/letsencrypt:ro
+      - ./certbot/webroot:/var/www/html
+      - ./frontend/build:/usr/share/nginx/html:ro
+    command: [ "/bin/sh", "-c", "envsubst '$$DOMAIN' < /etc/nginx/templates/default.conf.template > /etc/nginx/conf.d/default.conf && exec nginx -g 'daemon off;'" ]
     depends_on:
-      - pognaleey-back
-      - pognaleey-front
+      - backend
+      - frontend
     networks:
       - app-network
 
 
-  pognaleey-back:
-    container_name: pognaleey-back
+  backend:
+    container_name: backend
     build:
       context: ./pognaleey-back
       dockerfile: Dockerfile
@@ -29,18 +32,20 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_DB: ${POSTGRES_DB}
       CHAT_GPT_API_KEY: ${CHAT_GPT_API_KEY}
-      APP_DOMAIN_NAME: ${APP_DOMAIN_NAME}
+      DOMAIN: ${DOMAIN}
       JWT_SECRET: ${JWT_SECRET}
       KANDINSKY_API_KEY: ${KANDINSKY_API_KEY}
       KANDINSKY_API_SECRET: ${KANDINSKY_API_SECRET}
     networks:
       - app-network
 
-  pognaleey-front:
-    container_name: pognaleey-front
+  frontend:
+    container_name: frontend
     build:
       context: ./pognaleey-front
       dockerfile: Dockerfile
+      args:
+        REACT_APP_API_URL: ${REACT_APP_API_URL}  # Pass API URL to build
     networks:
       - app-network
     volumes:

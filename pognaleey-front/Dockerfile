@@ -8,9 +8,13 @@ COPY package.json package-lock.json ./
 RUN npm install
 # Copy the rest of the application
 COPY . .
+
+# Pass the environment variable to React at build time
+ARG REACT_APP_API_URL
+ENV REACT_APP_API_URL=${REACT_APP_API_URL}
+
 # Build the React app
 RUN npm run build
 
-# Копируем файлы сборки в указанную папку (на хосте она будет замонтирована)
-#CMD ["cp", "-r", "/usr/src/app/build", "/usr/src/app/mnt"]
+# Copy build files to mounted volume
 CMD ["cp", "-r", "/usr/src/app/build", "/mnt"]
