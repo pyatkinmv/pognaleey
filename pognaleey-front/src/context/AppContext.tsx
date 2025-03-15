@@ -17,12 +17,12 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({children})
     const navigate = useNavigate();
     const [user, setUser] = useState<{ username: string | null }>({username: null});
     const [language, setLanguage] = useState<string>(
-        localStorage.getItem("language") || "ru" // Читаем язык из localStorage
+        localStorage.getItem("language") || "en" // Читаем язык из localStorage
     );
 
     const languages = [
-        {code: "ru", label: "Русский"},
         {code: "en", label: "English"},
+        {code: "ru", label: "Русский"},
     ];
 
     useEffect(() => {
