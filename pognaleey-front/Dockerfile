@@ -13,7 +13,7 @@ COPY . .
 ARG REACT_APP_API_URL
 ENV REACT_APP_API_URL=${REACT_APP_API_URL}
 ARG REACT_APP_NAME
-ENV REACT_APP_NAME=${REACT_APP_NAME}
+RUN sed -i "s|%%REACT_APP_NAME%%|${REACT_APP_NAME}|g" public/index.html
 
 # Build the React app
 RUN npm run build
