@@ -12,11 +12,8 @@ COPY . .
 # Pass the environment variable to React at build time
 ARG REACT_APP_API_URL
 ENV REACT_APP_API_URL=${REACT_APP_API_URL}
-# Use environment variables to replace values in manifest.json
-ARG APP_SHORT_NAME
-ARG APP_NAME
-RUN sed -i "s|__APP_SHORT_NAME__|${APP_SHORT_NAME}|g" public/manifest.json && \
-    sed -i "s|__APP_NAME__|${APP_NAME}|g" public/manifest.json
+ARG REACT_APP_NAME
+ENV REACT_APP_NAME=${REACT_APP_NAME}
 
 # Build the React app
 RUN npm run build

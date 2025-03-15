@@ -6,7 +6,7 @@ import './styles/index.css';
 import {BrowserRouter as Router} from "react-router-dom";
 import './i18n/i18n';
 
-document.title = process.env.APP_NAME || "Travel Smart!";
+document.title = process.env.REACT_APP_NAME || "Let's Explore";
 
 const root = ReactDOM.createRoot(
     document.getElementById('root') as HTMLElement

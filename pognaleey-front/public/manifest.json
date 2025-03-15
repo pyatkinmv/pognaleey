@@ -1,6 +1,6 @@
 {
-  "short_name": "__APP_SHORT_NAME__",
-  "name": "__APP_NAME__",
+  "short_name": "Let's Explore",
+  "name": "Let's Explore",
   "icons": [
     {
       "src": "favicon.ico",

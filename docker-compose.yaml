@@ -44,9 +44,8 @@ services:
       context: ./pognaleey-front
       dockerfile: Dockerfile
       args:
-        REACT_APP_API_URL: ${REACT_APP_API_URL}  # Pass API URL to build
-        APP_NAME: ${APP_NAME}
-        APP_SHORT_NAME: ${APP_SHORT_NAME}
+        REACT_APP_API_URL: ${REACT_APP_API_URL}
+        REACT_APP_NAME: ${REACT_APP_NAME}
     networks:
       - app-network
     volumes:
