@@ -4,7 +4,7 @@ import {initReactI18next} from 'react-i18next';
 import enTranslations from './locales/en.json';
 import ruTranslations from './locales/ru.json';
 
-const savedLanguage = localStorage.getItem('language') || 'ru';
+const savedLanguage = localStorage.getItem('language') || 'en';
 
 i18n
     .use(initReactI18next) // Подключаем интеграцию с React
@@ -14,7 +14,7 @@ i18n
             ru: {translation: ruTranslations},
         },
         lng: savedLanguage, // Устанавливаем язык при инициализации
-        fallbackLng: 'ru', // Язык по умолчанию
+        fallbackLng: 'en', // Язык по умолчанию
         interpolation: {
             escapeValue: false, // Для работы с JSX
         },
