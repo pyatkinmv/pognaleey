@@ -18,6 +18,6 @@ public enum Language {
   }
 
   public static Language getDefault() {
-    return RU;
+    return EN;
   }
 }
